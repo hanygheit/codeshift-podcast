@@ -132,13 +132,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <div className="flex items-end justify-between gap-4">
-          <div><p className="eyebrow">Archive</p><h2 className="mt-3 text-3xl font-bold">Recent episodes</h2></div>
-          <Link to="/episodes" className="text-sm font-semibold text-primary hover:underline">All episodes →</Link>
-        </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-2">{eps.slice(0, 4).map((e) => <EpisodeCard key={e.id} ep={e} />)}</div>
-      </section>
+      <EpisodeBrowser />
 
       <section className="mx-auto max-w-6xl px-5 py-16">
         <p className="eyebrow">Your hosts</p>
