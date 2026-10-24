@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Compact navbar and homepage hero; original larger logo, approved copy, profile links without hero job titles, ITI beneath CTAs; verify desktop/tablet/mobile and public routes.
+- [x] Compact navbar and homepage hero; original larger logo, approved copy, profile links without hero job titles, ITI beneath CTAs; verified desktop/tablet/mobile and public routes.
 
 - [x] Focused hero/header refinement: approved wording, portrait links, dual waveforms and supplied ITI header/footer badges; verify desktop/mobile and existing navigation
 
@@ -13,4 +13,4 @@
 - [ ] Backend PDF via Browserless — code done; waiting on BROWSERLESS_API_KEY + publish
 - [x] Home: Upcoming Episode (YouTube) + Explore Episodes
 - [ ] Upcoming Episode live data — waiting on YOUTUBE_API_KEY
-- [x] ITI support badge: inline beside the hero slogan, no extra row, smaller
+- [x] ITI support badge: compact beneath hero CTAs within left column; existing footer acknowledgment retained.
