@@ -1,6 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, List, Maximize2, Minimize2, X } from 'lucide-react';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Episode } from '@/content/types';
 import { formatDate, pad } from '@/content/episodes';
 import { boundedSlide } from '@/lib/deck-model';
@@ -9,15 +9,7 @@ import { DownloadPdfButton } from './download-pdf';
 import { Button } from '@/components/ui/button';
 
 export function Scaled({ children, className = '' }: { children: ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0);
-  useLayoutEffect(() => {
-    const el = ref.current; if (!el) return;
-    const update = () => setScale(el.clientWidth / 1920);
-    const observer = new ResizeObserver(update); observer.observe(el); update();
-    return () => observer.disconnect();
-  }, []);
-  return <div ref={ref} className={`relative aspect-video w-full overflow-hidden ${className}`}><div className="absolute left-0 top-0 origin-top-left" style={{ transform: `scale(${scale})`, visibility: scale ? 'visible' : 'hidden' }}>{children}</div></div>;
+  return <div className={`deck-scaled relative aspect-video w-full overflow-hidden ${className}`}>{children}</div>;
 }
 
 export function DeckPlayer({ ep, slideId }: { ep: Episode; slideId?: string | undefined }) {

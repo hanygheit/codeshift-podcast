@@ -154,6 +154,7 @@
 @font-face { font-family: Deckbody; src: url('/fonts/deck-body.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: Deckmono; src: url('/fonts/deck-mono.ttf') format('truetype'); font-display: swap; }
 .deck-slide { display: block; letter-spacing: 0; }
+.deck-scaled > svg { width: 100%; height: 100%; }
 .deck-link-target:hover { stroke: var(--deck-teal); stroke-width: 3px; }
 .presentation-shell { height: calc(100dvh - 72px); min-height: 420px; display: flex; flex-direction: column; background: var(--background); }
 .presentation-toolbar { min-height: 56px; flex-shrink: 0; }
