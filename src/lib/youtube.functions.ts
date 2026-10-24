@@ -81,3 +81,65 @@ export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (
     return { status: "error", message: "We couldn't reach YouTube right now." };
   }
 });
+
+export interface YtRecording {
+  videoId: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  publishedAt: string;
+  url: string;
+}
+export type RecordingsResult = { status: "ok"; items: YtRecording[] } | { status: "unconfigured" } | { status: "error" };
+
+const REC_TTL_MS = 45 * 60 * 1000;
+let recordingsCache: { at: number; value: RecordingsResult } | null = null;
+
+/** ISO-8601 duration (PT1H2M3S) to seconds. */
+function seconds(d = ""): number {
+  const m = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(d);
+  return m ? (+(m[1] ?? 0)) * 3600 + (+(m[2] ?? 0)) * 60 + (+(m[3] ?? 0)) : 0;
+}
+
+/**
+ * Completed, public CodeShift recordings. Uses YOUTUBE_PLAYLIST_ID (the podcast playlist) when set;
+ * otherwise falls back to channel uploads filtered to titles mentioning CodeShift.
+ * Excludes upcoming/live streams, Shorts and clips under 10 minutes.
+ */
+export const getYoutubeRecordings = createServerFn({ method: "GET" }).handler(async (): Promise<RecordingsResult> => {
+  const key = process.env["YOUTUBE_API_KEY"];
+  if (!key) return { status: "unconfigured" };
+  if (recordingsCache && Date.now() - recordingsCache.at < REC_TTL_MS) return recordingsCache.value;
+  const playlist = process.env["YOUTUBE_PLAYLIST_ID"];
+  const channel = process.env["YOUTUBE_CHANNEL_ID"] || CODESHIFT_CHANNEL_ID;
+  try {
+    const list = await yt<{ items?: { contentDetails: { videoId: string } }[] }>("playlistItems",
+      { part: "contentDetails", playlistId: playlist || "UU" + channel.slice(2), maxResults: "50" }, key);
+    const ids = (list.items ?? []).map((i) => i.contentDetails.videoId);
+    let items: YtRecording[] = [];
+    if (ids.length) {
+      const vids = await yt<{ items?: (VideoItem & { snippet: { description: string; publishedAt: string }; contentDetails?: { duration?: string } })[] }>(
+        "videos", { part: "snippet,liveStreamingDetails,status,contentDetails", id: ids.join(",") }, key);
+      items = (vids.items ?? [])
+        .filter((v) => v.status?.privacyStatus === "public" && v.snippet.liveBroadcastContent === "none")
+        .filter((v) => seconds(v.contentDetails?.duration) >= 600)
+        .filter((v) => !!playlist || /codeshift/i.test(v.snippet.title))
+        .map((v) => {
+          const t = v.snippet.thumbnails;
+          return {
+            videoId: v.id, title: v.snippet.title,
+            description: v.snippet.description.split("\n").find((l) => l.trim())?.slice(0, 220) ?? "",
+            thumbnail: (t["medium"] ?? t["high"] ?? t["default"])?.url ?? "",
+            publishedAt: v.liveStreamingDetails?.actualStartTime ?? v.snippet.publishedAt,
+            url: `https://www.youtube.com/watch?v=${v.id}`,
+          };
+        });
+    }
+    const value: RecordingsResult = { status: "ok", items };
+    recordingsCache = { at: Date.now(), value };
+    return value;
+  } catch (e) {
+    console.error("YouTube recordings lookup failed", e);
+    return { status: "error" };
+  }
+});
