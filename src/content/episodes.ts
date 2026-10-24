@@ -82,6 +82,59 @@ export const EPISODES: Episode[] = [
       { id: "resources", type: "resources", section: "Learn more", title: "Curated resources", blocks: [{ kind: "resources", ids: ["roadmap-sh", "github-copilot-docs", "anthropic-effective-agents", "fowler-architecture"] }] },
       { id: "closing", type: "closing", section: "CodeShift", title: "Think Beyond the Code.", subtitle: "Join us live every Saturday at 7:00 PM Cairo time.", blocks: [] },
     ],
+    brief: {
+      summaryHeadline: "What You Need to Know",
+      summary: [
+        "AI coding assistants are evolving into agents capable of handling increasingly complex software development tasks. This changes how software is built, but it doesn't remove the need for software engineers.",
+        "Developer value increasingly extends beyond writing code into understanding problems, designing solutions, directing AI-assisted workflows, evaluating trade-offs, validating results, and taking responsibility for the delivered software.",
+        "Strong engineering fundamentals, broader system knowledge, and the ability to work effectively with AI are becoming complementary skills rather than competing alternatives.",
+      ],
+      lessons: [
+        { title: "Software Engineering Is More Than Writing Code", body: "Requirements, design, architecture, testing, debugging, security, deployment, and ownership remain essential, even when AI generates much of the implementation." },
+        { title: "AI Changes the Developer Workflow", body: "Developers increasingly specify, plan, provide context, guide implementation, validate outputs, and manage feedback loops." },
+        { title: "Fundamentals Still Matter", body: "Programming concepts, data structures, databases, operating systems, networking, and software design are necessary for understanding and evaluating AI-generated solutions." },
+        { title: "Juniors Should Learn With AI", body: "AI can accelerate learning and experimentation, but juniors must develop independent debugging, problem-solving, and code-understanding skills." },
+        { title: "Senior Skills Must Evolve", body: "Experienced engineers should deepen architecture, system design, domain knowledge, technical judgment, and effective agentic coding practices." },
+        { title: "Engineering Ownership Remains Human", body: "Generated code requires verification. Developers and engineering teams are accountable for correctness, quality, maintainability, security, and business outcomes." },
+      ],
+      actions: [
+        { role: "Students & Juniors", items: [
+          "Strengthen one fundamentals gap.",
+          "Build a complete working feature.",
+          "Practice explaining and debugging code independently.",
+        ] },
+        { role: "Senior Engineers", items: [
+          "Learn a structured agentic coding workflow.",
+          "Use AI for a bounded engineering task.",
+          "Evaluate the resulting code, tests, and architecture.",
+        ] },
+        { role: "Tech Leads & Engineering Managers", items: [
+          "Establish safe AI usage practices.",
+          "Encourage engineering knowledge sharing.",
+          "Define review and validation standards for AI-assisted work.",
+        ] },
+      ],
+      resourceGroups: [
+        { label: "Engineering Foundations", items: [
+          { title: "Harvard CS50x", provider: "Harvard University", url: "https://cs50.harvard.edu/x/", access: "Free" },
+          { title: "MIT Introduction to Algorithms", provider: "MIT OpenCourseWare", url: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/", access: "Free" },
+          { title: "MIT Missing Semester", provider: "MIT", url: "https://missing.csail.mit.edu/", access: "Free" },
+          { title: "Microsoft Learn — .NET", provider: "Microsoft", url: "https://learn.microsoft.com/en-us/training/dotnet/", access: "Free" },
+        ] },
+        { label: "Practical Software Development", items: [
+          { title: "GitHub Skills", provider: "GitHub", url: "https://skills.github.com/", access: "Free" },
+          { title: "React Official Learning Guide", provider: "react.dev", url: "https://react.dev/learn", access: "Free" },
+        ] },
+        { label: "AI-Assisted & Agentic Coding", items: [
+          { title: "Microsoft Generative AI for Beginners", provider: "Microsoft", url: "https://github.com/microsoft/generative-ai-for-beginners", access: "Free" },
+          { title: "GitHub Copilot Documentation", provider: "GitHub", url: "https://docs.github.com/en/copilot", access: "Free" },
+          { title: "GitHub Copilot Free & Plans", provider: "GitHub", url: "https://github.com/features/copilot/plans", access: "Free tier" },
+          { title: "Claude Code Documentation", provider: "Anthropic", url: "https://code.claude.com/docs/en/overview", access: "Subscription" },
+        ] },
+      ],
+      finalMessage: "AI changes how we write software. Engineering knowledge determines what we build, why it works, and whether we can trust it.",
+      nextEpisode: { label: "Continue to EP002 — The New Developer Playbook", url: "https://www.youtube.com/live/CohumEwctE4" },
+    },
   },
   {
     id: "ep002",

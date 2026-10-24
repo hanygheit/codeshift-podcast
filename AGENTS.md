@@ -11,3 +11,4 @@
 
 - Content is repository-managed in src/content (episodes.ts, resources.ts, site.ts); routes render from it — add episodes by adding records, never by editing route components. Why: single source of truth for pages, slides and PDF.
 - PDF export uses native window.print() with a print-only PrintDeck sharing the SlideView component; never add PDF libraries. Why: user requirement and identical web/print visuals.
+- An episode with a `brief` field (EP001) renders a single scrollable BriefView instead of the SlideView deck on /episodes/$slug/slides — no deck controls; printing shows the brief itself. Why: user requirement "one episode = one slide".
