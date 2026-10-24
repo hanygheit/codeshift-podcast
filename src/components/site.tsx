@@ -37,7 +37,6 @@ const nav = [
 ] as const;
 
 export function SiteHeader() {
-  const latest = episodesNewestFirst()[0]!;
   return (
     <header className="screen-only sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
@@ -50,10 +49,10 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
-          <a href={latest.youtubeUrl} target="_blank" rel="noopener noreferrer"
+          <ExtLink href={SITE.youtube}
             className="ml-2 hidden items-center gap-2 rounded-full bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground sm:inline-flex">
             <Youtube className="h-4 w-4" /> Watch
-          </a>
+          </ExtLink>
         </nav>
       </div>
     </header>
@@ -61,7 +60,6 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
-  const latest = episodesNewestFirst()[0]!;
   return (
     <footer className="screen-only mt-24 border-t">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-3">
@@ -79,7 +77,7 @@ export function SiteFooter() {
           <p className="eyebrow mb-3">Connect</p>
           <ul className="space-y-2">
             <li><ExtLink href={SITE.facebook} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"><Facebook className="h-4 w-4" /> Facebook</ExtLink></li>
-            <li><ExtLink href={latest.youtubeUrl} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"><Youtube className="h-4 w-4" /> Watch on YouTube</ExtLink></li>
+            <li><ExtLink href={SITE.youtube} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"><Youtube className="h-4 w-4" /> Watch on YouTube</ExtLink></li>
             {HOSTS.map((h) => <li key={h.name}><ExtLink href={h.linkedin} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"><Linkedin className="h-4 w-4" /> {h.name}</ExtLink></li>)}
           </ul>
           <p className="mt-4 text-muted-foreground">{SITE.schedule}</p>
