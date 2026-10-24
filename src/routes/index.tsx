@@ -5,7 +5,7 @@ import { UpcomingEpisode } from "@/components/upcoming-episode";
 import { archiveSearchSchema } from "@/lib/archive";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { ExtLink, HostCard, Tag } from "@/components/site";
+import { ExtLink, HostCard, SupportBadge, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
 
 export const Route = createFileRoute("/")({
@@ -79,6 +79,9 @@ function Home() {
                   </div>
                 ))}
               </figcaption>
+            </div>
+            <div className="mt-3 flex justify-center">
+              <SupportBadge className="p-1.5" imgClassName="h-8 w-auto" />
             </div>
           </figure>
         </div>

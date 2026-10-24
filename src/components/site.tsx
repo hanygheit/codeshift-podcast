@@ -6,7 +6,7 @@ import logoAsset from "@/assets/codeshift-logo.png.asset.json";
 import itiSupport from "@/assets/iti-support.png.asset.json";
 import { Button } from "@/components/ui/button";
 
-function SupportBadge({ className = "w-28 p-2", imgClassName = "h-auto w-full" }: { className?: string; imgClassName?: string }) {
+export function SupportBadge({ className = "w-28 p-2", imgClassName = "h-auto w-full" }: { className?: string; imgClassName?: string }) {
   return (
     <div className={`inline-flex shrink-0 rounded-md border border-support-border bg-support ${className}`}>
       <img src={itiSupport.url} alt="Supported by — Information Technology Institute (ITI)" width={1124} height={705} className={`block ${imgClassName}`} />
@@ -59,11 +59,6 @@ export function SiteHeader() {
         <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
-      </div>
-      <div className="border-t bg-secondary/40">
-        <div className="mx-auto flex max-w-7xl items-center justify-center px-5 py-1.5">
-          <SupportBadge className="p-2" imgClassName="h-10 w-auto" />
-        </div>
       </div>
       {open && (
         <nav aria-label="Mobile" className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
