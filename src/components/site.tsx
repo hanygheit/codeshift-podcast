@@ -53,7 +53,7 @@ export function SiteHeader() {
         <Wordmark prominent />
         <nav aria-label="Main" className="hidden items-center gap-1 text-sm lg:flex">
           {nav.map((n) => (
-            <Link key={n.label} to={n.to} hash={"hash" in n ? n.hash : undefined} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
+            <Link key={n.label} to={n.to} {...("hash" in n ? { hash: n.hash } : {})} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
               {n.label}
             </Link>
           ))}
@@ -68,7 +68,7 @@ export function SiteHeader() {
       {open && (
         <nav aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
           {nav.map((n) => (
-            <Link key={n.label} to={n.to} hash={"hash" in n ? n.hash : undefined} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
+            <Link key={n.label} to={n.to} {...("hash" in n ? { hash: n.hash } : {})} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
               className="block rounded-md px-3 py-3 text-muted-foreground" activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}>
               {n.label}
             </Link>
@@ -92,7 +92,7 @@ export function SiteFooter() {
         <div className="text-sm">
           <p className="eyebrow mb-3">Explore</p>
           <ul className="space-y-2">
-            {nav.map((n) => <li key={n.to}><Link to={n.to} className="text-muted-foreground hover:text-foreground">{n.label}</Link></li>)}
+            {nav.map((n) => <li key={n.label}><Link to={n.to} {...("hash" in n ? { hash: n.hash } : {})} className="text-muted-foreground hover:text-foreground">{n.label}</Link></li>)}
             <li><ExtLink href={SITE.facebook} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"><Facebook className="h-4 w-4" /> Facebook</ExtLink></li>
             <li><ExtLink href={SITE.youtube} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"><Youtube className="h-4 w-4" /> YouTube</ExtLink></li>
           </ul>
