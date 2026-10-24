@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { Episode } from "@/content/types";
 
 export const PAGE_SIZE = 10;
+export const HOME_PAGE_SIZE = 5;
 
 export const archiveSearchSchema = z.object({
   q: z.string().optional().catch(undefined),
