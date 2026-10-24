@@ -110,3 +110,14 @@ function Home() {
     </PageShell>
   );
 }
+
+const WAVE = [6, 12, 20, 9, 26, 16, 30, 12, 22, 8, 18, 28, 14, 24, 10, 20, 6, 16, 26, 12, 22, 9, 18, 30, 14, 8, 20, 12];
+function Waveform() {
+  return (
+    <div className="flex h-8 items-end gap-[3px]" aria-hidden>
+      {WAVE.map((h, i) => (
+        <span key={i} className="wave-bar w-[3px] rounded-full bg-gradient-to-t from-primary to-teal" style={{ height: h, animationDelay: `${(i % 7) * 0.12}s` }} />
+      ))}
+    </div>
+  );
+}
