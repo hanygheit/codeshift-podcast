@@ -30,7 +30,7 @@ export function filterEpisodes(episodes: Episode[], s: ArchiveSearch, pageSize =
   list = [...list].sort((a, b) =>
     sort === "number" ? a.number - b.number
     : sort === "oldest" ? a.scheduledDate.localeCompare(b.scheduledDate)
-    : b.scheduledDate.localeCompare(a.scheduledDate),
+    : b.number - a.number,
   );
   const total = list.length;
   const pageCount = Math.max(1, Math.ceil(total / pageSize));

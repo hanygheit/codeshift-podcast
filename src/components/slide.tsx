@@ -2,7 +2,7 @@ import { CheckCircle2, ExternalLink } from "lucide-react";
 import type { Episode, Slide, SlideBlock } from "@/content/types";
 import { getResource } from "@/content/resources";
 import { pad } from "@/content/episodes";
-import { BrandMark } from "./site";
+import { Logo } from "./site";
 
 function Block({ b }: { b: SlideBlock }) {
   switch (b.kind) {
@@ -87,7 +87,7 @@ export function SlideView({ ep, slide, index }: { ep: Episode; slide: Slide; ind
     <div className="slide-canvas relative rounded-xl">
       <div className="slide-inner flex h-full flex-col p-[2.6em]">
         <div className="flex items-center justify-between font-mono text-[0.75em] uppercase tracking-[0.2em] text-muted-foreground">
-          <span className="flex items-center gap-[0.6em]"><BrandMark className="h-[1.8em] w-[1.8em]" /> CodeShift · EP{pad(ep.number)}</span>
+          <span className="flex items-center gap-[0.6em]"><Logo className="h-[1.8em] w-[1.8em]" /> CodeShift · EP{pad(ep.number)}</span>
           <span>{slide.section}</span>
         </div>
         {hero ? (
@@ -113,19 +113,3 @@ export function SlideView({ ep, slide, index }: { ep: Episode; slide: Slide; ind
   );
 }
 
-/** All slides, visible only when printing (Save as PDF). */
-export function PrintDeck({ ep }: { ep: Episode }) {
-  return (
-    <div className="print-deck" aria-hidden="true">
-      {ep.slides.map((s, i) => <div key={s.id} className="print-page"><SlideView ep={ep} slide={s} index={i} /></div>)}
-    </div>
-  );
-}
-
-export function printDeck(ep: Episode) {
-  const prev = document.title;
-  document.title = `CodeShift EP${pad(ep.number)} - ${ep.shortTitle} - Reference Slides`;
-  const restore = () => { document.title = prev; window.removeEventListener("afterprint", restore); };
-  window.addEventListener("afterprint", restore);
-  window.print();
-}

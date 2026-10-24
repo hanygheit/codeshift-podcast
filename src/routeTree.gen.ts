@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as EpisodesIndexRouteImport } from './routes/episodes.index'
 import { Route as EpisodesSlugRouteImport } from './routes/episodes.$slug'
 import { Route as EpisodesSlugSlidesRouteImport } from './routes/episodes.$slug_.slides'
+import { Route as ApiPublicPdfSlugRouteImport } from './routes/api/public/pdf.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const EpisodesSlugSlidesRoute = EpisodesSlugSlidesRouteImport.update({
   path: '/episodes/$slug/slides',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPdfSlugRoute = ApiPublicPdfSlugRouteImport.update({
+  id: '/api/public/pdf/$slug',
+  path: '/api/public/pdf/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/episodes/$slug': typeof EpisodesSlugRoute
   '/episodes/': typeof EpisodesIndexRoute
   '/episodes/$slug/slides': typeof EpisodesSlugSlidesRoute
+  '/api/public/pdf/$slug': typeof ApiPublicPdfSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/episodes/$slug': typeof EpisodesSlugRoute
   '/episodes': typeof EpisodesIndexRoute
   '/episodes/$slug/slides': typeof EpisodesSlugSlidesRoute
+  '/api/public/pdf/$slug': typeof ApiPublicPdfSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/episodes/$slug': typeof EpisodesSlugRoute
   '/episodes/': typeof EpisodesIndexRoute
   '/episodes/$slug_/slides': typeof EpisodesSlugSlidesRoute
+  '/api/public/pdf/$slug': typeof ApiPublicPdfSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/episodes/$slug'
     | '/episodes/'
     | '/episodes/$slug/slides'
+    | '/api/public/pdf/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/episodes/$slug'
     | '/episodes'
     | '/episodes/$slug/slides'
+    | '/api/public/pdf/$slug'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/episodes/$slug'
     | '/episodes/'
     | '/episodes/$slug_/slides'
+    | '/api/public/pdf/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   EpisodesSlugRoute: typeof EpisodesSlugRoute
   EpisodesIndexRoute: typeof EpisodesIndexRoute
   EpisodesSlugSlidesRoute: typeof EpisodesSlugSlidesRoute
+  ApiPublicPdfSlugRoute: typeof ApiPublicPdfSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -152,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EpisodesSlugSlidesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/pdf/$slug': {
+      id: '/api/public/pdf/$slug'
+      path: '/api/public/pdf/$slug'
+      fullPath: '/api/public/pdf/$slug'
+      preLoaderRoute: typeof ApiPublicPdfSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   EpisodesSlugRoute: EpisodesSlugRoute,
   EpisodesIndexRoute: EpisodesIndexRoute,
   EpisodesSlugSlidesRoute: EpisodesSlugSlidesRoute,
+  ApiPublicPdfSlugRoute: ApiPublicPdfSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
