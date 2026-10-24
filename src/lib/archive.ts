@@ -13,7 +13,7 @@ export const archiveSearchSchema = z.object({
 });
 export type ArchiveSearch = z.infer<typeof archiveSearchSchema>;
 
-export function filterEpisodes(episodes: Episode[], s: ArchiveSearch) {
+export function filterEpisodes(episodes: Episode[], s: ArchiveSearch, pageSize = PAGE_SIZE) {
   const q = s.q?.trim().toLowerCase();
   let list = episodes.filter((e) => {
     if (q) {
@@ -32,7 +32,7 @@ export function filterEpisodes(episodes: Episode[], s: ArchiveSearch) {
     : b.scheduledDate.localeCompare(a.scheduledDate),
   );
   const total = list.length;
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const page = Math.min(Math.max(1, s.page ?? 1), pageCount);
-  return { items: list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), total, page, pageCount };
+  return { items: list.slice((page - 1) * pageSize, page * pageSize), total, page, pageCount, pageSize };
 }
