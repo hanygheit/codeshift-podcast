@@ -45,6 +45,24 @@ export interface Slide {
   blocks: SlideBlock[];
 }
 
+export interface BriefResource {
+  title: string;
+  provider: string;
+  url: string;
+  /** How the resource is accessed — shown so free material is distinguishable from paid tools. */
+  access: "Free" | "Free tier" | "Subscription";
+}
+
+export interface EpisodeBrief {
+  summaryHeadline: string;
+  summary: string[];
+  lessons: { title: string; body: string }[];
+  actions: { role: string; items: string[] }[];
+  resourceGroups: { label: string; items: BriefResource[] }[];
+  finalMessage: string;
+  nextEpisode?: { label: string; url: string };
+}
+
 export interface Episode {
   id: string;
   number: number;
@@ -66,4 +84,6 @@ export interface Episode {
   actionItems: string[];
   resourceIds: string[];
   slides: Slide[];
+  /** When set, the episode presents a single scrollable executive brief instead of a slide deck. */
+  brief?: EpisodeBrief;
 }
