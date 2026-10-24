@@ -101,7 +101,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-14">
+      <section id="hosts" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-14">
         <p className="eyebrow">Meet the hosts</p>
         <h2 className="mt-2 text-2xl font-bold">Hany & Ahmed</h2>
         <div className="mt-6 grid gap-5 md:grid-cols-2">{HOSTS.map((h) => <HostCard key={h.name} host={h} />)}</div>
