@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ChevronLeft, ChevronRight, Copy, FileDown, List, Maximize2, X, Youtube } from "lucide-react";
+import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Copy, FileDown, List, Maximize2, X, Youtube } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { PrintDeck, printDeck, SlideView } from "@/components/slide";
