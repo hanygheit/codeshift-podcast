@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FileDown, Loader2, RotateCcw } from 'lucide-react';
 import type { Episode } from '@/content/types';
-import { pdfFilename } from '@/lib/pdf';
+import { contentVersion, pdfFilename } from '@/lib/pdf';
 import { deliverFile } from '@/lib/download';
 import { Button } from '@/components/ui/button';
 
@@ -14,7 +14,7 @@ export function DownloadPdfButton({ ep, className }: { ep: Episode; className?: 
     if (prepared) { void deliverFile(prepared, pdfFilename(ep)); return; }
     setState('loading'); setError('');
     try {
-      const res = await fetch(`/api/public/pdf/${ep.slug}`, { signal: AbortSignal.timeout(60_000) });
+       const res = await fetch(`/api/public/pdf/${ep.slug}?v=${contentVersion(ep)}`, { signal: AbortSignal.timeout(60_000) });
       if (!res.ok) { const body = await res.json().catch(() => ({})); throw new Error(body.error ?? 'PDF generation failed. Please retry.'); }
       const blob = await res.blob();
       if (blob.type !== 'application/pdf' || blob.size === 0) throw new Error('The PDF could not be downloaded. Please retry.');

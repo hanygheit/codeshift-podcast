@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getEpisode } from '@/content/episodes';
 import { contentVersion, PDF_SOURCE_ORIGIN, pdfFilename } from '@/lib/pdf';
+import { readPdfCache, writePdfCache } from '@/lib/pdf-cache.server';
 
 const memory = new Map<string, Uint8Array>();
 const pending = new Map<string, Promise<Uint8Array>>();
@@ -11,7 +12,7 @@ export const Route = createFileRoute('/api/public/pdf/$slug')({
     const key = `${ep.slug}/${contentVersion(ep)}`;
     const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
     const cacheKey = new Request(`${PDF_SOURCE_ORIGIN}/__pdf-cache/${key}`);
-    const cached = await cache?.match(cacheKey);
+     const cached = await readPdfCache(cache, cacheKey);
     if (cached) return cached;
     try {
       let data = memory.get(key);
@@ -30,7 +31,7 @@ export const Route = createFileRoute('/api/public/pdf/$slug')({
         'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${pdfFilename(ep)}"`,
         'Cache-Control': 'public, max-age=3600', 'X-Content-Type-Options': 'nosniff',
       } });
-      if (cache) await cache.put(cacheKey, response.clone());
+       await writePdfCache(cache, cacheKey, response);
       return response;
     } catch (error) {
       console.error('Local PDF generation failed', error);

@@ -1,7 +1,7 @@
 import { PDFDocument, PDFName, PDFString, rgb, type PDFPage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import fontData from '@/assets/deck-fonts.json';
-import imageData from '@/assets/deck-images.json';
+import imageData from '@/assets/deck-pdf-images.json';
 import { buildDeck, SLIDE_HEIGHT, SLIDE_WIDTH, type Ink } from './deck-model';
 import type { Episode } from '@/content/types';
 import designTokens from '@/styles.css?raw';
@@ -38,7 +38,9 @@ export async function generateDeckPdf(ep: Episode): Promise<Uint8Array> {
         let image = images.get(node.src);
         if (!image) {
           const encoded = (imageData as Record<string, string>)[node.src];
-          if (encoded) image = await doc.embedPng(bytes(encoded));
+           // JPEG streams embed directly: avoid decoding/recompressing megapixel PNGs
+           // during each request, which can exhaust the hosted CPU budget.
+           if (encoded) image = await doc.embedJpg(bytes(encoded));
           else {
             // Only repository-authored asset destinations, never a caller-provided URL.
             const response = await fetch(new URL(node.src, 'https://codeshift-podcast.lovable.app'), { signal: AbortSignal.timeout(10_000) });
