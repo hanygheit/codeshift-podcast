@@ -116,6 +116,7 @@ function EpisodePage() {
               <button aria-label="Next slide" disabled={preview === ep.slides.length - 1} onClick={() => setPreview(preview + 1)} className="rounded-full border p-2 disabled:opacity-30"><ArrowRight className="h-4 w-4" /></button>
             </div>
           </section>
+          )}
 
           <section className="mt-16">
             <h2 className="text-2xl font-bold">Curated resources</h2>
@@ -137,7 +138,7 @@ function EpisodePage() {
           </nav>
         </article>
       </PageShell>
-      <PrintDeck ep={ep} />
+      {ep.brief ? <div className="print-deck"><BriefView ep={ep} /></div> : <PrintDeck ep={ep} />}
     </>
   );
 }
