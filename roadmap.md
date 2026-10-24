@@ -6,6 +6,7 @@
 
 - [x] Harden PDF preparation: efficient original-artwork derivatives, nonfatal caching, versioned download requests; both presentation downloads verified and 13 relevant tests pass.
 - [ ] Verify corrected PDFs on the published site — waiting for publication of the tested changes.
+- [x] Hero portrait captions: "Senior Software Engineering Manager" under each host name, above the LinkedIn Profile link; verified desktop/tablet/phone, no overflow.
 
 - [x] Compact navbar and homepage hero; original larger logo, approved copy, profile links without hero job titles, ITI beneath CTAs; verified desktop/tablet/mobile and public routes.
 
