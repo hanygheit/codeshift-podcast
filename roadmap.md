@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Compact navbar and homepage hero; original larger logo, approved copy, profile links without hero job titles, ITI beneath CTAs; verify desktop/tablet/mobile and public routes.
+
 - [x] Focused hero/header refinement: approved wording, portrait links, dual waveforms and supplied ITI header/footer badges; verify desktop/mobile and existing navigation
 
 - [x] Global sticky nav with real logo + mobile menu on all pages
