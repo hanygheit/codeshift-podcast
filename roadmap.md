@@ -1,6 +1,7 @@
 # Roadmap
 
-- [ ] Correct hosted PDF preparation failure and verify both episode downloads.
+- [x] Harden PDF preparation: efficient original-artwork derivatives, nonfatal caching, versioned download requests; both presentation downloads verified and 13 relevant tests pass.
+- [ ] Verify corrected PDFs on the published site — waiting for publication of the tested changes.
 
 - [x] Compact navbar and homepage hero; original larger logo, approved copy, profile links without hero job titles, ITI beneath CTAs; verified desktop/tablet/mobile and public routes.
 
