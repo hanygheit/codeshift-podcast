@@ -39,7 +39,7 @@ function Home() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-10 md:grid-cols-2 md:py-12 lg:gap-14">
           <div>
             <p className="eyebrow">Weekly Arabic Tech Podcast</p>
-            <h1 className="mt-4 max-w-xl text-4xl font-bold leading-[1.18] lg:text-5xl">
+            <h1 className="mt-4 max-w-xl text-3xl font-bold leading-[1.18] sm:text-4xl lg:text-5xl">
               Software Engineering <span className="text-teal">in the AI Era.</span>
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground lg:text-lg">
@@ -63,6 +63,7 @@ function Home() {
                   </div>
                 ))}
               </div>
+              <div className="h-14 sm:hidden" aria-hidden="true" />
               <div className="pointer-events-none absolute inset-0 bg-portrait-overlay" />
               <div className="absolute left-4 top-4 rounded-full border bg-background/70 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-teal backdrop-blur">
                 Your hosts
@@ -71,7 +72,7 @@ function Home() {
                 {HOSTS.map((h, i) => (
                   <div key={h.name} className="min-w-0 px-3 pb-4 sm:px-5 sm:pb-5">
                     <Waveform offset={i} />
-                    <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${h.name} on LinkedIn (opens in a new tab)"`.slice(0, -1)} className="mt-3 block w-fit font-display text-sm font-semibold text-foreground transition-colors hover:text-teal sm:text-base lg:text-lg">{h.name}</a>
+                    <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${h.name} on LinkedIn (opens in a new tab)`} className="mt-3 block w-fit font-display text-sm font-semibold text-foreground transition-colors hover:text-teal sm:text-base lg:text-lg">{h.name}</a>
                     <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`View ${h.name}'s LinkedIn profile (opens in a new tab)`} className="mt-1 inline-flex min-h-8 items-center gap-1.5 text-[11px] font-semibold text-teal hover:underline sm:text-xs">
                       <Linkedin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> LinkedIn Profile <ArrowRight className="h-3 w-3 shrink-0" aria-hidden="true" />
                     </a>

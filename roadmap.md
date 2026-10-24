@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Focused hero/header refinement: approved wording, portrait links, dual waveforms and supplied ITI header/footer badges; verify desktop/mobile and existing navigation
+- [x] Focused hero/header refinement: approved wording, portrait links, dual waveforms and supplied ITI header/footer badges; verify desktop/mobile and existing navigation
 
 - [x] Global sticky nav with real logo + mobile menu on all pages
 - [x] Simplified home (no global resource directory)
