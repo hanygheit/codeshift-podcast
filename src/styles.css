@@ -156,20 +156,23 @@
 .deck-slide { display: block; letter-spacing: 0; }
 .deck-scaled > svg { width: 100%; height: 100%; }
 .deck-link-target:hover { stroke: var(--deck-teal); stroke-width: 3px; }
-.presentation-shell { height: calc(100dvh - 72px); min-height: 420px; display: flex; flex-direction: column; background: var(--background); }
-.presentation-toolbar { min-height: 56px; flex-shrink: 0; }
-.presentation-stage { overflow: hidden; padding: 12px 18px; }
-.presentation-canvas { width: min(100%, calc((100dvh - 222px) * 16 / 9)); }
+.presentation-shell { height: calc(100dvh - 72px); min-height: 360px; display: flex; flex-direction: column; background: var(--background); }
+.presentation-toolbar { min-height: 48px; flex-shrink: 0; }
+.presentation-stage { overflow: hidden; padding: 4px 8px; container-type: size; }
+.presentation-canvas { width: min(100cqw, calc(100cqh * 16 / 9)); }
 .presentation-reading { display: none; }
 .presentation-immersive { position: fixed; inset: 0; z-index: 100; height: 100dvh; min-height: 0; }
-.presentation-immersive .presentation-canvas { width: min(100%, calc((100dvh - 90px) * 16 / 9)); }
+.presentation-immersive .presentation-canvas { width: min(100cqw, calc(100cqh * 16 / 9)); }
 @media (min-width: 1024px) { .presentation-shell:not(.presentation-immersive) { height: calc(100dvh - 74px); } }
 @media (max-width: 700px) and (orientation: portrait) {
   .presentation-shell { min-height: 0; }
   .presentation-stage { overflow-y: auto; padding: 0; overscroll-behavior: contain; touch-action: pan-y; }
   .presentation-canvas { display: none; }
   .presentation-reading { display: block; }
-  .presentation-toolbar { min-height: 54px; gap: 2px; }
+  .presentation-toolbar { min-height: 48px; gap: 0; padding-inline: 4px; }
+  .presentation-toolbar button { padding-inline: 8px; }
+  .presentation-toolbar a { padding-inline: 8px; }
+  .presentation-toolbar > span { font-size: 11px; }
   .presentation-navigation { gap: 12px; }
   .presentation-navigation input { width: min(45vw, 220px); }
 }
@@ -177,5 +180,5 @@
   .presentation-shell { min-height: 0; }
   .presentation-toolbar { min-height: 44px; }
   .presentation-navigation { padding-block: 4px; }
-  .presentation-canvas { width: min(100%, calc((100dvh - 184px) * 16 / 9)); }
+  .presentation-canvas { width: min(100cqw, calc(100cqh * 16 / 9)); }
 }
