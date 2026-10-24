@@ -37,7 +37,8 @@ export const Route = createFileRoute("/episodes/$slug_/slides")({
 
 function Slides() {
   const { slug } = Route.useLoaderData();
-  const ep = getEpisode(slug)!;
+  const ep = getEpisode(slug);
+  if (!ep) return null;
   const s = Route.useSearch();
   if (s.export) return <ExportDeck ep={ep} />;
   return (
