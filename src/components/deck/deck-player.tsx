@@ -95,7 +95,7 @@ export function DeckPlayer({ ep, slideId }: { ep: Episode; slideId?: string }) {
         <main className="flex min-w-0 flex-1 items-center justify-center"
           onTouchStart={(e) => (touchX.current = e.touches[0]!.clientX)}
           onTouchEnd={(e) => { if (touchX.current === null) return; const dx = e.changedTouches[0]!.clientX - touchX.current; if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1)); touchX.current = null; }}>
-          <div className="w-full" style={{ maxWidth: fs ? "calc((100vh - 5rem) * 16 / 9)" : "calc((100vh - 13rem) * 16 / 9)" }}>
+          <div className="w-full" style={{ maxWidth: fs ? "calc((100vh - 5rem) * 16 / 9)" : "calc((100vh - 15rem) * 16 / 9)" }}>
             <Scaled className="rounded-xl border shadow-glow">
               <div key={slides[i]!.id} className="animate-in fade-in duration-300"><SlideFrame ep={ep} slide={slides[i]!} index={i} total={total} /></div>
             </Scaled>

@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Content is repository-managed in src/content (episodes.ts, resources.ts, site.ts); routes render from it — add episodes by adding records, never by editing route components. Why: single source of truth for pages, slides and PDF.
-- PDF export uses native window.print() with a print-only PrintDeck sharing the SlideView component; never add PDF libraries. Why: user requirement and identical web/print visuals.
-- An episode with a `brief` field (EP001, EP002) renders a single scrollable BriefView instead of the SlideView deck on /episodes/$slug/slides — no deck controls; printing shows the brief itself. Briefs may add optional sections (packages, careerLevels, juniorAi, adoption, caseStudy) rendered by BriefView when present. Why: user requirement "one episode = one slide".
-- Home episode actions use EpisodeTable; the learning directory derives links from episode briefs, and home PDF actions render the shared brief/deck before native printing. Why: direct access without duplicated editorial content or PDF libraries.
+
+- Episode presentations are built by buildDeck() (src/components/deck) from episode data and rendered on a fixed 1920×1080 SlideFrame; the player, thumbnails and the `?export=1` view share it. Why: one visual source for web and PDF.
+- PDFs are rendered server-side by Browserless via /api/public/pdf/$slug loading the published `?export=1` view from a fixed origin; never use window.print or client PDF libraries. Bump DECK_DESIGN_VERSION when slide design changes. Why: slide-accurate downloadable PDFs, cache invalidation.
+- Learning resources live on each episode (EpisodeResources) — never a global directory on the home page. Why: user requirement.

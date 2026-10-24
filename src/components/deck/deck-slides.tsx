@@ -96,7 +96,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
       <div className="grid h-full grid-cols-[0.8fr_1.2fr] gap-20">
         <div className="flex flex-col justify-center">
           <Kicker>Executive summary</Kicker>
-          <h2 className="mt-5 font-display text-[88px] font-bold leading-none tracking-tight text-gradient">{b.summaryHeadline}</h2>
+          <h2 className="mt-5 font-display text-[88px] font-bold leading-none tracking-tight text-teal">{b.summaryHeadline}</h2>
         </div>
         <div className="flex flex-col justify-center gap-7 border-l-4 border-teal/70 pl-14">
           {b.summary.map((p) => <p key={p} className="text-[29px] leading-[1.38] text-foreground/90">{p}</p>)}
@@ -154,7 +154,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
         <div className="flex h-full flex-col justify-center">
           <Kicker>AI-assisted learning & agentic coding</Kicker>
           <div className="mt-3"><Title>Should juniors use AI?</Title></div>
-          <p className="mt-8 max-w-[1500px] font-display text-[44px] font-semibold leading-tight text-gradient">{j.message}</p>
+          <p className="mt-8 max-w-[1500px] font-display text-[44px] font-semibold leading-tight text-teal">{j.message}</p>
           <div className="mt-14 flex items-center gap-5">
             {j.modes.map((m, i) => (
               <div key={m} className="flex items-center gap-5">
@@ -279,7 +279,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
     body: (
       <div className="flex h-full flex-col items-center justify-center text-center">
         <Quote className="h-16 w-16 text-teal" />
-        <p className="mt-8 max-w-[1500px] font-display text-[60px] font-bold leading-[1.12] text-gradient">{b.finalMessage}</p>
+        <p className="mt-8 max-w-[1500px] font-display text-[60px] font-bold leading-[1.12] text-teal">{b.finalMessage}</p>
         {b.resourcesNote && <p className="mt-8 max-w-[1300px] text-[22px] text-muted-foreground">{b.resourcesNote}</p>}
         <div className="mt-12 flex gap-6">
           <WatchLink ep={ep} />
