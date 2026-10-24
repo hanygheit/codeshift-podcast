@@ -5,7 +5,7 @@ import { UpcomingEpisode } from "@/components/upcoming-episode";
 import { archiveSearchSchema } from "@/lib/archive";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { ExtLink, HostCard, Tag } from "@/components/site";
+import { ExtLink, HostCard, SupportBadge, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
 
 export const Route = createFileRoute("/")({
@@ -80,6 +80,7 @@ function Home() {
                 ))}
               </figcaption>
             </div>
+            <div className="absolute right-4 top-4"><SupportBadge className="p-1.5" imgClassName="h-7 w-auto" /></div>
           </figure>
         </div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
