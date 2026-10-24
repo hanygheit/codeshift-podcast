@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Content is repository-managed in src/content (episodes.ts, resources.ts, site.ts); routes render from it — add episodes by adding records, never by editing route components. Why: single source of truth for pages, slides and PDF.
+- PDF export uses native window.print() with a print-only PrintDeck sharing the SlideView component; never add PDF libraries. Why: user requirement and identical web/print visuals.
