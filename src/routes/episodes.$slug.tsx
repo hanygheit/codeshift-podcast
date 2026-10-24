@@ -97,6 +97,13 @@ function EpisodePage() {
             <ul className="mt-4 grid gap-3 md:grid-cols-2">{ep.actionItems.map((a) => <li key={a} className="flex gap-3 rounded-xl border bg-card p-4"><CheckCircle2 className="h-5 w-5 shrink-0 text-teal" />{a}</li>)}</ul>
           </section>
 
+          {ep.brief ? (
+            <section className="mt-16 rounded-3xl border bg-hero p-8 text-center md:p-10">
+              <h2 className="text-2xl font-bold">Executive summary</h2>
+              <p className="mx-auto mt-2 max-w-xl text-muted-foreground">One scrollable brief: the executive summary, six key lessons, role-based action items and every curated learning resource.</p>
+              <Link to="/episodes/$slug/slides" params={{ slug: ep.slug }} className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 font-semibold text-primary-foreground">View Summary <ArrowRight className="h-4 w-4" /></Link>
+            </section>
+          ) : (
           <section className="mt-16">
             <div className="flex items-end justify-between gap-4">
               <h2 className="text-2xl font-bold">Reference slides</h2>
