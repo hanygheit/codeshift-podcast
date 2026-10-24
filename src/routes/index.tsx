@@ -81,7 +81,7 @@ function Home() {
               </figcaption>
             </div>
             <div className="mt-3 flex justify-center">
-              <SupportBadge className="p-1.5" imgClassName="h-8 w-auto" />
+              <SupportBadge className="p-2" imgClassName="h-8 w-auto" />
             </div>
           </figure>
         </div>
