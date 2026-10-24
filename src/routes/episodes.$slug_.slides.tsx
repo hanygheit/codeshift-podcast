@@ -1,9 +1,12 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ChevronLeft, ChevronRight, Copy, FileDown, List, Maximize2, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Copy, FileDown, List, Maximize2, X, Youtube } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { PrintDeck, printDeck, SlideView } from "@/components/slide";
+import { BriefView, printBrief } from "@/components/brief";
+import { ExtLink } from "@/components/site";
 import { getEpisode, pad } from "@/content/episodes";
+import type { Episode } from "@/content/types";
 
 export const Route = createFileRoute("/episodes/$slug_/slides")({
   validateSearch: z.object({ slide: z.string().optional().catch(undefined) }),
@@ -15,13 +18,14 @@ export const Route = createFileRoute("/episodes/$slug_/slides")({
   head: ({ params, loaderData }) => {
     const ep = loaderData ? getEpisode(loaderData.slug) : undefined;
     if (!ep) return { meta: [{ title: "Slides unavailable — CodeShift" }, { name: "robots", content: "noindex" }] };
-    const title = `EP${pad(ep.number)} Reference Slides — CodeShift`;
+    const title = ep.brief ? `EP${pad(ep.number)} Executive Brief — CodeShift` : `EP${pad(ep.number)} Reference Slides — CodeShift`;
+    const desc = ep.brief ? `One-page executive brief for “${ep.title}” — summary, key lessons, action items and resources.` : `Interactive reference deck for “${ep.title}”.`;
     return {
       meta: [
         { title },
-        { name: "description", content: `Interactive reference deck for “${ep.title}”.` },
+        { name: "description", content: desc },
         { property: "og:title", content: title },
-        { property: "og:description", content: `Interactive reference deck for “${ep.title}”.` },
+        { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
@@ -30,6 +34,27 @@ export const Route = createFileRoute("/episodes/$slug_/slides")({
   },
   component: Slides,
 });
+
+/** Episodes with a brief render one scrollable knowledge sheet — no deck controls. */
+function BriefPage({ ep }: { ep: Episode }) {
+  const btn = "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm hover:bg-secondary";
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="screen-only sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-2 px-4 py-3">
+          <Link to="/episodes/$slug" params={{ slug: ep.slug }} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" /> EP{pad(ep.number)} details
+          </Link>
+          <div className="flex flex-wrap gap-2">
+            <ExtLink href={ep.youtubeUrl} className={btn}><Youtube className="h-4 w-4" /> Watch Full Episode</ExtLink>
+            <button onClick={() => printBrief(ep)} className={btn} title="Choose “Save as PDF” in the print dialog"><FileDown className="h-4 w-4" /> Save as PDF</button>
+          </div>
+        </div>
+      </header>
+      <main className="px-4 py-10"><BriefView ep={ep} /></main>
+    </div>
+  );
+}
 
 function Slides() {
   const { slug } = Route.useLoaderData();
