@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { ExtLink, Tag } from "@/components/site";
 import { PrintDeck, printDeck, SlideView } from "@/components/slide";
+import { BriefView, printBrief } from "@/components/brief";
 import { YouTubeEmbed } from "@/components/youtube-embed";
 import { EPISODES, formatDate, getEpisode, pad } from "@/content/episodes";
 import { getResource } from "@/content/resources";
@@ -72,8 +73,8 @@ function EpisodePage() {
             <YouTubeEmbed id={ep.youtubeVideoId} title={ep.title} thumbnail={ep.thumbnail} />
             <div className="flex flex-col gap-3">
               <ExtLink href={ep.youtubeUrl} className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-brand px-5 py-3 font-semibold text-primary-foreground"><Youtube className="h-4 w-4" /> Open on YouTube</ExtLink>
-              <Link to="/episodes/$slug/slides" params={{ slug: ep.slug }} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold hover:bg-secondary"><Maximize2 className="h-4 w-4" /> View reference slides</Link>
-              <button onClick={() => printDeck(ep)} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold hover:bg-secondary"><FileDown className="h-4 w-4" /> Save slides as PDF</button>
+              <Link to="/episodes/$slug/slides" params={{ slug: ep.slug }} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold hover:bg-secondary"><Maximize2 className="h-4 w-4" /> {ep.brief ? "View Summary" : "View reference slides"}</Link>
+              <button onClick={() => (ep.brief ? printBrief(ep) : printDeck(ep))} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold hover:bg-secondary"><FileDown className="h-4 w-4" /> {ep.brief ? "Save summary as PDF" : "Save slides as PDF"}</button>
               <p className="text-xs text-muted-foreground">Opens your browser's print dialog — choose <strong>Save as PDF</strong> as the destination. On mobile, use the share or print option in your browser.</p>
               <button onClick={copy} className="inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 font-semibold hover:bg-secondary"><Copy className="h-4 w-4" /> {copied ? "Link copied" : "Copy episode link"}</button>
             </div>

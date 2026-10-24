@@ -61,6 +61,7 @@ function Slides() {
   const ep = getEpisode(slug)!;
   const { slide } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  if (ep.brief) return <BriefPage ep={ep} />;
   const found = ep.slides.findIndex((s) => s.id === slide);
   const i = found < 0 ? 0 : found;
   const total = ep.slides.length;
