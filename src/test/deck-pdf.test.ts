@@ -1,5 +1,9 @@
 // @vitest-environment node
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+vi.mock('@/styles.css?raw', async () => {
+  const { readFileSync } = await import('node:fs');
+  return { default: readFileSync('src/styles.css', 'utf8') };
+});
 import { PDFDocument } from 'pdf-lib';
 import { EPISODES } from '@/content/episodes';
 import { buildDeck } from '@/lib/deck-model';
