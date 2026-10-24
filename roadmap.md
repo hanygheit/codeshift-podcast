@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Consolidate EP001/EP002 into 8/16-slide executive briefs with all resources and one dedicated slide per EP002 package.
+- [x] Improve shared slide typography, editorial layouts, screen-fitting canvas, grouped contents and direct resource/watch actions.
+- [x] Verify every slide on desktop, readable phone views, keyboard/arrows/history/slider/swipe/fullscreen, complete links, finalized PDF counts and unchanged routes; 25 tests pass.
+
 - [x] Harden PDF preparation: efficient original-artwork derivatives, nonfatal caching, versioned download requests; both presentation downloads verified and 13 relevant tests pass.
 - [ ] Verify corrected PDFs on the published site — waiting for publication of the tested changes.
 

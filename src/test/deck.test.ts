@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { EPISODES } from '@/content/episodes';
-import { buildDeck, boundedSlide, SLIDE_WIDTH, SLIDE_HEIGHT } from '@/lib/deck-model';
+import { buildDeck, boundedSlide, slideIndex, SLIDE_WIDTH, SLIDE_HEIGHT } from '@/lib/deck-model';
+import { getResource } from '@/content/resources';
 
 describe('shared presentation rules', () => {
   it('uses a 16:9 1920 by 1080 canvas', () => {
@@ -18,6 +19,7 @@ describe('shared presentation rules', () => {
       expect(links).toContain(ep.youtubeUrl);
       for (const g of ep.brief?.resourceGroups ?? []) for (const r of g.items) expect(links).toContain(r.url);
       for (const l of ep.brief?.caseStudy?.links ?? []) expect(links).toContain(l.url);
+      for (const id of ep.resourceIds) { const resource = getResource(id); if (resource) expect(links).toContain(resource.url); }
     });
     it(`keeps essential content inside slide boundaries for ${ep.id}`, () => {
       for (const s of buildDeck(ep)) for (const n of s.nodes) {
@@ -42,5 +44,35 @@ describe('shared presentation rules', () => {
     const secondText = JSON.stringify(buildDeck(second));
     expect(secondText).toContain('Pilot with a small team; set guidelines and security rules.');
     expect(secondText).toContain('Standardise workflows and invest in skills.');
+  });
+  it('keeps EP001 within 7–9 slides and EP002 within 14–16 slides', () => {
+    const first = EPISODES.find(e => e.id === 'ep001');
+    const second = EPISODES.find(e => e.id === 'ep002');
+    if (!first || !second) throw new Error('Required episodes missing');
+    expect(buildDeck(first).length).toBeGreaterThanOrEqual(7);
+    expect(buildDeck(first).length).toBeLessThanOrEqual(9);
+    expect(buildDeck(second).length).toBeGreaterThanOrEqual(14);
+    expect(buildDeck(second).length).toBeLessThanOrEqual(16);
+  });
+  it('provides exactly one complete resource slide per EP002 package, including optional P06', () => {
+    const ep = EPISODES.find(e => e.id === 'ep002');
+    if (!ep) throw new Error('Required episode missing');
+    const deck = buildDeck(ep);
+    for (let i = 0; i < 6; i++) {
+      const id = `P0${i + 1}`;
+      const matches = deck.filter(s => s.part === 'resources' && s.packageId === id);
+      expect(matches).toHaveLength(1);
+      for (const resource of ep.brief?.resourceGroups[i]?.items ?? []) expect(matches[0]?.entries.map(e => e.url)).toContain(resource.url);
+    }
+    expect(deck.find(s => s.packageId === 'P06')?.title).toContain('Optional');
+    for (let i = 1; i <= 14; i++) expect(deck.flatMap(s => s.entries).some(e => e.title.startsWith(`R${i} / `))).toBe(true);
+  });
+  it('maps removed fragmented resource links to the consolidated package', () => {
+    const ep = EPISODES.find(e => e.id === 'ep002');
+    if (!ep) throw new Error('Required episode missing');
+    const deck = buildDeck(ep);
+    expect(deck[slideIndex(deck, 'resources-3-4')]?.packageId).toBe('P03');
+    expect(deck[slideIndex(deck, 'playbook-90')]?.id).toBe('adoption');
+    expect(deck[slideIndex(deck, 'lessons')]?.id).toBe('lessons');
   });
 });
