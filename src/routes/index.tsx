@@ -49,8 +49,9 @@ function Home() {
               <Button asChild size="lg" className="h-12 bg-gradient-brand px-6"><Link to="/episodes">Explore Episodes <ArrowRight /></Link></Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
             </div>
-            <div className="mt-7 flex items-center gap-3 font-mono text-xs text-muted-foreground">
+            <div className="mt-7 flex flex-wrap items-center gap-3 font-mono text-xs text-muted-foreground">
               <span className="h-px w-10 bg-primary" /> {SITE.tagline}
+              <SupportBadge className="ml-1 p-1.5" imgClassName="h-7 w-auto" />
             </div>
           </div>
 
@@ -80,7 +81,6 @@ function Home() {
                 ))}
               </figcaption>
             </div>
-            <div className="absolute right-4 top-4"><SupportBadge className="p-1.5" imgClassName="h-7 w-auto" /></div>
           </figure>
         </div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
