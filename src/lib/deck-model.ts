@@ -51,7 +51,7 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
   const h=text(ep.shortTitle,56,235,1000,88,'title');
   text('Executive Episode Brief',56,255+h,970,42,'body','muted');
   text(`${formatDate(ep.scheduledDate)}\nHany Saad & Ahmed Mamdoh`,56,676,990,34,'body','muted');
-  rect(56,844,760,88,'primary'); text('Watch Full Episode ↗',90,863,692,40,'title');
+  rect(56,844,760,88,'primary'); text('Watch Full Episode >',90,863,692,40,'title');
   link(ep.youtubeUrl,'Watch Full Episode',56,844,760,88);
   if(s.image) nodes.push({kind:'image',x:1110,y:285,width:754,height:480,src:s.image});
  } else {
@@ -71,7 +71,7 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
    const rows=Math.ceil(s.entries.length/columns), rowHeight=(968-start)/Math.max(rows,1);
    s.entries.forEach((e,i)=>{
     const col=Math.floor(i/rows),row=i%rows,x=x0+col*(colWidth+36),y=start+row*rowHeight;
-    const h=text(`${e.title} ↗`,x,y,colWidth, s.entries.length>8?32:36,'title', 'teal');
+    const h=text(`${e.title} >`,x,y,colWidth, s.entries.length>8?32:36,'title', 'teal');
     // One concise metadata line avoids overlapping provider/access labels in dense directories.
     text([e.body,e.meta].filter(Boolean).join(' · '),x,y+h+10,colWidth,28,'body','muted');
     rect(x,y+rowHeight-10,colWidth,1,'border');
