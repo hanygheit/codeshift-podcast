@@ -101,7 +101,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
   rows('summary', 'Executive summary', b?.summaryHeadline ?? 'Executive summary', (b?.summary ?? ep.overview).map(body => ({ title: '', body })));
   if (b) rows('lessons', 'Key lessons', 'Essential lessons', b.lessons);
   else rows('lessons', 'Key lessons', 'Essential lessons', ep.takeaways.map(title => ({ title, body: '' })));
-  if (b?.packages) chunks(b.packages, 3).forEach((group, i) => add({ id: i ? 'packages-2' : 'packages', section: 'Learning packages', title: i ? 'Learning packages · P04–P06' : 'Learning packages · P01–P03', part: 'summary', layout: 'cards', subtitle: b.packagesNote, entries: group.map(p => ({ title: `${p.id} / ${p.name}`, body: `${p.topics}\n${p.outcome}` })) }));
+  if (b?.packages) chunks(b.packages, 3).forEach((group, i) => add({ id: i ? 'packages-2' : 'packages', section: 'Learning packages', title: i ? 'Learning packages · P04–P06' : 'Learning packages · P01–P03', part: 'summary', layout: 'cards', ...(b.packagesNote ? { subtitle: b.packagesNote } : {}), entries: group.map(p => ({ title: `${p.id} / ${p.name}`, body: `${p.topics}\n${p.outcome}` })) }));
   if (b?.juniorAi) rows('ai-learning', 'AI-assisted learning', 'Should juniors use AI?', [{ title: b.juniorAi.message, body: `${b.juniorAi.modes.join(' → ')}\n${b.juniorAi.emphasis}` }]);
   if (b?.careerLevels) rows('career-levels', 'Career levels', 'Priorities by career level', b.careerLevels.map(c => ({ title: c.level, body: c.priorities })));
   // Preserve the unique original visual frameworks, not the duplicated summary or resource slides.
