@@ -51,16 +51,28 @@ export interface BriefResource {
   url: string;
   /** How the resource is accessed — shown so free material is distinguishable from paid tools. */
   access: "Free" | "Free tier" | "Subscription";
+  /** Curriculum reference label, e.g. the WorxForge R1–R14 mapping. */
+  ref?: string;
 }
 
 export interface EpisodeBrief {
   summaryHeadline: string;
   summary: string[];
   lessons: { title: string; body: string }[];
+  /** Learning-package map (EP002 playbook). */
+  packages?: { id: string; name: string; topics: string; outcome: string }[];
+  packagesNote?: string;
+  careerLevels?: { level: string; priorities: string }[];
+  juniorAi?: { message: string; modes: string[]; emphasis: string };
+  adoption?: { phases: { days: string; title: string; body: string }[]; metrics: string[]; highlight: string };
+  caseStudy?: { headline: string; body: string[]; links: { label: string; url: string }[] };
   actions: { role: string; items: string[] }[];
   resourceGroups: { label: string; items: BriefResource[] }[];
+  resourcesNote?: string;
   finalMessage: string;
   nextEpisode?: { label: string; url: string };
+  /** Label for the episode watch button, e.g. "Watch Live / Replay" when the recording status is unverified. */
+  watchLabel?: string;
 }
 
 export interface Episode {

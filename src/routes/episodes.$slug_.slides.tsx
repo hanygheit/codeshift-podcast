@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ChevronLeft, ChevronRight, Copy, FileDown, List, Maximize2, X, Youtube } from "lucide-react";
+import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Copy, FileDown, List, Maximize2, X, Youtube } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { PrintDeck, printDeck, SlideView } from "@/components/slide";
@@ -46,7 +46,8 @@ function BriefPage({ ep }: { ep: Episode }) {
             <ArrowLeft className="h-4 w-4" /> EP{pad(ep.number)} details
           </Link>
           <div className="flex flex-wrap gap-2">
-            <ExtLink href={ep.youtubeUrl} className={btn}><Youtube className="h-4 w-4" /> Watch Full Episode</ExtLink>
+            <a href="#resources" className={btn}><BookOpen className="h-4 w-4" /> Explore Resources</a>
+            <ExtLink href={ep.youtubeUrl} className={btn}><Youtube className="h-4 w-4" /> {ep.brief?.watchLabel ?? "Watch Full Episode"}</ExtLink>
             <button onClick={() => printBrief(ep)} className={btn} title="Choose “Save as PDF” in the print dialog"><FileDown className="h-4 w-4" /> Save as PDF</button>
           </div>
         </div>
