@@ -5,7 +5,7 @@ import { UpcomingEpisode } from "@/components/upcoming-episode";
 import { archiveSearchSchema } from "@/lib/archive";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { ExtLink, HostCard, SupportBadge, Tag } from "@/components/site";
+import { ExtLink, HostCard, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
 
 export const Route = createFileRoute("/")({
@@ -50,7 +50,6 @@ function Home() {
               <Button asChild size="lg" className="h-11 bg-gradient-brand px-5"><Link to="/episodes">Explore Episodes <ArrowRight /></Link></Button>
               <Button asChild size="lg" variant="outline" className="h-11 px-5"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
             </div>
-            <SupportBadge className="mt-3 rounded-sm p-1.5" imgClassName="h-9 w-auto" />
           </div>
 
           <figure className="relative">

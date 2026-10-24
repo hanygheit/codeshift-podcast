@@ -60,6 +60,7 @@ export function SiteHeader() {
           <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-md bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
             <Youtube className="h-4 w-4" /> YouTube
           </ExtLink>
+          <SupportBadge className="ml-3 rounded p-1" imgClassName="h-7 w-auto" />
         </nav>
         <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -75,6 +76,7 @@ export function SiteHeader() {
           ))}
           <ExtLink href={SITE.facebook} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Facebook className="h-4 w-4" /> Facebook</ExtLink>
           <ExtLink href={SITE.youtube} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Youtube className="h-4 w-4" /> YouTube</ExtLink>
+          <SupportBadge className="mt-1 rounded p-1" imgClassName="h-7 w-auto" />
         </nav>
       )}
     </header>
