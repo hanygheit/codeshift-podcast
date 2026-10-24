@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 /** Official CodeShift channel ID (provided by the channel owner). */
-export const CODESHIFT_CHANNEL_ID = "UCRjaB0a3R2gqIgo-UpJZHwA";
+export const CODESHIFT_CHANNEL_ID = "UCLCIMGSDf2mHF21404-1Efg";
 
 export interface LiveEvent {
   videoId: string;
