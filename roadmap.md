@@ -10,7 +10,10 @@
 - [x] Episode-specific resources with search + package filter
 - [x] PowerPoint-style 16:9 decks for EP001/EP002
 - [x] Host photos
-- [ ] Backend PDF via Browserless — code done; waiting on BROWSERLESS_API_KEY + publish
+- [x] Simplify shared episode details while preserving all educational content
+- [x] Rebuild shared presentation layout, navigation, contents, thumbnails and mobile reading view
+- [x] Replace Browserless with directly generated vector PDFs sharing web slide layouts
+- [x] Validate both episode flows, slide coverage, PDFs and existing routes; 19 tests pass, EP001 18 pages and EP002 39 pages, native/fallback fullscreen and phone swipes verified
 - [x] Home: Upcoming Episode (YouTube) + Explore Episodes
-- [ ] Upcoming Episode live data — waiting on YOUTUBE_API_KEY
+- [ ] Upcoming Episode live data — configured YouTube playlist returns 404; correct playlist configuration needed (outside episode redesign)
 - [x] ITI support badge: compact beneath hero CTAs within left column; existing footer acknowledgment retained.

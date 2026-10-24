@@ -5,10 +5,10 @@ import { pad } from "@/content/episodes";
 export const PDF_SOURCE_ORIGIN = "https://codeshift-podcast.lovable.app";
 
 /** Bump when slide design changes so cached PDFs are regenerated. */
-export const DECK_DESIGN_VERSION = "deck-1";
+export const DECK_DESIGN_VERSION = "vector-deck-4";
 
 export function pdfFilename(ep: Episode) {
-  return `CodeShift_EP${pad(ep.number)}_${ep.brief?.packages ? "Learning_Playbook" : "Executive_Summary"}.pdf`;
+  return `CodeShift_EP${pad(ep.number)}_${ep.brief?.packages ? "Developer_Learning_Playbook" : "Executive_Summary"}.pdf`;
 }
 
 /** Stable short hash of episode content + design version, used for cache invalidation. */

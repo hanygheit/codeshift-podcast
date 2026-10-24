@@ -40,6 +40,14 @@
 }
 
 :root {
+  /* Canonical vector deck palette, also parsed by the backend PDF renderer. */
+  --deck-background: rgb(13 21 39);
+  --deck-foreground: rgb(241 245 250);
+  --deck-muted: rgb(170 186 209);
+  --deck-primary: rgb(48 133 246);
+  --deck-teal: rgb(70 214 197);
+  --deck-panel: rgb(24 37 59);
+  --deck-border: rgb(49 68 94);
   --radius: 0.875rem;
   --background: oklch(0.16 0.035 262);
   --foreground: oklch(0.96 0.01 250);
@@ -126,7 +134,7 @@
 }
 .slide-inner { font-size: clamp(9px, 1.6cqi, 22px); }
 
-/* PDF export view: one 1920×1080 slide per page (rendered by the backend PDF service). */
+/* Diagnostic all-slides view; not used to generate PDF. */
 .deck-export { width: 1920px; }
 .deck-export .deck-slide { break-after: page; page-break-after: always; }
 .deck-export .deck-slide:last-child { break-after: auto; page-break-after: auto; }
@@ -141,3 +149,33 @@
 @keyframes wave { 0%,100% { transform: scaleY(1) } 50% { transform: scaleY(.45) } }
 @utility wave-bar { transform-origin: bottom; animation: wave 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .wave-bar { animation: none; } }
+
+@font-face { font-family: Decktitle; src: url('/fonts/deck-title.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: Deckbody; src: url('/fonts/deck-body.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: Deckmono; src: url('/fonts/deck-mono.ttf') format('truetype'); font-display: swap; }
+.deck-slide { display: block; letter-spacing: 0; }
+.deck-scaled > svg { width: 100%; height: 100%; }
+.deck-link-target:hover { stroke: var(--deck-teal); stroke-width: 3px; }
+.presentation-shell { height: calc(100dvh - 72px); min-height: 420px; display: flex; flex-direction: column; background: var(--background); }
+.presentation-toolbar { min-height: 56px; flex-shrink: 0; }
+.presentation-stage { overflow: hidden; padding: 12px 18px; }
+.presentation-canvas { width: min(100%, calc((100dvh - 222px) * 16 / 9)); }
+.presentation-reading { display: none; }
+.presentation-immersive { position: fixed; inset: 0; z-index: 100; height: 100dvh; min-height: 0; }
+.presentation-immersive .presentation-canvas { width: min(100%, calc((100dvh - 90px) * 16 / 9)); }
+@media (min-width: 1024px) { .presentation-shell:not(.presentation-immersive) { height: calc(100dvh - 74px); } }
+@media (max-width: 700px) and (orientation: portrait) {
+  .presentation-shell { min-height: 0; }
+  .presentation-stage { overflow-y: auto; padding: 0; overscroll-behavior: contain; touch-action: pan-y; }
+  .presentation-canvas { display: none; }
+  .presentation-reading { display: block; }
+  .presentation-toolbar { min-height: 54px; gap: 2px; }
+  .presentation-navigation { gap: 12px; }
+  .presentation-navigation input { width: min(45vw, 220px); }
+}
+@media (max-height: 600px) and (orientation: landscape) {
+  .presentation-shell { min-height: 0; }
+  .presentation-toolbar { min-height: 44px; }
+  .presentation-navigation { padding-block: 4px; }
+  .presentation-canvas { width: min(100%, calc((100dvh - 184px) * 16 / 9)); }
+}

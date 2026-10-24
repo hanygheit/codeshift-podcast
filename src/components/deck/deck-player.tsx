@@ -1,131 +1,113 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, LayoutGrid, Maximize2, Minimize2, Youtube } from "lucide-react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import type { Episode } from "@/content/types";
-import { pad } from "@/content/episodes";
-import { buildDeck, SlideFrame, type DeckSlide } from "./deck-slides";
-import { DownloadPdfButton } from "./download-pdf";
+import { Link, useNavigate } from '@tanstack/react-router';
+import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, List, Maximize2, Minimize2, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import type { Episode } from '@/content/types';
+import { formatDate, pad } from '@/content/episodes';
+import { boundedSlide } from '@/lib/deck-model';
+import { buildDeck, SlideFrame } from './deck-slides';
+import { DownloadPdfButton } from './download-pdf';
+import { Button } from '@/components/ui/button';
 
-/** Renders 1920×1080 content scaled to the width of its container. */
-export function Scaled({ children, className = "" }: { children: ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0);
-  useLayoutEffect(() => {
-    const el = ref.current; if (!el) return;
-    const ro = new ResizeObserver(() => setScale(el.clientWidth / 1920));
-    ro.observe(el); setScale(el.clientWidth / 1920);
-    return () => ro.disconnect();
-  }, []);
-  return (
-    <div ref={ref} className={`relative aspect-video w-full overflow-hidden ${className}`}>
-      <div className="absolute left-0 top-0 origin-top-left" style={{ transform: `scale(${scale})`, visibility: scale ? "visible" : "hidden" }}>{children}</div>
-    </div>
-  );
+export function Scaled({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <div className={`deck-scaled relative aspect-video w-full overflow-hidden ${className}`}>{children}</div>;
 }
-
-const btn = "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm hover:bg-secondary disabled:opacity-60";
 
 export function DeckPlayer({ ep, slideId }: { ep: Episode; slideId?: string | undefined }) {
-  const slides = buildDeck(ep);
+  const slides = useMemo(() => buildDeck(ep), [ep]);
   const total = slides.length;
-  const found = slides.findIndex((s) => s.id === slideId);
-  const i = found < 0 ? 0 : found;
+  const found = slides.findIndex(s => s.id === slideId);
+  const index = found < 0 ? 0 : found;
+  const slide = slides[index];
   const navigate = useNavigate();
   const root = useRef<HTMLDivElement>(null);
-  const touchX = useRef<number | null>(null);
-  const [thumbs, setThumbs] = useState(true);
-  const [fs, setFs] = useState(false);
-
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const [contents, setContents] = useState(false);
+  const [query, setQuery] = useState('');
+  const [fullscreen, setFullscreen] = useState(false);
+  const [fallback, setFallback] = useState(false);
+  const [nativePending, setNativePending] = useState(false);
   const go = useCallback((n: number) => {
-    const t = Math.max(0, Math.min(total - 1, n));
-    navigate({ to: "/episodes/$slug/slides", params: { slug: ep.slug }, search: { slide: slides[t]!.id }, replace: true });
-  }, [total, navigate, ep.slug, slides]);
-
+    const next = slides[boundedSlide(n, total)];
+    if (!next || next.id === slides[index]?.id) return;
+    void navigate({ to: '/episodes/$slug/slides', params: { slug: ep.slug }, search: { slide: next.id }, resetScroll: false });
+  }, [slides, total, index, navigate, ep.slug]);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(i + 1); }
-      else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(i - 1); }
-      else if (e.key === "Home") { e.preventDefault(); go(0); }
-      else if (e.key === "End") { e.preventDefault(); go(total - 1); }
-      else if (e.key === "Escape" && !document.fullscreenElement) setThumbs(false);
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target;
+      if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || (target instanceof Element && target.closest('input,textarea,select,[contenteditable="true"]'))) return;
+      if (e.key === 'Escape') { setContents(false); setFallback(false); return; }
+      if (contents) return;
+      if (e.key === ' ' && target instanceof Element && target.closest('button,a')) return;
+      if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(index + 1); }
+      if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(index - 1); }
+      if (e.key === 'Home') { e.preventDefault(); go(0); }
+      if (e.key === 'End') { e.preventDefault(); go(total - 1); }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [i, go, total]);
-
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [go, index, total, contents]);
   useEffect(() => {
-    const onFs = () => setFs(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", onFs);
-    return () => document.removeEventListener("fullscreenchange", onFs);
+    const changed = () => { const active = document.fullscreenElement === root.current; setFullscreen(active); setNativePending(false); if (!active) setFallback(false); };
+    document.addEventListener('fullscreenchange', changed);
+    return () => document.removeEventListener('fullscreenchange', changed);
   }, []);
-  useEffect(() => { document.title = `${i + 1}/${total} — ${slides[i]!.title} · EP${pad(ep.number)} CodeShift`; }, [i, total, slides, ep.number]);
-
-  const toggleFs = () => (document.fullscreenElement ? document.exitFullscreen() : root.current?.requestFullscreen?.());
-  const firstResources = slides.findIndex((s) => s.section === "Resources");
-
-  return (
-    <div ref={root} className="flex flex-col bg-background" style={{ minHeight: fs ? "100vh" : "calc(100vh - 4rem)" }}>
-      {!fs && (
-        <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-2 px-4 pt-3">
-          <Link to="/episodes/$slug" params={{ slug: ep.slug }} className="inline-flex min-w-0 items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4 shrink-0" /> <span className="truncate">EP{pad(ep.number)} · {ep.shortTitle}</span>
-          </Link>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => setThumbs(!thumbs)} className={`${btn} hidden lg:inline-flex`} aria-pressed={thumbs}><LayoutGrid className="h-4 w-4" /> Slides</button>
-            {firstResources >= 0 && <button onClick={() => go(firstResources)} className={btn}><BookOpen className="h-4 w-4" /> Resources</button>}
-            <a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer" className={btn}><Youtube className="h-4 w-4" /> Watch</a>
-            <DownloadPdfButton ep={ep} className={btn} />
-            <button onClick={toggleFs} className={btn}><Maximize2 className="h-4 w-4" /> Fullscreen</button>
-          </div>
-        </div>
-      )}
-      <div className="flex min-h-0 flex-1 gap-4 px-4 py-3">
-        {thumbs && !fs && (
-          <aside aria-label="Slide thumbnails" className="hidden w-52 shrink-0 space-y-3 overflow-y-auto pr-1 lg:block" style={{ maxHeight: "calc(100vh - 10rem)" }}>
-            {slides.map((s, n) => (
-              <button key={s.id} onClick={() => go(n)} aria-label={`Slide ${n + 1}: ${s.title}`} aria-current={n === i}
-                className={`block w-full overflow-hidden rounded-lg border-2 text-left transition ${n === i ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"}`}>
-                <Scaled><div className="pointer-events-none"><SlideFrame ep={ep} slide={s} index={n} total={total} /></div></Scaled>
-                <span className="block truncate bg-surface px-2 py-1 font-mono text-[10px] text-muted-foreground">{String(n + 1).padStart(2, "0")} · {s.title}</span>
-              </button>
-            ))}
-          </aside>
-        )}
-        <main className="flex min-w-0 flex-1 items-center justify-center"
-          onTouchStart={(e) => (touchX.current = e.touches[0]!.clientX)}
-          onTouchEnd={(e) => { if (touchX.current === null) return; const dx = e.changedTouches[0]!.clientX - touchX.current; if (Math.abs(dx) > 50) go(i + (dx < 0 ? 1 : -1)); touchX.current = null; }}>
-          <div className="w-full" style={{ maxWidth: fs ? "calc((100vh - 5rem) * 16 / 9)" : "calc((100vh - 15rem) * 16 / 9)" }}>
-            <Scaled className="rounded-xl border shadow-glow">
-              <div key={slides[i]!.id} className="animate-in fade-in duration-300"><SlideFrame ep={ep} slide={slides[i]!} index={i} total={total} /></div>
-            </Scaled>
-          </div>
-        </main>
-      </div>
-      <div className="flex items-center justify-center gap-4 pb-4">
-        <button aria-label="Previous slide" onClick={() => go(i - 1)} disabled={i === 0} className="rounded-full border p-3 disabled:opacity-30"><ChevronLeft className="h-5 w-5" /></button>
-        <div className="flex w-40 flex-col items-center gap-1.5 sm:w-64">
-          <span className="font-mono text-sm" aria-live="polite">{String(i + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}</span>
-          <div className="h-1 w-full overflow-hidden rounded-full bg-muted"><div className="h-full bg-gradient-brand transition-all" style={{ width: `${((i + 1) / total) * 100}%` }} /></div>
-        </div>
-        <button aria-label="Next slide" onClick={() => go(i + 1)} disabled={i === total - 1} className="rounded-full border p-3 disabled:opacity-30"><ChevronRight className="h-5 w-5" /></button>
-        {fs && <button aria-label="Exit fullscreen" onClick={toggleFs} className="rounded-full border p-3"><Minimize2 className="h-5 w-5" /></button>}
-      </div>
+  useEffect(() => { if (slide) document.title = `${index + 1}/${total} — ${slide.title} · CodeShift EP${pad(ep.number)}`; }, [slide, index, total, ep.number]);
+  useEffect(() => {
+    if (!fallback) return;
+    const old = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = old; };
+  }, [fallback]);
+  const toggleFullscreen = async () => {
+    setContents(false);
+    if (fallback) { setFallback(false); return; }
+    if (document.fullscreenElement) { await document.exitFullscreen(); return; }
+    try {
+      if (!root.current?.requestFullscreen) { setFallback(true); return; }
+      setNativePending(true); await root.current.requestFullscreen();
+    } catch { setFallback(true); setNativePending(false); }
+  };
+  const immersive = fullscreen || fallback || nativePending;
+  if (!slide) return null;
+  const resourceIndex = slides.findIndex(s => s.part === 'resources');
+  const select = (n: number) => { go(n); setContents(false); };
+  return <div ref={root} className={`presentation-shell ${immersive ? 'presentation-immersive' : ''}`}>
+    {!immersive && <div className="presentation-toolbar flex items-center gap-2 border-b px-3 md:px-5">
+      <Button asChild variant="ghost" size="sm"><Link to="/episodes/$slug" params={{ slug: ep.slug }} title="Back to Episode"><ArrowLeft /><span className="hidden md:inline">Back to Episode</span><span className="sr-only md:hidden">Back to Episode</span></Link></Button>
+      <Button variant="ghost" size="sm" onClick={() => setContents(!contents)} aria-expanded={contents}><List /> Contents</Button>
+      <span className="ml-auto whitespace-nowrap font-mono text-xs sm:text-sm" aria-live="polite">Slide {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
+      <Button variant="ghost" size="icon" onClick={toggleFullscreen} aria-label="Fullscreen" title="Fullscreen"><Maximize2 /></Button>
+      <DownloadPdfButton ep={ep} />
+    </div>}
+    <div className="presentation-stage relative flex min-h-0 flex-1 items-center justify-center"
+      onTouchStart={e => { if (e.target instanceof Element && e.target.closest('a,button,input')) { touch.current = null; return; } const t = e.touches[0]; touch.current = t ? { x: t.clientX, y: t.clientY } : null; }}
+      onTouchEnd={e => { const start = touch.current; touch.current = null; const end = e.changedTouches[0]; if (!start || !end) return; const dx = end.clientX - start.x, dy = end.clientY - start.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(index + (dx < 0 ? 1 : -1)); }}>
+      <div className="presentation-canvas"><Scaled><SlideFrame ep={ep} slide={slide} index={index} total={total} /></Scaled></div>
+      <article className="presentation-reading w-full self-start px-5 py-7" aria-label="Slide reading view">
+        <p className="eyebrow">{slide.part === 'resources' ? 'Resources & references' : slide.section}</p>
+        <h1 className="mt-3 text-2xl font-semibold leading-tight">{slide.title}</h1>
+        {slide.image && <img src={slide.image} alt="Episode cover" className="mt-5 w-full rounded-md" />}
+        {slide.subtitle && <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{slide.subtitle}</p>}
+        <div className="mt-6 divide-y">{slide.entries.map((e, n) => <div key={n} className="py-5 first:pt-0">{e.url ? <a href={e.url} target="_blank" rel="noopener noreferrer" className="block min-h-11 text-lg font-semibold text-teal">{e.title} ↗</a> : e.title && <h2 className="text-lg font-semibold">{e.title}</h2>}<p className="mt-2 whitespace-pre-line leading-relaxed text-muted-foreground">{e.body}</p>{e.meta && <p className="mt-3 font-mono text-xs text-teal">{e.meta}</p>}</div>)}</div>
+        {slide.layout === 'cover' && <><p className="mt-5 text-sm text-muted-foreground">{formatDate(ep.scheduledDate)} · Hany Saad &amp; Ahmed Mamdoh</p><Button asChild className="mt-5"><a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer">Watch Episode ↗</a></Button></>}
+      </article>
+      {contents && <aside role="dialog" aria-label="Presentation contents" className="presentation-contents absolute inset-y-0 left-0 z-30 w-full max-w-md overflow-y-auto border-r bg-popover p-4 shadow-glow">
+        <div className="flex items-center justify-between"><h2 className="text-lg font-semibold">Contents</h2><Button variant="ghost" size="icon" onClick={() => setContents(false)} aria-label="Close contents"><X /></Button></div>
+        <div className="mt-3 flex gap-2"><Button variant="secondary" size="sm" onClick={() => select(0)}>Executive Summary</Button>{resourceIndex >= 0 && <Button variant="secondary" size="sm" onClick={() => select(resourceIndex)}><BookOpen /> Resources</Button>}</div>
+        <input aria-label="Search slide titles" placeholder="Search contents…" value={query} onChange={e => setQuery(e.target.value)} className="mt-4 h-10 w-full rounded-md border bg-background px-3 text-sm" />
+        <ol className="mt-4 space-y-1">{slides.map((s, n) => [s.title, s.section, ...s.entries.flatMap(e => [e.title, e.body, e.meta ?? ''])].join(' ').toLowerCase().includes(query.toLowerCase()) ? <li key={s.id}><Button variant={n === index ? 'secondary' : 'ghost'} onClick={() => select(n)} className="h-auto w-full justify-start gap-3 whitespace-normal py-3 text-left"><span className="hidden w-24 shrink-0 sm:block" aria-hidden="true"><Scaled><SlideFrame ep={ep} slide={s} index={n} total={total} /></Scaled></span><span className="font-mono text-xs text-teal">{String(n + 1).padStart(2, '0')}</span><span className="min-w-0"><span className="block text-[10px] uppercase text-muted-foreground">{s.section}</span><span>{s.title}</span></span></Button></li> : null)}</ol>
+      </aside>}
     </div>
-  );
+    <div className="presentation-navigation flex shrink-0 items-center justify-center gap-4 border-t px-4 py-3">
+      <Button variant="outline" className="h-11 w-11" onClick={() => go(index - 1)} disabled={index === 0} aria-label="Previous slide"><ChevronLeft /></Button>
+      <input type="range" min={1} max={total} value={index + 1} onChange={e => go(Number(e.target.value) - 1)} aria-label="Slide navigator" className="w-48 accent-primary sm:w-80" />
+      <Button variant="outline" className="h-11 w-11" onClick={() => go(index + 1)} disabled={index === total - 1} aria-label="Next slide"><ChevronRight /></Button>
+      {immersive && <><span className="font-mono text-xs">{index + 1} / {total}</span><Button variant="ghost" size="icon" onClick={toggleFullscreen} aria-label="Exit fullscreen"><Minimize2 /></Button></>}
+    </div>
+  </div>;
 }
 
-/** Non-interactive, unscaled render of every slide — loaded by the PDF renderer. */
+/** Preserved diagnostic export URL; PDFs are generated directly from the model, not this view. */
 export function ExportDeck({ ep }: { ep: Episode }) {
-  const slides: DeckSlide[] = buildDeck(ep);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const imgs = Array.from(document.images).map((img) => (img.complete ? Promise.resolve() : img.decode().catch(() => undefined)));
-    Promise.all([document.fonts.ready, ...imgs]).then(() => setReady(true));
-  }, []);
-  return (
-    <div className="deck-export" {...(ready ? { "data-export-ready": "" } : {})}>
-      {slides.map((s, n) => <SlideFrame key={s.id} ep={ep} slide={s} index={n} total={slides.length} />)}
-    </div>
-  );
+  const slides = buildDeck(ep);
+  return <div className="deck-export">{slides.map((s, i) => <SlideFrame key={s.id} ep={ep} slide={s} index={i} total={slides.length} />)}</div>;
 }

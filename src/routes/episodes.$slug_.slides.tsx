@@ -27,9 +27,11 @@ export const Route = createFileRoute("/episodes/$slug_/slides")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: `https://codeshift-podcast.lovable.app/episodes/${params.slug}/slides` },
         { name: "twitter:card", content: "summary_large_image" },
+        ...(ep.thumbnail.startsWith("https://") ? [{ property: "og:image", content: ep.thumbnail }, { name: "twitter:image", content: ep.thumbnail }] : []),
       ],
-      links: [{ rel: "canonical", href: `/episodes/${params.slug}/slides` }],
+      links: [{ rel: "canonical", href: `https://codeshift-podcast.lovable.app/episodes/${params.slug}/slides` }],
     };
   },
   component: Slides,
@@ -37,7 +39,8 @@ export const Route = createFileRoute("/episodes/$slug_/slides")({
 
 function Slides() {
   const { slug } = Route.useLoaderData();
-  const ep = getEpisode(slug)!;
+  const ep = getEpisode(slug);
+  if (!ep) return null;
   const s = Route.useSearch();
   if (s.export) return <ExportDeck ep={ep} />;
   return (
