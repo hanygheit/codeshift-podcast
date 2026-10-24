@@ -3,6 +3,16 @@ import { Facebook, Linkedin, Menu, X, Youtube } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { SITE, HOSTS } from "@/content/site";
 import logoAsset from "@/assets/codeshift-logo.png.asset.json";
+import itiSupport from "@/assets/iti-support.png.asset.json";
+import { Button } from "@/components/ui/button";
+
+function SupportBadge({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`shrink-0 rounded-md border border-support-border bg-support p-2 ${compact ? "w-24" : "w-28"}`}>
+      <img src={itiSupport.url} alt="Supported by — Information Technology Institute (ITI)" width={1124} height={705} className="block h-auto w-full" />
+    </div>
+  );
+}
 
 /** The official CodeShift logo (uploaded asset, used as-is). */
 export function Logo({ className = "h-10 w-10" }: { className?: string }) {
@@ -27,15 +37,15 @@ const nav = [
 ] as const;
 
 const linkCls = "relative rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground";
-const activeCls = "text-foreground after:absolute after:inset-x-3 after:-bottom-[13px] after:h-0.5 after:rounded-full after:bg-gradient-brand";
+const activeCls = "text-foreground after:absolute after:inset-x-3 after:-bottom-5 after:h-0.5 after:rounded-full after:bg-gradient-brand";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="screen-only sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 lg:h-20">
         <Wordmark />
-        <nav aria-label="Main" className="hidden items-center gap-1 text-sm md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-1 text-sm lg:flex">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
               {n.label}
@@ -45,13 +55,14 @@ export function SiteHeader() {
           <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
             <Youtube className="h-4 w-4" /> YouTube
           </ExtLink>
+          <div className="ml-5 border-l pl-5"><SupportBadge /></div>
         </nav>
-        <button className="rounded-md p-2 md:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
+        <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        </Button>
       </div>
       {open && (
-        <nav aria-label="Mobile" className="border-t bg-background px-5 py-3 md:hidden">
+        <nav aria-label="Mobile" className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
               className="block rounded-md px-3 py-3 text-muted-foreground" activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}>
@@ -60,6 +71,7 @@ export function SiteHeader() {
           ))}
           <ExtLink href={SITE.facebook} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Facebook className="h-4 w-4" /> Facebook</ExtLink>
           <ExtLink href={SITE.youtube} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Youtube className="h-4 w-4" /> YouTube</ExtLink>
+          <div className="mt-3 border-t px-3 pt-4 pb-2"><SupportBadge /></div>
         </nav>
       )}
     </header>
@@ -73,6 +85,7 @@ export function SiteFooter() {
         <div className="space-y-3">
           <Wordmark />
           <p className="text-sm text-muted-foreground">{SITE.descriptor}. An independent, community knowledge-sharing initiative — not a commercial training platform.</p>
+          <div className="pt-2"><SupportBadge compact /></div>
         </div>
         <div className="text-sm">
           <p className="eyebrow mb-3">Explore</p>

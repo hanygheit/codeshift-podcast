@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Youtube } from "lucide-react";
+import { ArrowRight, Linkedin, Youtube } from "lucide-react";
 import { EpisodeExplorer, patchSearch } from "@/components/episode-explorer";
 import { UpcomingEpisode } from "@/components/upcoming-episode";
 import { archiveSearchSchema } from "@/lib/archive";
@@ -36,27 +36,26 @@ function Home() {
       <section className="relative overflow-hidden border-b">
         <div className="pointer-events-none absolute inset-0 bg-hero" />
         <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-12 md:grid-cols-2 md:py-16 lg:gap-16">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-10 md:grid-cols-2 md:py-12 lg:gap-14">
           <div>
             <p className="eyebrow">Weekly Arabic Tech Podcast</p>
-            <h1 className="mt-5 max-w-xl text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.5rem]">
-              Engineering <br className="hidden sm:block" />Beyond the <span className="text-teal">Code.</span>
+            <h1 className="mt-4 max-w-xl text-3xl font-bold leading-[1.18] sm:text-4xl lg:text-5xl">
+              Software Engineering <span className="text-teal">in the AI Era.</span>
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Practical conversations on AI-native development, software architecture, coding agents, developer growth, and engineering leadership.
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground lg:text-lg">
+              Practical conversations on engineering fundamentals, software architecture, coding agents, developer growth, and the changing way we build software.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-12 bg-gradient-brand px-6"><Link to="/episodes">Explore Episodes <ArrowRight /></Link></Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-6"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
             </div>
-            <div className="mt-10 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            <div className="mt-7 flex items-center gap-3 font-mono text-xs text-muted-foreground">
               <span className="h-px w-10 bg-primary" /> {SITE.tagline}
             </div>
           </div>
 
           <figure className="relative">
-            <div className="absolute -inset-6 rounded-[2rem] bg-primary/10 blur-3xl" aria-hidden />
-            <div className="relative overflow-hidden rounded-3xl border bg-card shadow-glow">
+            <div className="relative overflow-hidden rounded-2xl border bg-card shadow-glow">
               <div className="grid grid-cols-2">
                 {HOSTS.map((h, i) => (
                   <div key={h.name} className={`relative aspect-[4/5] overflow-hidden ${i === 0 ? "border-r" : ""}`}>
@@ -64,21 +63,22 @@ function Home() {
                   </div>
                 ))}
               </div>
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+              <div className="h-14 sm:hidden" aria-hidden="true" />
+              <div className="pointer-events-none absolute inset-0 bg-portrait-overlay" />
               <div className="absolute left-4 top-4 rounded-full border bg-background/70 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-teal backdrop-blur">
                 Your hosts
               </div>
-              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                <Waveform />
-                <div className="mt-4 grid grid-cols-2 gap-4">
-                  {HOSTS.map((h) => (
-                    <figcaption key={h.name}>
-                      <p className="font-display text-base font-semibold sm:text-lg">{h.name}</p>
-                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{h.role}</p>
-                    </figcaption>
-                  ))}
-                </div>
-              </div>
+              <figcaption className="absolute inset-x-0 bottom-0 grid grid-cols-2">
+                {HOSTS.map((h, i) => (
+                  <div key={h.name} className="min-w-0 px-3 pb-4 sm:px-5 sm:pb-5">
+                    <Waveform offset={i} />
+                    <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${h.name} on LinkedIn (opens in a new tab)`} className="mt-3 block w-fit font-display text-sm font-semibold text-foreground transition-colors hover:text-teal sm:text-base lg:text-lg">{h.name}</a>
+                    <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`View ${h.name}'s LinkedIn profile (opens in a new tab)`} className="mt-1 inline-flex min-h-8 items-center gap-1.5 text-[11px] font-semibold text-teal hover:underline sm:text-xs">
+                      <Linkedin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> LinkedIn Profile <ArrowRight className="h-3 w-3 shrink-0" aria-hidden="true" />
+                    </a>
+                  </div>
+                ))}
+              </figcaption>
             </div>
           </figure>
         </div>
@@ -112,11 +112,11 @@ function Home() {
 }
 
 const WAVE = [6, 12, 20, 9, 26, 16, 30, 12, 22, 8, 18, 28, 14, 24, 10, 20, 6, 16, 26, 12, 22, 9, 18, 30, 14, 8, 20, 12];
-function Waveform() {
+function Waveform({ offset }: { offset: number }) {
   return (
-    <div className="flex h-8 items-end gap-[3px]" aria-hidden>
+    <div className="pointer-events-none flex h-6 items-end gap-[3px]" aria-hidden="true" data-waveform>
       {WAVE.map((h, i) => (
-        <span key={i} className="wave-bar w-[3px] rounded-full bg-gradient-to-t from-primary to-teal" style={{ height: h, animationDelay: `${(i % 7) * 0.12}s` }} />
+        <span key={i} className="wave-bar w-[2px] rounded-full bg-gradient-to-t from-primary to-teal" style={{ height: h * 0.75, animationDelay: `${-((i % 7) * 0.16 + offset * 0.53)}s` }} />
       ))}
     </div>
   );
