@@ -16,14 +16,14 @@ export function SupportBadge({ className = "w-28 p-2", imgClassName = "h-auto w-
 
 /** The official CodeShift logo (uploaded asset, used as-is). */
 export function Logo({ className = "h-10 w-10" }: { className?: string }) {
-  return <img src={logoAsset.url} alt="" className={`${className} shrink-0 rounded-full bg-foreground object-contain ring-1 ring-border`} />;
+  return <span className={`${className} inline-flex shrink-0 overflow-hidden rounded-full bg-support ring-1 ring-border`}><img src={logoAsset.url} alt="" className="h-full w-full scale-[1.3] object-contain" /></span>;
 }
 
-export function Wordmark() {
+export function Wordmark({ prominent = false }: { prominent?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5" aria-label="CodeShift home">
-      <Logo />
-      <span className="font-display text-lg font-bold tracking-tight">
+      <Logo className={prominent ? "h-14 w-14 lg:h-[58px] lg:w-[58px]" : "h-10 w-10"} />
+      <span className="font-display text-lg font-bold">
         Code<span className="text-gradient">Shift</span>
       </span>
     </Link>
@@ -37,21 +37,22 @@ const nav = [
 ] as const;
 
 const linkCls = "relative rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground";
-const activeCls = "text-foreground after:absolute after:inset-x-3 after:-bottom-5 after:h-0.5 after:rounded-full after:bg-gradient-brand";
+const activeCls = "text-foreground after:absolute after:inset-x-3 after:-bottom-4 after:h-0.5 after:rounded-full after:bg-gradient-brand";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="screen-only sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 lg:h-20">
-        <Wordmark />
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 lg:h-[74px]">
+        <Wordmark prominent />
         <nav aria-label="Main" className="hidden items-center gap-1 text-sm lg:flex">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
               {n.label}
             </Link>
           ))}
-          <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
+          <ExtLink href={SITE.facebook} className={`${linkCls} inline-flex items-center gap-2`}><Facebook className="h-4 w-4" /> Facebook</ExtLink>
+          <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-md bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
             <Youtube className="h-4 w-4" /> YouTube
           </ExtLink>
         </nav>
@@ -60,13 +61,14 @@ export function SiteHeader() {
         </Button>
       </div>
       {open && (
-        <nav aria-label="Mobile" className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
+        <nav aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
           {nav.map((n) => (
             <Link key={n.to} to={n.to} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
               className="block rounded-md px-3 py-3 text-muted-foreground" activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}>
               {n.label}
             </Link>
           ))}
+          <ExtLink href={SITE.facebook} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Facebook className="h-4 w-4" /> Facebook</ExtLink>
           <ExtLink href={SITE.youtube} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Youtube className="h-4 w-4" /> YouTube</ExtLink>
         </nav>
       )}
