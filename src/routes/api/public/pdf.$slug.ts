@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/public/pdf/$slug")({
         // Only known episodes are rendered; the target URL is built from a fixed origin.
         const ep = getEpisode(params.slug);
         if (!ep) return json(404, "Unknown episode");
-        const token = process.env.BROWSERLESS_API_KEY;
+        const token = process.env['BROWSERLESS_API_KEY'];
         if (!token) return json(503, "The PDF service is not configured yet.");
 
         const version = contentVersion(ep);

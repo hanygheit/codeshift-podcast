@@ -25,7 +25,7 @@ export function Scaled({ children, className = "" }: { children: ReactNode; clas
 
 const btn = "inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm hover:bg-secondary disabled:opacity-60";
 
-export function DeckPlayer({ ep, slideId }: { ep: Episode; slideId?: string }) {
+export function DeckPlayer({ ep, slideId }: { ep: Episode; slideId?: string | undefined }) {
   const slides = buildDeck(ep);
   const total = slides.length;
   const found = slides.findIndex((s) => s.id === slideId);

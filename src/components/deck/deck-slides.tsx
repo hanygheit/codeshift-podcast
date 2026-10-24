@@ -40,7 +40,7 @@ function WatchLink({ ep, label }: { ep: Episode; label?: string }) {
   );
 }
 
-function ResourceSlide({ group, items, part }: { group: string; items: BriefResource[]; part?: string }) {
+function ResourceSlide({ group, items, part }: { group: string; items: BriefResource[]; part?: string | undefined }) {
   return (
     <div className="flex h-full flex-col">
       <Kicker>Learning resources{part ? ` · ${part}` : ""}</Kicker>
