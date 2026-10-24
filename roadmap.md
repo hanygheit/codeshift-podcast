@@ -7,3 +7,5 @@
 - [x] PowerPoint-style 16:9 decks for EP001/EP002
 - [x] Host photos
 - [ ] Backend PDF via Browserless — code done; waiting on BROWSERLESS_API_KEY + publish
+- [x] Home: Upcoming Episode (YouTube) + Explore Episodes
+- [ ] Upcoming Episode live data — waiting on YOUTUBE_API_KEY

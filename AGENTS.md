@@ -14,3 +14,5 @@
 - Episode presentations are built by buildDeck() (src/components/deck) from episode data and rendered on a fixed 1920×1080 SlideFrame; the player, thumbnails and the `?export=1` view share it. Why: one visual source for web and PDF.
 - PDFs are rendered server-side by Browserless via /api/public/pdf/$slug loading the published `?export=1` view from a fixed origin; never use window.print or client PDF libraries. Bump DECK_DESIGN_VERSION when slide design changes. Why: slide-accurate downloadable PDFs, cache invalidation.
 - Learning resources live on each episode (EpisodeResources) — never a global directory on the home page. Why: user requirement.
+- Home and /episodes share EpisodeExplorer + filterEpisodes (URL search params, 10/page, default episode number desc). Why: one discovery logic.
+- Upcoming Episode is fetched server-side (getUpcomingLive) from the YouTube Data API via the channel uploads playlist + videos.list (low quota), cached 20 min; needs YOUTUBE_API_KEY. Never hardcode upcoming episodes. Why: automatic schedule sync.

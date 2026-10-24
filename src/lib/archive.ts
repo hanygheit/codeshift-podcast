@@ -9,7 +9,7 @@ export const archiveSearchSchema = z.object({
   topic: z.string().optional().catch(undefined),
   audience: z.string().optional().catch(undefined),
   year: z.string().optional().catch(undefined),
-  sort: z.enum(["newest", "oldest", "number"]).optional().catch(undefined),
+  sort: z.enum(["newest", "oldest", "number", "title-asc", "title-desc"]).optional().catch(undefined),
   page: z.coerce.number().int().min(1).optional().catch(undefined),
 });
 export type ArchiveSearch = z.infer<typeof archiveSearchSchema>;
@@ -18,7 +18,7 @@ export function filterEpisodes(episodes: Episode[], s: ArchiveSearch, pageSize =
   const q = s.q?.trim().toLowerCase();
   let list = episodes.filter((e) => {
     if (q) {
-      const hay = [e.title, e.summary, e.description, ...e.topics, ...e.tags].join(" ").toLowerCase();
+      const hay = [`ep${String(e.number).padStart(3, "0")}`, `ep${e.number}`, e.title, e.summary, e.description, ...e.topics, ...e.tags].join(" ").toLowerCase();
       if (!q.split(/\s+/).every((w) => hay.includes(w))) return false;
     }
     if (s.topic && !e.topics.includes(s.topic as never)) return false;
@@ -28,8 +28,9 @@ export function filterEpisodes(episodes: Episode[], s: ArchiveSearch, pageSize =
   });
   const sort = s.sort ?? "newest";
   list = [...list].sort((a, b) =>
-    sort === "number" ? a.number - b.number
-    : sort === "oldest" ? a.scheduledDate.localeCompare(b.scheduledDate)
+    sort === "oldest" || sort === "number" ? a.number - b.number
+    : sort === "title-asc" ? a.title.localeCompare(b.title)
+    : sort === "title-desc" ? b.title.localeCompare(a.title)
     : b.number - a.number,
   );
   const total = list.length;
