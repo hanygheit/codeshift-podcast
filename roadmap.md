@@ -5,7 +5,7 @@
 - [x] Hosts with LinkedIn links on home (already present via HostCard)
 - [x] Home page: episode listing with search + filters + pagination (5 per page)
 
-- [ ] Compact home with searchable episode table and direct video, summary and PDF actions
-- [ ] Searchable learning resources accessible directly from home
-- [ ] Actual LinkedIn profile photos for both hosts
-- [ ] Verify home search, filters, PDF and resource navigation
+- [x] Compact home with searchable episode table and direct video, summary and PDF actions
+- [x] Searchable learning resources accessible directly from home
+- [ ] Actual LinkedIn profile photos for both hosts — blocked by LinkedIn access restrictions; awaiting photo uploads
+- [x] Verify home search, filters, PDF and resource navigation
