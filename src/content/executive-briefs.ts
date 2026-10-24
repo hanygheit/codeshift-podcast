@@ -64,7 +64,7 @@ export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
       { title: '31–60 / Pilot', body: 'Train hands-on. Add agentic workflows, tests and review. Measure delivery and quality.' },
       { title: '61–90 / Scale', body: 'Standardise workflows and invest in skills. Expand proven practices.' },
     ] },
-    { id: 'case-study', title: 'Four students. Four weeks. One application.', section: 'WorxForge case study', layout: 'statement', subtitle: 'A four-week internship, not a controlled productivity study or proof of production readiness.', entries: [
+    { id: 'case-study', title: 'Four students. Four weeks. One application.', section: 'WorxForge case study', layout: 'flow', subtitle: 'Across a four-week internship; not a productivity study or proof of production readiness.', entries: [
       { title: 'Concept-focused learning', body: 'Computer science students combined learning with senior mentorship.' },
       { title: 'Agentic implementation', body: 'GitHub Copilot supported implementation of a .NET + React application.' },
       { title: 'A local demonstration', body: 'The team demonstrated a working application; the repository and whitepaper document the experience.' },

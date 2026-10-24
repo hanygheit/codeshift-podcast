@@ -72,8 +72,8 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
    s.entries.forEach((e,i)=>{
     const col=Math.floor(i/rows),row=i%rows,x=x0+col*(colWidth+36),y=start+row*rowHeight;
     const h=text(`${e.title} ↗`,x,y,colWidth, s.entries.length>8?32:36,'title', 'teal');
-    text(e.body,x,y+h+8,colWidth,28,'body','muted');
-    if(e.meta) text(e.meta,x,y+rowHeight-44,colWidth,26,'mono','muted');
+    // One concise metadata line avoids overlapping provider/access labels in dense directories.
+    text([e.body,e.meta].filter(Boolean).join(' · '),x,y+h+10,colWidth,28,'body','muted');
     rect(x,y+rowHeight-10,colWidth,1,'border');
     if(e.url)link(e.url,e.title,x,y,colWidth,rowHeight-10);
    });
