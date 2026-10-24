@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { Facebook, Linkedin, Youtube } from "lucide-react";
 import type { ReactNode } from "react";
 import { SITE, HOSTS } from "@/content/site";
-import { episodesNewestFirst } from "@/content/episodes";
 
 export function BrandMark({ className = "h-8 w-8" }: { className?: string }) {
   return (
