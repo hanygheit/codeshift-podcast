@@ -73,7 +73,8 @@ function Home() {
                   <div key={h.name} className="min-w-0 px-3 pb-4 sm:px-5 sm:pb-5">
                     <Waveform offset={i} />
                     <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${h.name} on LinkedIn (opens in a new tab)`} className="mt-3 block w-fit font-display text-sm font-semibold text-foreground transition-colors hover:text-teal sm:text-base lg:text-lg">{h.name}</a>
-                    <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`View ${h.name}'s LinkedIn profile (opens in a new tab)`} className="mt-1 inline-flex min-h-8 items-center gap-1.5 text-[11px] font-semibold text-teal hover:underline sm:text-xs">
+                    <p className="mt-1 text-[11px] font-medium leading-snug text-foreground/85 sm:text-xs">{h.heroTitle}</p>
+                    <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`View ${h.name}'s LinkedIn profile (opens in a new tab)`} className="mt-3 inline-flex min-h-8 items-center gap-1.5 text-[11px] font-semibold text-teal hover:underline sm:mt-2 sm:text-xs">
                       <Linkedin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> LinkedIn Profile <ArrowRight className="h-3 w-3 shrink-0" aria-hidden="true" />
                     </a>
                   </div>
