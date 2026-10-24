@@ -66,7 +66,7 @@ function Archive() {
             <option value="">All years</option>{YEARS.map((t) => <option key={t}>{t}</option>)}
           </select>
           <select aria-label="Sort" className={selectCls} value={s.sort ?? "newest"} onChange={(e) => set({ sort: e.target.value === "newest" ? undefined : (e.target.value as ArchiveSearch["sort"]) })}>
-            <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="number">Episode number</option>
+            <option value="newest">Latest episode first</option><option value="oldest">Oldest first</option><option value="number">Episode number</option>
           </select>
           {active && <button onClick={clear} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /> Clear</button>}
         </div>

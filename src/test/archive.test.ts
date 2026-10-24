@@ -28,4 +28,8 @@ describe("archive", () => {
     expect(filterEpisodes(EPISODES, {}).items[0]!.id).toBe("ep002");
     expect(filterEpisodes(EPISODES, { sort: "oldest" }).items[0]!.id).toBe("ep001");
   });
+  it("orders by episode number descending by default, regardless of date", () => {
+    const mixed = many.map((e, i) => ({ ...e, scheduledDate: `2026-02-${String(28 - i).padStart(2, "0")}` }));
+    expect(filterEpisodes(mixed, {}).items[0]!.number).toBe(23);
+  });
 });
