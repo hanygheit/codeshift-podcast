@@ -31,4 +31,16 @@ describe('shared presentation rules', () => {
     expect(EPISODES.find(e => e.id === 'ep001')?.youtubeUrl).toBe('https://www.youtube.com/live/bJTXs9y39Lw');
     expect(EPISODES.find(e => e.id === 'ep002')?.youtubeUrl).toBe('https://www.youtube.com/live/CohumEwctE4');
   });
+  it('retains the original fundamentals and company adoption frameworks', () => {
+    const first = EPISODES.find(e => e.id === 'ep001');
+    const second = EPISODES.find(e => e.id === 'ep002');
+    expect(first).toBeDefined(); expect(second).toBeDefined();
+    if (!first || !second) return;
+    const firstText = JSON.stringify(buildDeck(first));
+    expect(firstText).toContain('Spot inefficient or incorrect logic.');
+    expect(firstText).toContain('Diagnose what generated code actually does.');
+    const secondText = JSON.stringify(buildDeck(second));
+    expect(secondText).toContain('Pilot with a small team; set guidelines and security rules.');
+    expect(secondText).toContain('Standardise workflows and invest in skills.');
+  });
 });

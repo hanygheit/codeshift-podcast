@@ -110,8 +110,13 @@ export function buildDeck(ep: Episode): DeckSlide[] {
     if (block.kind === 'compare') add({ id: s.id, title: s.title, section: s.section, part: 'summary', layout: 'cards', entries: [block.left, block.right].map(c => ({ title: c.title, body: c.items.join('\n') })) });
     if (block.kind === 'steps') chunks(block.items, 4).forEach((group, i) => add({ id: i ? `${s.id}-${n}-${i + 1}` : s.id, title: s.title, section: s.section, part: 'summary', layout: 'timeline', entries: group.map(e => ({ title: e.title, body: e.body ?? '' })) }));
   }));
+  // Card-based source frameworks not already covered by the career-level brief.
+  ep.slides.filter(s => s.type === 'insight').forEach(s => s.blocks.forEach(block => {
+    if (block.kind === 'cards') chunks(block.items, 3).forEach((entries, i) => add({ id: i ? `${s.id}-${i + 1}` : s.id, title: s.title, section: s.section, part: 'summary', layout: 'cards', entries }));
+  }));
   if (b?.adoption) {
-    add({ id: 'adoption', title: '90-day AI adoption roadmap', section: 'For software companies', part: 'summary', layout: 'timeline', entries: b.adoption.phases.map(p => ({ title: `${p.days} / ${p.title}`, body: p.body })) });
+    const originalPhases = ep.slides.find(s => s.id === 'playbook-90')?.blocks.find(block => block.kind === 'steps');
+    add({ id: 'adoption', title: '90-day AI adoption roadmap', section: 'For software companies', part: 'summary', layout: 'timeline', entries: b.adoption.phases.map((p, i) => ({ title: `${p.days} / ${p.title}`, body: [p.body, originalPhases?.kind === 'steps' ? originalPhases.items[i]?.body : undefined].filter(Boolean).join('\n') })) });
     rows('adoption-measures', 'For software companies', b.adoption.highlight, [{ title: 'Measure engineering outcomes', body: b.adoption.metrics.join(' · ') }]);
   }
   if (b?.caseStudy) rows('case-study', 'WorxForge case study', b.caseStudy.headline, b.caseStudy.body.map(body => ({ title: '', body })));
