@@ -1,12 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Facebook, Youtube, CalendarClock } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, Facebook, Youtube, CalendarClock, Layers, Cog, BrainCircuit, Laptop, MessagesSquare, Users, Lightbulb, CalendarDays, Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { EpisodeCard } from "@/components/episode-card";
 import { ExtLink, HostCard, Tag } from "@/components/site";
 import { EXPLORE, HOSTS, SITE } from "@/content/site";
-import { episodesNewestFirst, formatDate, pad } from "@/content/episodes";
+import { EPISODES, episodesNewestFirst, formatDate, pad } from "@/content/episodes";
+import { AUDIENCES } from "@/content/types";
+import { archiveSearchSchema, filterEpisodes, type ArchiveSearch } from "@/lib/archive";
+import logoAsset from "@/assets/codeshift-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (s) => archiveSearchSchema.parse(s),
   head: () => ({
     meta: [
       { title: "CodeShift Podcast — Software Engineering in the AI Era" },
@@ -25,20 +30,27 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function HeroArt() {
+const HERO_LEFT = [
+  { icon: Layers, label: "Architecture" },
+  { icon: Cog, label: "System Design" },
+  { icon: BrainCircuit, label: "AI & Agentic Coding" },
+  { icon: Laptop, label: "Engineering Leadership" },
+];
+const HERO_RIGHT = [
+  { icon: MessagesSquare, label: "Practical Discussions" },
+  { icon: Users, label: "Real-World Experience" },
+  { icon: Lightbulb, label: "Advice & Mentoring" },
+  { icon: CalendarDays, label: "Weekly Episodes" },
+];
+
+function HeroFeature({ icon: Icon, label }: { icon: typeof Layers; label: string }) {
   return (
-    <svg viewBox="0 0 360 300" className="h-full w-full" aria-hidden="true">
-      {([[60, 60], [300, 70], [70, 240], [290, 230]] as const).map(([x, y], i) => (
-        <g key={i}>
-          <line x1="180" y1="150" x2={x} y2={y} stroke="var(--teal)" strokeOpacity=".5" className="animate-dash" />
-          <rect x={x - 26} y={y - 18} width="52" height="36" rx="8" fill="var(--surface-raised)" stroke="var(--border)" />
-          <text x={x} y={y + 5} textAnchor="middle" fontFamily="var(--font-mono)" fontSize="12" fill="var(--muted-foreground)">{["</>", "API", "test", "ship"][i]}</text>
-        </g>
-      ))}
-      <circle cx="180" cy="150" r="54" fill="var(--surface)" stroke="var(--primary)" strokeWidth="2" />
-      <circle cx="180" cy="150" r="72" fill="none" stroke="var(--teal)" strokeOpacity=".3" strokeDasharray="2 8" />
-      <text x="180" y="160" textAnchor="middle" fontFamily="var(--font-display)" fontWeight="800" fontSize="30" fill="var(--teal)">CS</text>
-    </svg>
+    <li className="flex items-center gap-3">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border bg-card text-teal shadow-sm">
+        <Icon className="h-5 w-5" />
+      </span>
+      <span className="font-semibold">{label}</span>
+    </li>
   );
 }
 
@@ -49,14 +61,14 @@ function Home() {
     <PageShell>
       <section className="relative overflow-hidden bg-hero">
         <div className="grid-lines absolute inset-0 opacity-40" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-[1.2fr_1fr] md:py-28">
-          <div>
+        <div className="relative mx-auto max-w-6xl px-5 py-16 md:py-24">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">Weekly Arabic podcast · {SITE.descriptor}</p>
             <h1 className="mt-5 text-5xl font-extrabold leading-[1.02] md:text-7xl">
-              Think Beyond<br /><span className="text-gradient">the Code.</span>
+              Think Beyond <span className="text-gradient">the Code.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-muted-foreground">{SITE.description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">{SITE.description}</p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/episodes" className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 font-semibold text-primary-foreground shadow-glow">
                 Explore Episodes <ArrowRight className="h-4 w-4" />
               </Link>
@@ -65,7 +77,27 @@ function Home() {
               </ExtLink>
             </div>
           </div>
-          <div className="animate-float mx-auto aspect-[6/5] w-full max-w-md"><HeroArt /></div>
+          <div className="mt-16 grid items-center gap-10 md:grid-cols-[1fr_auto_1fr]">
+            <ul className="space-y-5 md:justify-self-end">
+              {HERO_LEFT.map((f) => <HeroFeature key={f.label} {...f} />)}
+            </ul>
+            <div className="relative mx-auto order-first md:order-none">
+              <div className="absolute inset-0 -m-10 rounded-full bg-primary/30 blur-3xl" />
+              <div className="absolute inset-0 -m-4 rounded-full border border-teal/30" />
+              <img src={logoAsset.url} alt="CodeShift logo" className="animate-float relative w-56 rounded-full shadow-glow md:w-72" />
+            </div>
+            <ul className="space-y-5">
+              {HERO_RIGHT.map((f) => <HeroFeature key={f.label} {...f} />)}
+            </ul>
+          </div>
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-3">
+            <ExtLink href={SITE.youtube} className="inline-flex items-center gap-2 rounded-full border bg-card px-5 py-2.5 text-sm font-semibold hover:bg-secondary">
+              <Youtube className="h-4 w-4 text-primary" /> YouTube
+            </ExtLink>
+            <ExtLink href={SITE.facebook} className="inline-flex items-center gap-2 rounded-full border bg-card px-5 py-2.5 text-sm font-semibold hover:bg-secondary">
+              <Facebook className="h-4 w-4 text-primary" /> Facebook
+            </ExtLink>
+          </div>
         </div>
       </section>
 
@@ -100,13 +132,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-5 py-16">
-        <div className="flex items-end justify-between gap-4">
-          <div><p className="eyebrow">Archive</p><h2 className="mt-3 text-3xl font-bold">Recent episodes</h2></div>
-          <Link to="/episodes" className="text-sm font-semibold text-primary hover:underline">All episodes →</Link>
-        </div>
-        <div className="mt-8 grid gap-6 md:grid-cols-2">{eps.slice(0, 4).map((e) => <EpisodeCard key={e.id} ep={e} />)}</div>
-      </section>
+      <EpisodeBrowser />
 
       <section className="mx-auto max-w-6xl px-5 py-16">
         <p className="eyebrow">Your hosts</p>
@@ -126,5 +152,77 @@ function Home() {
         </div>
       </section>
     </PageShell>
+  );
+}
+
+const HOME_PAGE_SIZE = 5;
+const TOPICS = [...new Set(EPISODES.flatMap((e) => e.topics))].sort();
+const YEARS = [...new Set(EPISODES.map((e) => e.scheduledDate.slice(0, 4)))].sort().reverse();
+const selectCls = "rounded-lg border bg-card px-3 py-2 text-sm";
+
+function EpisodeBrowser() {
+  const s = Route.useSearch();
+  const navigate = useNavigate({ from: "/" });
+  const set = (patch: Partial<ArchiveSearch>, resetPage = true) =>
+    navigate({ search: (prev) => {
+      const next = { ...prev, ...patch, ...(resetPage ? { page: undefined } : {}) };
+      Object.keys(next).forEach((k) => { const v = next[k as keyof ArchiveSearch]; if (v === "" || v === undefined) delete next[k as keyof ArchiveSearch]; });
+      return next;
+    }, replace: true });
+  const [q, setQ] = useState(s.q ?? "");
+  useEffect(() => setQ(s.q ?? ""), [s.q]);
+  useEffect(() => { const t = setTimeout(() => { if ((s.q ?? "") !== q) set({ q }); }, 250); return () => clearTimeout(t); }, [q]);
+
+  const { items, total, page, pageCount, pageSize } = filterEpisodes(EPISODES, s, HOME_PAGE_SIZE);
+  const active = !!(s.q || s.topic || s.audience || s.year || s.sort);
+  const clear = () => navigate({ search: {} });
+
+  return (
+    <section className="mx-auto max-w-6xl px-5 py-16">
+      <p className="eyebrow">Archive</p>
+      <h2 className="mt-3 text-3xl font-bold">Browse episodes</h2>
+      <div className="mt-8 flex flex-col gap-3 rounded-2xl border bg-surface p-4 lg:flex-row lg:items-center">
+        <label className="relative flex-1">
+          <span className="sr-only">Search episodes</span>
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search titles, topics, tags…"
+            className="w-full rounded-lg border bg-card py-2 pl-9 pr-3 text-sm" />
+        </label>
+        <select aria-label="Topic" className={selectCls} value={s.topic ?? ""} onChange={(e) => set({ topic: e.target.value })}>
+          <option value="">All topics</option>{TOPICS.map((t) => <option key={t}>{t}</option>)}
+        </select>
+        <select aria-label="Audience" className={selectCls} value={s.audience ?? ""} onChange={(e) => set({ audience: e.target.value })}>
+          <option value="">All audiences</option>{AUDIENCES.map((t) => <option key={t}>{t}</option>)}
+        </select>
+        <select aria-label="Year" className={selectCls} value={s.year ?? ""} onChange={(e) => set({ year: e.target.value })}>
+          <option value="">All years</option>{YEARS.map((t) => <option key={t}>{t}</option>)}
+        </select>
+        <select aria-label="Sort" className={selectCls} value={s.sort ?? "newest"} onChange={(e) => set({ sort: e.target.value === "newest" ? undefined : (e.target.value as ArchiveSearch["sort"]) })}>
+          <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="number">Episode number</option>
+        </select>
+        {active && <button onClick={clear} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /> Clear</button>}
+      </div>
+      <p className="mt-6 text-sm text-muted-foreground" aria-live="polite">
+        {total === 0 ? "No episodes found" : `Showing ${(page - 1) * pageSize + 1}–${(page - 1) * pageSize + items.length} of ${total} episode${total === 1 ? "" : "s"}`}
+      </p>
+      {total === 0 ? (
+        <div className="mt-8 rounded-2xl border border-dashed p-12 text-center">
+          <p className="text-lg font-semibold">Nothing matches those filters.</p>
+          <button onClick={clear} className="mt-4 rounded-full bg-gradient-brand px-5 py-2.5 font-semibold text-primary-foreground">Reset filters</button>
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{items.map((e) => <EpisodeCard key={e.id} ep={e} />)}</div>
+      )}
+      {pageCount > 1 && (
+        <nav aria-label="Pagination" className="mt-10 flex items-center justify-center gap-2">
+          <Link to="/" search={{ ...s, page: page - 1 }} disabled={page === 1} className="rounded-lg border px-3 py-2 text-sm aria-disabled:opacity-40">Previous</Link>
+          {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+            <Link key={n} to="/" search={{ ...s, page: n }} aria-current={n === page ? "page" : undefined}
+              className={`rounded-lg border px-3 py-2 text-sm ${n === page ? "bg-gradient-brand text-primary-foreground" : ""}`}>{n}</Link>
+          ))}
+          <Link to="/" search={{ ...s, page: page + 1 }} disabled={page === pageCount} className="rounded-lg border px-3 py-2 text-sm aria-disabled:opacity-40">Next</Link>
+        </nav>
+      )}
+    </section>
   );
 }
