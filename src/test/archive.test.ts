@@ -32,4 +32,9 @@ describe("archive", () => {
     const mixed = many.map((e, i) => ({ ...e, scheduledDate: `2026-02-${String(28 - i).padStart(2, "0")}` }));
     expect(filterEpisodes(mixed, {}).items[0]!.number).toBe(23);
   });
+  it("sorts by title and searches by episode number", () => {
+    expect(filterEpisodes(EPISODES, { sort: "title-asc" }).items[0]!.id).toBe("ep001");
+    expect(filterEpisodes(EPISODES, { sort: "title-desc" }).items[0]!.id).toBe("ep002");
+    expect(filterEpisodes(EPISODES, { q: "EP001" }).items.map((e) => e.id)).toEqual(["ep001"]);
+  });
 });
