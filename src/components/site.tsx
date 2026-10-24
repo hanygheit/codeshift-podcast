@@ -6,10 +6,10 @@ import logoAsset from "@/assets/codeshift-logo.png.asset.json";
 import itiSupport from "@/assets/iti-support.png.asset.json";
 import { Button } from "@/components/ui/button";
 
-function SupportBadge({ compact = false }: { compact?: boolean }) {
+function SupportBadge({ className = "w-28 p-2", imgClassName = "h-auto w-full" }: { className?: string; imgClassName?: string }) {
   return (
-    <div className={`shrink-0 rounded-md border border-support-border bg-support p-2 ${compact ? "w-24" : "w-28"}`}>
-      <img src={itiSupport.url} alt="Supported by — Information Technology Institute (ITI)" width={1124} height={705} className="block h-auto w-full" />
+    <div className={`inline-flex shrink-0 rounded-md border border-support-border bg-support ${className}`}>
+      <img src={itiSupport.url} alt="Supported by — Information Technology Institute (ITI)" width={1124} height={705} className={`block ${imgClassName}`} />
     </div>
   );
 }
@@ -55,11 +55,15 @@ export function SiteHeader() {
           <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
             <Youtube className="h-4 w-4" /> YouTube
           </ExtLink>
-          <div className="ml-5 border-l pl-5"><SupportBadge /></div>
         </nav>
         <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
+      </div>
+      <div className="border-t bg-secondary/40">
+        <div className="mx-auto flex max-w-7xl items-center justify-center px-5 py-1.5">
+          <SupportBadge className="p-2" imgClassName="h-10 w-auto" />
+        </div>
       </div>
       {open && (
         <nav aria-label="Mobile" className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
@@ -71,7 +75,6 @@ export function SiteHeader() {
           ))}
           <ExtLink href={SITE.facebook} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Facebook className="h-4 w-4" /> Facebook</ExtLink>
           <ExtLink href={SITE.youtube} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Youtube className="h-4 w-4" /> YouTube</ExtLink>
-          <div className="mt-3 border-t px-3 pt-4 pb-2"><SupportBadge /></div>
         </nav>
       )}
     </header>
@@ -85,7 +88,7 @@ export function SiteFooter() {
         <div className="space-y-3">
           <Wordmark />
           <p className="text-sm text-muted-foreground">{SITE.descriptor}. An independent, community knowledge-sharing initiative — not a commercial training platform.</p>
-          <div className="pt-2"><SupportBadge compact /></div>
+          <div className="pt-2"><SupportBadge className="p-2" imgClassName="h-9 w-auto" /></div>
         </div>
         <div className="text-sm">
           <p className="eyebrow mb-3">Explore</p>
