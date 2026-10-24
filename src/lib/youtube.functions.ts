@@ -17,7 +17,7 @@ export type UpcomingResult =
   | { status: "error"; message: string };
 
 const TTL_MS = 20 * 60 * 1000;
-let cache: { at: number; value: UpcomingResult } | null = null;
+let upcomingCache: { at: number; value: UpcomingResult } | null = null;
 
 type Thumbs = Record<string, { url: string } | undefined>;
 interface VideoItem {
@@ -42,7 +42,7 @@ async function yt<T>(path: string, params: Record<string, string>, key: string):
 export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (): Promise<UpcomingResult> => {
   const key = process.env["YOUTUBE_API_KEY"];
   if (!key) return { status: "unconfigured" };
-  if (cache && Date.now() - cache.at < TTL_MS) return cache.value;
+  if (upcomingCache && Date.now() - upcomingCache.at < TTL_MS) return upcomingCache.value;
   try {
     const uploads = "UU" + CODESHIFT_CHANNEL_ID.slice(2);
     const list = await yt<{ items?: { contentDetails: { videoId: string } }[] }>("playlistItems",
@@ -74,7 +74,7 @@ export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (
       event = candidates[0] ?? null;
     }
     const value: UpcomingResult = { status: "ok", event, checkedAt: new Date().toISOString() };
-    cache = { at: Date.now(), value };
+    upcomingCache = { at: Date.now(), value };
     return value;
   } catch (e) {
     console.error("Upcoming live lookup failed", e);
