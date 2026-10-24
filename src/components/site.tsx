@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 function SupportBadge({ className = "w-28 p-2", imgClassName = "h-auto w-full" }: { className?: string; imgClassName?: string }) {
   return (
-    <div className={`shrink-0 rounded-md border border-support-border bg-support ${className}`}>
+    <div className={`inline-flex shrink-0 rounded-md border border-support-border bg-support ${className}`}>
       <img src={itiSupport.url} alt="Supported by — Information Technology Institute (ITI)" width={1124} height={705} className={`block ${imgClassName}`} />
     </div>
   );
@@ -62,7 +62,7 @@ export function SiteHeader() {
       </div>
       <div className="border-t bg-secondary/40">
         <div className="mx-auto flex max-w-7xl items-center justify-center px-5 py-1.5">
-          <SupportBadge className="p-1.5" imgClassName="h-10 w-auto" />
+          <SupportBadge className="p-2" imgClassName="h-10 w-auto" />
         </div>
       </div>
       {open && (
@@ -88,7 +88,7 @@ export function SiteFooter() {
         <div className="space-y-3">
           <Wordmark />
           <p className="text-sm text-muted-foreground">{SITE.descriptor}. An independent, community knowledge-sharing initiative — not a commercial training platform.</p>
-          <div className="pt-2"><SupportBadge className="p-1.5" imgClassName="h-9 w-auto" /></div>
+          <div className="pt-2"><SupportBadge className="p-2" imgClassName="h-9 w-auto" /></div>
         </div>
         <div className="text-sm">
           <p className="eyebrow mb-3">Explore</p>
