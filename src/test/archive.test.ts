@@ -38,3 +38,13 @@ describe("archive", () => {
     expect(filterEpisodes(EPISODES, { q: "EP001" }).items.map((e) => e.id)).toEqual(["ep001"]);
   });
 });
+
+describe("library sorting", () => {
+  it("supports publication date newest first", () => {
+    expect(filterEpisodes(EPISODES, { sort: "date-desc" }).items[0]!.id).toBe("ep002");
+  });
+  it("filters by topic", () => {
+    const t = EPISODES[0]!.topics[0]!;
+    expect(filterEpisodes(EPISODES, { topic: t }).items.every((e) => e.topics.includes(t))).toBe(true);
+  });
+});
