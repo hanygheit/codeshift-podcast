@@ -7,7 +7,6 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { ExtLink, HostCard, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
-import { EPISODES } from "@/content/episodes";
 
 export const Route = createFileRoute("/")({
   validateSearch: (s) => archiveSearchSchema.parse(s),
