@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Facebook, Youtube, CalendarClock } from "lucide-react";
+import { ArrowRight, Facebook, Youtube, CalendarClock, Layers, Cog, BrainCircuit, Laptop, MessagesSquare, Users, Lightbulb, CalendarDays } from "lucide-react";
 import { PageShell } from "@/components/page-shell";
 import { EpisodeCard } from "@/components/episode-card";
 import { ExtLink, HostCard, Tag } from "@/components/site";
 import { EXPLORE, HOSTS, SITE } from "@/content/site";
 import { episodesNewestFirst, formatDate, pad } from "@/content/episodes";
+import logoAsset from "@/assets/codeshift-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
