@@ -1,11 +1,9 @@
 # Roadmap
 
-- [x] Use uploaded logo as-is (home hero, About, favicon)
-- [x] Home hero redesigned like FB cover (logo center, flanking topic lists, social pills)
-- [x] Hosts with LinkedIn links on home (already present via HostCard)
-- [x] Home page: episode listing with search + filters + pagination (5 per page)
-
-- [x] Compact home with searchable episode table and direct video, summary and PDF actions
-- [x] Searchable learning resources accessible directly from home
-- [ ] Actual LinkedIn profile photos for both hosts — blocked by LinkedIn access restrictions; awaiting photo uploads
-- [x] Verify home search, filters, PDF and resource navigation
+- [ ] Global sticky nav with real logo (Home, Episodes, About, Facebook, YouTube) + mobile menu on all pages
+- [ ] Simplified home: hero, latest episode, previous episodes, topics, hosts; no global resource directory
+- [ ] Episodes ordered by number descending (home + archive)
+- [ ] Episode-specific resources with search + package filter on episode pages
+- [ ] PowerPoint-style 16:9 decks for EP001/EP002 (one slide at a time, thumbnails, fullscreen, keyboard, swipe)
+- [ ] Backend PDF via Browserless (Download PDF, no print dialog) — needs BROWSERLESS_API_KEY
+- [ ] Host photos — waiting on user upload
