@@ -57,14 +57,14 @@ function Home() {
     <PageShell>
       <section className="relative overflow-hidden bg-hero">
         <div className="grid-lines absolute inset-0 opacity-40" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-[1.2fr_1fr] md:py-28">
-          <div>
+        <div className="relative mx-auto max-w-6xl px-5 py-16 md:py-24">
+          <div className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">Weekly Arabic podcast · {SITE.descriptor}</p>
             <h1 className="mt-5 text-5xl font-extrabold leading-[1.02] md:text-7xl">
-              Think Beyond<br /><span className="text-gradient">the Code.</span>
+              Think Beyond <span className="text-gradient">the Code.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-muted-foreground">{SITE.description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">{SITE.description}</p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/episodes" className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 font-semibold text-primary-foreground shadow-glow">
                 Explore Episodes <ArrowRight className="h-4 w-4" />
               </Link>
@@ -73,7 +73,27 @@ function Home() {
               </ExtLink>
             </div>
           </div>
-          <div className="animate-float mx-auto aspect-[6/5] w-full max-w-md"><HeroArt /></div>
+          <div className="mt-16 grid items-center gap-10 md:grid-cols-[1fr_auto_1fr]">
+            <ul className="space-y-5 md:justify-self-end">
+              {HERO_LEFT.map((f) => <HeroFeature key={f.label} {...f} />)}
+            </ul>
+            <div className="relative mx-auto order-first md:order-none">
+              <div className="absolute inset-0 -m-10 rounded-full bg-primary/30 blur-3xl" />
+              <div className="absolute inset-0 -m-4 rounded-full border border-teal/30" />
+              <img src={logoAsset.url} alt="CodeShift logo" className="animate-float relative w-56 rounded-full shadow-glow md:w-72" />
+            </div>
+            <ul className="space-y-5">
+              {HERO_RIGHT.map((f) => <HeroFeature key={f.label} {...f} />)}
+            </ul>
+          </div>
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-3">
+            <ExtLink href={SITE.youtube} className="inline-flex items-center gap-2 rounded-full border bg-card px-5 py-2.5 text-sm font-semibold hover:bg-secondary">
+              <Youtube className="h-4 w-4 text-primary" /> YouTube
+            </ExtLink>
+            <ExtLink href={SITE.facebook} className="inline-flex items-center gap-2 rounded-full border bg-card px-5 py-2.5 text-sm font-semibold hover:bg-secondary">
+              <Facebook className="h-4 w-4 text-primary" /> Facebook
+            </ExtLink>
+          </div>
         </div>
       </section>
 
