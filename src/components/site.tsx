@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Facebook, Linkedin, Menu, X, Youtube } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { SITE, HOSTS } from "@/content/site";
@@ -45,6 +45,24 @@ const nav = [
 const linkCls = "relative rounded-md px-3 py-2 text-muted-foreground transition-colors hover:text-foreground";
 const activeCls = "text-foreground after:absolute after:inset-x-3 after:-bottom-4 after:h-0.5 after:rounded-full after:bg-gradient-brand";
 
+function NavItem({ n, className, activeClass, onNavigate }: { n: (typeof nav)[number]; className: string; activeClass: string; onNavigate?: () => void }) {
+  const loc = useRouterState({ select: (s) => s.location });
+  const active =
+    (n.to === "/" ? loc.pathname === "/" : loc.pathname.startsWith(n.to)) &&
+    ("hash" in n ? loc.hash === `#${n.hash}` : loc.hash === "");
+  return (
+    <Link
+      to={n.to}
+      {...("hash" in n ? { hash: n.hash } : {})}
+      {...(onNavigate ? { onClick: onNavigate } : {})}
+      className={`${className} ${active ? activeClass : ""}`}
+      {...(active ? { "aria-current": "page" as const } : {})}
+    >
+      {n.label}
+    </Link>
+  );
+}
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
@@ -52,11 +70,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 lg:h-[74px]">
         <Wordmark prominent />
         <nav aria-label="Main" className="hidden items-center gap-1 text-sm lg:flex">
-          {nav.map((n) => (
-            <Link key={n.label} to={n.to} {...("hash" in n ? { hash: n.hash } : {})} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
-              {n.label}
-            </Link>
-          ))}
+          {nav.map((n) => <NavItem key={n.label} n={n} className={linkCls} activeClass={activeCls} />)}
           <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-md bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
             <Youtube className="h-4 w-4" /> YouTube
           </ExtLink>
@@ -67,12 +81,7 @@ export function SiteHeader() {
       </div>
       {open && (
         <nav aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
-          {nav.map((n) => (
-            <Link key={n.label} to={n.to} {...("hash" in n ? { hash: n.hash } : {})} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
-              className="block rounded-md px-3 py-3 text-muted-foreground" activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}>
-              {n.label}
-            </Link>
-          ))}
+          {nav.map((n) => <NavItem key={n.label} n={n} onNavigate={() => setOpen(false)} className="block rounded-md px-3 py-3 text-muted-foreground" activeClass="bg-secondary text-foreground" />)}
           <ExtLink href={SITE.youtube} className="flex items-center gap-2 rounded-md px-3 py-3 text-muted-foreground"><Youtube className="h-4 w-4" /> YouTube</ExtLink>
         </nav>
       )}
