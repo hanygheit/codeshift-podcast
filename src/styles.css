@@ -40,7 +40,7 @@
 }
 
 :root {
-  /* Canonical vector deck palette; kept in sync with deck-pdf.server.ts. */
+  /* Canonical vector deck palette, also parsed by the backend PDF renderer. */
   --deck-background: rgb(13 21 39);
   --deck-foreground: rgb(241 245 250);
   --deck-muted: rgb(170 186 209);

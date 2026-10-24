@@ -4,12 +4,14 @@ import fontData from '@/assets/deck-fonts.json';
 import imageData from '@/assets/deck-images.json';
 import { buildDeck, SLIDE_HEIGHT, SLIDE_WIDTH, type Ink } from './deck-model';
 import type { Episode } from '@/content/types';
+import designTokens from '@/styles.css?raw';
 
-/** sRGB equivalents of the canonical --deck-* design tokens. */
-const colors: Record<Ink, [number, number, number]> = {
-  background: [13, 21, 39], foreground: [241, 245, 250], muted: [170, 186, 209],
-  primary: [48, 133, 246], teal: [70, 214, 197], panel: [24, 37, 59], border: [49, 68, 94],
-};
+/** Read the very same canonical design tokens used by SVG, without a second palette. */
+function colorFor(ink: Ink) {
+  const match = designTokens.match(new RegExp(`--deck-${ink}:\\s*rgb\\((\\d+) (\\d+) (\\d+)\\)`));
+  if (!match) throw new Error('Missing presentation color token');
+  return rgb(Number(match[1]) / 255, Number(match[2]) / 255, Number(match[3]) / 255);
+}
 const bytes = (value: string) => Uint8Array.from(atob(value), c => c.charCodeAt(0));
 
 export async function generateDeckPdf(ep: Episode): Promise<Uint8Array> {
@@ -51,8 +53,7 @@ export async function generateDeckPdf(ep: Episode): Promise<Uint8Array> {
         page.drawImage(image, { x: node.x + (node.width - w) / 2, y: SLIDE_HEIGHT - node.y - (node.height + h) / 2, width: w, height: h });
         continue;
       }
-      const c = colors[node.ink];
-      const color = rgb(c[0] / 255, c[1] / 255, c[2] / 255);
+      const color = colorFor(node.ink);
       if (node.kind === 'rect') page.drawRectangle({ x: node.x, y: SLIDE_HEIGHT - node.y - node.height, width: node.width, height: node.height, color });
       else node.lines.forEach((line, i) => page.drawText(line, { x: node.x, y: SLIDE_HEIGHT - node.y - node.size * .8 - i * node.size * 1.3, size: node.size, font: fonts[node.font], color }));
     }

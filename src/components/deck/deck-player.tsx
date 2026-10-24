@@ -2,7 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, BookOpen, ChevronLeft, ChevronRight, List, Maximize2, Minimize2, X } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Episode } from '@/content/types';
-import { pad } from '@/content/episodes';
+import { formatDate, pad } from '@/content/episodes';
 import { boundedSlide } from '@/lib/deck-model';
 import { buildDeck, SlideFrame } from './deck-slides';
 import { DownloadPdfButton } from './download-pdf';
@@ -96,7 +96,7 @@ export function DeckPlayer({ ep, slideId }: { ep: Episode; slideId?: string | un
         {slide.image && <img src={slide.image} alt="Episode cover" className="mt-5 w-full rounded-md" />}
         {slide.subtitle && <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{slide.subtitle}</p>}
         <div className="mt-6 divide-y">{slide.entries.map((e, n) => <div key={n} className="py-5 first:pt-0">{e.url ? <a href={e.url} target="_blank" rel="noopener noreferrer" className="block min-h-11 text-lg font-semibold text-teal">{e.title} ↗</a> : e.title && <h2 className="text-lg font-semibold">{e.title}</h2>}<p className="mt-2 whitespace-pre-line leading-relaxed text-muted-foreground">{e.body}</p>{e.meta && <p className="mt-3 font-mono text-xs text-teal">{e.meta}</p>}</div>)}</div>
-        {slide.layout === 'cover' && <Button asChild className="mt-5"><a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer">Watch Episode ↗</a></Button>}
+        {slide.layout === 'cover' && <><p className="mt-5 text-sm text-muted-foreground">{formatDate(ep.scheduledDate)} · Hany Saad &amp; Ahmed Mamdoh</p><Button asChild className="mt-5"><a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer">Watch Episode ↗</a></Button></>}
       </article>
       {contents && <aside role="dialog" aria-label="Presentation contents" className="presentation-contents absolute inset-y-0 left-0 z-30 w-full max-w-md overflow-y-auto border-r bg-popover p-4 shadow-glow">
         <div className="flex items-center justify-between"><h2 className="text-lg font-semibold">Contents</h2><Button variant="ghost" size="icon" onClick={() => setContents(false)} aria-label="Close contents"><X /></Button></div>

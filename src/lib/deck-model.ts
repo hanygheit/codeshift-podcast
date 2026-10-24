@@ -108,7 +108,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
   const unique = ep.slides.filter(s => s.blocks.some(block => block.kind === 'compare' || block.kind === 'steps') && !/90/.test(s.id));
   unique.forEach(s => s.blocks.forEach((block: SlideBlock, n) => {
     if (block.kind === 'compare') add({ id: s.id, title: s.title, section: s.section, part: 'summary', layout: 'cards', entries: [block.left, block.right].map(c => ({ title: c.title, body: c.items.join('\n') })) });
-    if (block.kind === 'steps') chunks(block.items, 3).forEach((group, i) => add({ id: i ? `${s.id}-${n}-${i + 1}` : s.id, title: s.title, section: s.section, part: 'summary', layout: 'timeline', entries: group.map(e => ({ title: e.title, body: e.body ?? '' })) }));
+    if (block.kind === 'steps') chunks(block.items, 4).forEach((group, i) => add({ id: i ? `${s.id}-${n}-${i + 1}` : s.id, title: s.title, section: s.section, part: 'summary', layout: 'timeline', entries: group.map(e => ({ title: e.title, body: e.body ?? '' })) }));
   }));
   if (b?.adoption) {
     add({ id: 'adoption', title: '90-day AI adoption roadmap', section: 'For software companies', part: 'summary', layout: 'timeline', entries: b.adoption.phases.map(p => ({ title: `${p.days} / ${p.title}`, body: p.body })) });
