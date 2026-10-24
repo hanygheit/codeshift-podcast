@@ -14,6 +14,7 @@
 
 - Episode presentations use the pure buildDeck() declarative primitive model in src/lib/deck-model.ts; SVG SlideFrame and the local pdf-lib backend consume the same 1920×1080 geometry, font metrics, palette, assets and link nodes. Why: vector fidelity without HTML conversion.
 - PDFs are generated directly by pdf-lib and fontkit inside /api/public/pdf/$slug using bundled fonts and original artwork, with link annotations and versioned caching; never use browser printing, browser automation or external conversion services. Bump DECK_DESIGN_VERSION when design or fonts change. Why: selectable, slide-accurate backend downloads without paid infrastructure.
+- PDF artwork uses repository-generated high-quality JPEG derivatives of the original artwork, embedded directly without runtime PNG decoding; regenerate derivatives when originals change. Why: keep request-time CPU and memory within hosted limits without changing slide geometry or original website assets.
 - Episode pages are discovery-only; full resources and editorial education live in the presentation, with adaptive semantic reading on portrait phones. Why: short episode pages and readable resource access.
 - Presentation navigation is URL-driven with history entries, bounded indices and input-aware keyboard/touch handlers. Why: direct links and natural browser Back preserve slide position.
 - Vector slides scale natively through their fixed SVG viewBox and aspect-ratio wrapper rather than JavaScript measurement. Why: avoid blank initial slides and resize races while sharing exact PDF coordinates.

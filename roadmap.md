@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Correct hosted PDF preparation failure and verify both episode downloads.
+
 - [x] Compact navbar and homepage hero; original larger logo, approved copy, profile links without hero job titles, ITI beneath CTAs; verified desktop/tablet/mobile and public routes.
 
 - [x] Focused hero/header refinement: approved wording, portrait links, dual waveforms and supplied ITI header/footer badges; verify desktop/mobile and existing navigation
