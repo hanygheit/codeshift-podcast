@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Consolidate EP001/EP002 into short executive briefs with complete package resources.
+- [ ] Improve shared slide typography, editorial layouts, canvas and resource navigation.
+- [ ] Verify desktop/mobile navigation, resources, finalized PDFs and unchanged public routes.
+
 - [x] Harden PDF preparation: efficient original-artwork derivatives, nonfatal caching, versioned download requests; both presentation downloads verified and 13 relevant tests pass.
 - [ ] Verify corrected PDFs on the published site — waiting for publication of the tested changes.
 
