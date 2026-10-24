@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, CheckCircle2, Copy, ExternalLink, FileDown, Maximize2, Youtube } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Copy, ExternalLink, Maximize2, Youtube } from "lucide-react";
 import { useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { ExtLink, Tag } from "@/components/site";
