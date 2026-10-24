@@ -40,7 +40,7 @@ function Archive() {
   useEffect(() => setQ(s.q ?? ""), [s.q]);
   useEffect(() => { const t = setTimeout(() => { if ((s.q ?? "") !== q) set({ q }); }, 250); return () => clearTimeout(t); }, [q]);
 
-  const { items, total, page, pageCount } = filterEpisodes(EPISODES, s);
+  const { items, total, page, pageCount, pageSize } = filterEpisodes(EPISODES, s);
   const active = !!(s.q || s.topic || s.audience || s.year || s.sort);
   const clear = () => navigate({ search: {} });
 
@@ -71,7 +71,7 @@ function Archive() {
           {active && <button onClick={clear} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /> Clear</button>}
         </div>
         <p className="mt-6 text-sm text-muted-foreground" aria-live="polite">
-          {total === 0 ? "No episodes found" : `Showing ${(page - 1) * 10 + 1}–${(page - 1) * 10 + items.length} of ${total} episode${total === 1 ? "" : "s"}`}
+          {total === 0 ? "No episodes found" : `Showing ${(page - 1) * pageSize + 1}–${(page - 1) * pageSize + items.length} of ${total} episode${total === 1 ? "" : "s"}`}
         </p>
         {total === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed p-12 text-center">
