@@ -73,5 +73,6 @@ describe('shared presentation rules', () => {
     const deck = buildDeck(ep);
     expect(deck[slideIndex(deck, 'resources-3-4')]?.packageId).toBe('P03');
     expect(deck[slideIndex(deck, 'playbook-90')]?.id).toBe('adoption');
+    expect(deck[slideIndex(deck, 'lessons')]?.id).toBe('lessons');
   });
 });

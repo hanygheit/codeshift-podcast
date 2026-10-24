@@ -149,5 +149,5 @@ function legacyAliases(s:DeckSlide):string[] {
  if(s.packageId){const n=s.packageId.slice(-1);return [`resources-${n}-2`,`resources-${n}-3`,`resources-${n}-4`];}
  return aliases[s.id]??[];
 }
-export function slideIndex(slides:DeckSlide[],id?:string){const index=slides.findIndex(s=>s.id===id||s.aliases?.includes(id??''));return index<0?0:index;}
+export function slideIndex(slides:DeckSlide[],id?:string){const exact=slides.findIndex(s=>s.id===id);if(exact>=0)return exact;const alias=slides.findIndex(s=>s.aliases?.includes(id??''));return alias<0?0:alias;}
 export function boundedSlide(index:number,total:number){return Math.max(0,Math.min(total-1,index));}
