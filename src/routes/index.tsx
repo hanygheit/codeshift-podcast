@@ -1,13 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Facebook, Youtube, CalendarClock, Layers, Cog, BrainCircuit, Laptop, MessagesSquare, Users, Lightbulb, CalendarDays } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, Facebook, Youtube, CalendarClock, Layers, Cog, BrainCircuit, Laptop, MessagesSquare, Users, Lightbulb, CalendarDays, Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { PageShell } from "@/components/page-shell";
 import { EpisodeCard } from "@/components/episode-card";
 import { ExtLink, HostCard, Tag } from "@/components/site";
 import { EXPLORE, HOSTS, SITE } from "@/content/site";
-import { episodesNewestFirst, formatDate, pad } from "@/content/episodes";
+import { EPISODES, episodesNewestFirst, formatDate, pad } from "@/content/episodes";
+import { AUDIENCES } from "@/content/types";
+import { archiveSearchSchema, filterEpisodes, type ArchiveSearch } from "@/lib/archive";
 import logoAsset from "@/assets/codeshift-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (s) => archiveSearchSchema.parse(s),
   head: () => ({
     meta: [
       { title: "CodeShift Podcast — Software Engineering in the AI Era" },
