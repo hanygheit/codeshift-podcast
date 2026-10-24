@@ -34,7 +34,7 @@ export function Logo({ className = "h-10 w-10", hideSupport = false }: { classNa
 export function Wordmark({ prominent = false }: { prominent?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5" aria-label="CodeShift home">
-      <Logo className={prominent ? "h-14 w-14 lg:h-[58px] lg:w-[58px]" : "h-10 w-10"} />
+      <Logo className={prominent ? "h-14 w-14 lg:h-[58px] lg:w-[58px]" : "h-10 w-10"} hideSupport={prominent} />
       <span className="flex flex-col leading-none">
         <span className="font-display text-lg font-bold">
           Code<span className="text-gradient">Shift</span>
