@@ -23,14 +23,19 @@ export function Wordmark({ prominent = false }: { prominent?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5" aria-label="CodeShift home">
       <Logo className={prominent ? "h-14 w-14 lg:h-[58px] lg:w-[58px]" : "h-10 w-10"} />
-      <span className="flex flex-col leading-none">
-        <span className="font-display text-lg font-bold">
+      {prominent ? (
+        <span className="flex items-baseline gap-2 leading-none">
+          <span className="font-display text-lg font-bold">
+            Code<span className="text-gradient">Shift</span>
+          </span>
+          <span aria-hidden="true" className="self-center h-3.5 w-px bg-border" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Podcast</span>
+        </span>
+      ) : (
+        <span className="font-display text-lg font-bold leading-none">
           Code<span className="text-gradient">Shift</span>
         </span>
-        {prominent && (
-          <span className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Podcast</span>
-        )}
-      </span>
+      )}
     </Link>
   );
 }
