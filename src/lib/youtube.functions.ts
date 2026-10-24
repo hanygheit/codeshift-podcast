@@ -66,6 +66,8 @@ export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (
             status: v.snippet.liveBroadcastContent === "live" ? "live" : "upcoming",
           };
         })
+        // Upcoming needs a real scheduled time (skips unscheduled placeholder streams).
+        .filter((e) => e.status === "live" || !!e.scheduledStart)
         // Drop stale "upcoming" entries whose start passed more than 12h ago without going live.
         .filter((e) => e.status === "live" || !e.scheduledStart || Date.parse(e.scheduledStart) > now - 12 * 3600_000)
         .sort((a, b) => (a.status === "live" ? -1 : b.status === "live" ? 1 : a.scheduledStart.localeCompare(b.scheduledStart)));
