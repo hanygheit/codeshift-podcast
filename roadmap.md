@@ -11,3 +11,4 @@
 - [ ] Backend PDF via Browserless — code done; waiting on BROWSERLESS_API_KEY + publish
 - [x] Home: Upcoming Episode (YouTube) + Explore Episodes
 - [ ] Upcoming Episode live data — waiting on YOUTUBE_API_KEY
+- [ ] ITI support badge: overlay on the hero host photo banner, no extra row, smaller

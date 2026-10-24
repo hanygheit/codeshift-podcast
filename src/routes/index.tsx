@@ -80,9 +80,7 @@ function Home() {
                 ))}
               </figcaption>
             </div>
-            <div className="mt-3 flex justify-center">
-              <SupportBadge className="p-2" imgClassName="h-8 w-auto" />
-            </div>
+            <div className="absolute right-4 top-4"><SupportBadge className="p-1.5" imgClassName="h-7 w-auto" /></div>
           </figure>
         </div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
