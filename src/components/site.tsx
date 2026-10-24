@@ -38,6 +38,7 @@ export function Wordmark({ prominent = false }: { prominent?: boolean }) {
 const nav = [
   { to: "/", label: "Home" },
   { to: "/episodes", label: "Episodes" },
+  { to: "/", label: "Meet the hosts", hash: "hosts" },
   { to: "/about", label: "About" },
 ] as const;
 
@@ -52,7 +53,7 @@ export function SiteHeader() {
         <Wordmark prominent />
         <nav aria-label="Main" className="hidden items-center gap-1 text-sm lg:flex">
           {nav.map((n) => (
-            <Link key={n.to} to={n.to} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
+            <Link key={n.label} to={n.to} hash={"hash" in n ? n.hash : undefined} activeOptions={{ exact: n.to === "/" }} className={linkCls} activeProps={{ className: activeCls, "aria-current": "page" }}>
               {n.label}
             </Link>
           ))}
@@ -67,7 +68,7 @@ export function SiteHeader() {
       {open && (
         <nav aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
           {nav.map((n) => (
-            <Link key={n.to} to={n.to} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
+            <Link key={n.label} to={n.to} hash={"hash" in n ? n.hash : undefined} onClick={() => setOpen(false)} activeOptions={{ exact: n.to === "/" }}
               className="block rounded-md px-3 py-3 text-muted-foreground" activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}>
               {n.label}
             </Link>
