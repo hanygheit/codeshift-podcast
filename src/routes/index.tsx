@@ -26,20 +26,27 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function HeroArt() {
+const HERO_LEFT = [
+  { icon: Layers, label: "Architecture" },
+  { icon: Cog, label: "System Design" },
+  { icon: BrainCircuit, label: "AI & Agentic Coding" },
+  { icon: Laptop, label: "Engineering Leadership" },
+];
+const HERO_RIGHT = [
+  { icon: MessagesSquare, label: "Practical Discussions" },
+  { icon: Users, label: "Real-World Experience" },
+  { icon: Lightbulb, label: "Advice & Mentoring" },
+  { icon: CalendarDays, label: "Weekly Episodes" },
+];
+
+function HeroFeature({ icon: Icon, label }: { icon: typeof Layers; label: string }) {
   return (
-    <svg viewBox="0 0 360 300" className="h-full w-full" aria-hidden="true">
-      {([[60, 60], [300, 70], [70, 240], [290, 230]] as const).map(([x, y], i) => (
-        <g key={i}>
-          <line x1="180" y1="150" x2={x} y2={y} stroke="var(--teal)" strokeOpacity=".5" className="animate-dash" />
-          <rect x={x - 26} y={y - 18} width="52" height="36" rx="8" fill="var(--surface-raised)" stroke="var(--border)" />
-          <text x={x} y={y + 5} textAnchor="middle" fontFamily="var(--font-mono)" fontSize="12" fill="var(--muted-foreground)">{["</>", "API", "test", "ship"][i]}</text>
-        </g>
-      ))}
-      <circle cx="180" cy="150" r="54" fill="var(--surface)" stroke="var(--primary)" strokeWidth="2" />
-      <circle cx="180" cy="150" r="72" fill="none" stroke="var(--teal)" strokeOpacity=".3" strokeDasharray="2 8" />
-      <text x="180" y="160" textAnchor="middle" fontFamily="var(--font-display)" fontWeight="800" fontSize="30" fill="var(--teal)">CS</text>
-    </svg>
+    <li className="flex items-center gap-3">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border bg-card text-teal shadow-sm">
+        <Icon className="h-5 w-5" />
+      </span>
+      <span className="font-semibold">{label}</span>
+    </li>
   );
 }
 
