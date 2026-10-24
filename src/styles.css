@@ -120,20 +120,8 @@
 }
 .slide-inner { font-size: clamp(9px, 1.6cqi, 22px); }
 
-.print-deck { display: none; }
-
-@page { size: 13.333in 7.5in; margin: 0; }
-@media print {
-  html, body { background: var(--background) !important; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .screen-only { display: none !important; }
-  .print-deck { display: block !important; }
-  .print-page {
-    width: 13.333in; height: 7.5in;
-    break-after: page; page-break-after: always; break-inside: avoid;
-    overflow: hidden;
-  }
-  .print-page:last-child { break-after: auto; page-break-after: auto; }
-  .print-page .slide-canvas { width: 13.333in; height: 7.5in; aspect-ratio: auto; border: 0; border-radius: 0; }
-  .print-page .slide-inner { font-size: 18px; }
-}
+/* PDF export view: one 1920×1080 slide per page (rendered by the backend PDF service). */
+.deck-export { width: 1920px; }
+.deck-export .deck-slide { break-after: page; page-break-after: always; }
+.deck-export .deck-slide:last-child { break-after: auto; page-break-after: auto; }
+@page { size: 1920px 1080px; margin: 0; }
