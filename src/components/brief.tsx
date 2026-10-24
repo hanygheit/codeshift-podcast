@@ -1,7 +1,8 @@
 import { ArrowUpRight, CheckCircle2, ExternalLink } from "lucide-react";
 import type { Episode } from "@/content/types";
 import { BrandMark, ExtLink } from "@/components/site";
-import { fmtDate, hostNames } from "@/lib/format";
+import { formatDate, pad } from "@/content/episodes";
+import { HOSTS } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 const ACCESS_STYLES: Record<string, string> = {
@@ -105,10 +106,10 @@ export function BriefView({ ep }: { ep: Episode }) {
           </div>
         </div>
         <h1 className="mt-5 font-display text-2xl font-bold leading-tight text-foreground sm:text-3xl">
-          <span className="text-teal">{ep.code}</span> — {ep.title}
+          <span className="text-teal">EP{pad(ep.number)}</span> — {ep.title}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {fmtDate(ep.date)} · Hosted by {hostNames(ep)}
+          {formatDate(ep.scheduledDate)} · Hosted by {HOSTS.map((h) => h.name).join(" & ")}
         </p>
         <div className="mt-5">
           <ExtLink
@@ -280,7 +281,7 @@ export function BriefView({ ep }: { ep: Episode }) {
             href={ep.youtubeUrl}
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Watch {ep.code} <ArrowUpRight className="h-4 w-4" />
+            Watch EP{pad(ep.number)} <ArrowUpRight className="h-4 w-4" />
           </ExtLink>
           {brief.nextEpisode && (
             <ExtLink
@@ -298,7 +299,7 @@ export function BriefView({ ep }: { ep: Episode }) {
 
 export function printBrief(ep: Episode) {
   const prev = document.title;
-  document.title = `${ep.code} — Executive Brief — CodeShift`;
+  document.title = `EP${pad(ep.number)} — Executive Brief — CodeShift`;
   const restore = () => {
     document.title = prev;
     window.removeEventListener("afterprint", restore);
