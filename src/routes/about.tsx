@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import logo from "@/assets/codeshift-logo.png.asset.json";
 import { PageShell } from "@/components/page-shell";
-import { HostCard } from "@/components/site";
+import { BrandMark, HostCard } from "@/components/site";
 import { HOSTS, SITE } from "@/content/site";
 
 export const Route = createFileRoute("/about")({
@@ -32,7 +31,7 @@ function About() {
             <p>CodeShift is a knowledge-sharing community initiative. It is not a course marketplace or commercial training platform, and the hosts speak for themselves rather than their employers.</p>
           </div>
         </div>
-        <img src={logo.url} alt="CodeShift logo" className="mx-auto w-full max-w-sm rounded-full" />
+        <div className="mx-auto grid h-64 w-64 place-items-center rounded-full border bg-card"><BrandMark className="h-40 w-40" /></div>
       </section>
       <section className="mx-auto max-w-6xl px-5">
         <h2 className="text-3xl font-bold">The hosts</h2>

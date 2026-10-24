@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "/" }],
     scripts: [{ type: "application/ld+json", children: JSON.stringify({
       "@context": "https://schema.org", "@type": "PodcastSeries", name: "CodeShift",
-      description: SITE.description, inLanguage: "ar-EG", sameAs: [SITE.facebook],
+      description: SITE.description, inLanguage: "ar-EG", sameAs: [SITE.facebook, SITE.youtube],
     }) }],
   }),
   component: Home,
@@ -60,7 +60,7 @@ function Home() {
               <Link to="/episodes" className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-6 py-3 font-semibold text-primary-foreground shadow-glow">
                 Explore Episodes <ArrowRight className="h-4 w-4" />
               </Link>
-              <ExtLink href={latest.youtubeUrl} className="inline-flex items-center gap-2 rounded-full border px-6 py-3 font-semibold hover:bg-secondary">
+              <ExtLink href={SITE.youtube} className="inline-flex items-center gap-2 rounded-full border px-6 py-3 font-semibold hover:bg-secondary">
                 <Youtube className="h-4 w-4" /> Watch on YouTube
               </ExtLink>
             </div>
@@ -121,7 +121,7 @@ function Home() {
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{SITE.schedule}. Bring your questions to the live chat — the discussion is in conversational Egyptian Arabic.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <ExtLink href={SITE.facebook} className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 font-semibold hover:bg-secondary"><Facebook className="h-4 w-4" /> Follow on Facebook</ExtLink>
-            <ExtLink href={latest.youtubeUrl} className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-5 py-2.5 font-semibold text-primary-foreground"><Youtube className="h-4 w-4" /> Watch on YouTube</ExtLink>
+            <ExtLink href={SITE.youtube} className="inline-flex items-center gap-2 rounded-full bg-gradient-brand px-5 py-2.5 font-semibold text-primary-foreground"><Youtube className="h-4 w-4" /> Watch on YouTube</ExtLink>
           </div>
         </div>
       </section>
