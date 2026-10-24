@@ -210,6 +210,145 @@ export const EPISODES: Episode[] = [
       { id: "resources", type: "resources", section: "Learn more", title: "Curated resources", blocks: [{ kind: "resources", ids: ["anthropic-effective-agents", "mcp", "owasp-genai", "dora"] }] },
       { id: "closing", type: "closing", section: "CodeShift", title: "Think Beyond the Code.", subtitle: "Join us live every Saturday at 7:00 PM Cairo time.", blocks: [] },
     ],
+    brief: {
+      summaryHeadline: "What You Need to Know",
+      summary: [
+        "AI is changing both software development and the skills engineers need to succeed.",
+        "The challenge is no longer just learning more technologies. Developers need stronger fundamentals, broader engineering knowledge, deep expertise in relevant areas, and the ability to use AI and coding agents effectively.",
+        "Students and juniors need practical learning paths that combine computer science, programming, complete applications, and responsible AI use. Experienced engineers must deepen architecture, technical judgment, validation, and agentic coding skills.",
+        "Engineering leaders and software companies must also adapt their development workflows, talent programs, quality practices, and AI adoption strategies.",
+      ],
+      lessons: [
+        { title: "Learn Concepts, Not Just Syntax", body: "Strong mental models and practical understanding are increasingly valuable." },
+        { title: "Build Real Engineering Capabilities", body: "Foundations, programming, complete applications, and testing remain essential." },
+        { title: "AI Literacy & Agentic Coding Are Core Skills", body: "Learn prompting, context, specifications, tools, agents, harnesses, testing, and verification." },
+        { title: "Different Career Levels Need Different Depth", body: "Students, juniors, seniors, and leads should prioritize different capabilities." },
+        { title: "Engineering Is More Than Technology", body: "Architecture, business domain knowledge, problem framing, judgment, and communication matter." },
+        { title: "Companies Must Adopt AI Systematically", body: "AI transformation requires training, workflows, governance, measurement, and leadership — not just software licenses." },
+      ],
+      packages: [
+        { id: "P01", name: "Computer Science Foundations", topics: "Operating Systems, Databases, Networking, HTTP, concurrency, security fundamentals.", outcome: "Understand how software systems work." },
+        { id: "P02", name: "Programming & Problem Solving", topics: "Programming, OOP, Data Structures, Algorithms, Debugging, Problem Solving.", outcome: "Build and evaluate solutions independently." },
+        { id: "P03", name: "Full-Stack Development", topics: "Frontend, Backend, APIs, Data Access, Git, Tests, CI/CD, Docker, Deployment.", outcome: "Deliver working applications end to end." },
+        { id: "P04", name: "AI Literacy & Agentic Coding", topics: "LLMs, Prompting, Context Engineering, AI-Assisted Coding, Agents, Specs, Harnesses, Testing, Review.", outcome: "Use AI safely and effectively within engineering workflows." },
+        { id: "P05", name: "System Design & Engineering Breadth", topics: "Architecture, Design Patterns, Cloud, Messaging, Distributed Systems, Containers, Performance, Security.", outcome: "Understand architectural choices and their trade-offs." },
+        { id: "P06", name: "Developing GenAI Applications — Optional", topics: "LLM APIs, RAG, Embeddings, Agents, Orchestration, Evaluation, Observability, Security.", outcome: "Build reliable AI-powered products." },
+      ],
+      packagesNote: "Packages overlap — they are not six mandatory sequential courses. P06 is an optional specialization.",
+      careerLevels: [
+        { level: "Students & Fresh Graduates", priorities: "Prioritize P01, P02, P03; introduce P04 early with guided usage." },
+        { level: "Junior Developers", priorities: "Deepen P01–P03, build P04 proficiency, develop P05 awareness." },
+        { level: "Senior Engineers", priorities: "Prioritize deeper P04 and P05, architecture, quality, performance, security, and technical judgment." },
+        { level: "Tech Leads & Engineering Managers", priorities: "Focus on engineering leadership, AI-native team workflows, standards, reviews, enablement, governance, and talent development." },
+      ],
+      juniorAi: {
+        message: "Use AI from early learning stages, but don't outsource your understanding.",
+        modes: ["Tutor", "Pair Programmer", "Reviewer", "Coding Agent"],
+        emphasis: "Emphasize independent explanation, debugging, and validation.",
+      },
+      adoption: {
+        phases: [
+          { days: "Days 01–30", title: "Prepare", body: "Assess skills, define approved tools and security policies, select pilot team and baseline metrics." },
+          { days: "Days 31–60", title: "Pilot", body: "Deliver hands-on training, implement agentic workflows, add testing and review practices." },
+          { days: "Days 61–90", title: "Scale", body: "Measure engineering outcomes, improve practices, share learnings, and expand proven workflows." },
+        ],
+        metrics: ["Adoption", "Delivery speed", "Quality and defects", "Security", "Developer skills", "AI usage cost", "Business outcomes"],
+        highlight: "Buying AI licenses is not an AI adoption strategy.",
+      },
+      caseStudy: {
+        headline: "Four Students. Four Weeks. One Working Application.",
+        body: [
+          "Four computer science students developed and locally demonstrated a .NET + React application through a four-week internship, supported by concept-focused learning, agentic implementation using GitHub Copilot, and senior mentorship.",
+          "The experience illustrates one possible model for combining junior engineering development with coding agents. It is not a controlled productivity study or proof of production readiness.",
+        ],
+        links: [
+          { label: "WorxForge Repository", url: "https://github.com/itworx/WorxForge" },
+          { label: "WorxForge Whitepaper", url: "https://github.com/itworx/WorxForge/blob/main/docs/Whitepaper/WorxForge-Juniors-and-AI-Coding-Agents.pdf" },
+        ],
+      },
+      actions: [
+        { role: "Student / Junior", items: ["Choose your next learning package and apply it in a real application."] },
+        { role: "Senior Engineer", items: ["Practice an agentic coding workflow with clear tests and quality checks."] },
+        { role: "Tech Lead", items: ["Introduce repeatable AI-native engineering workflows and team development plans."] },
+        { role: "Software Company", items: ["Start a measurable, governed 90-day AI adoption pilot."] },
+      ],
+      resourceGroups: [
+        {
+          label: "Package 01 — Computer Science",
+          items: [
+            { title: "Harvard CS50x", provider: "Harvard University", url: "https://cs50.harvard.edu/x/", access: "Free" },
+            { title: "Operating Systems: Three Easy Pieces", provider: "Remzi & Andrea Arpaci-Dusseau", url: "https://pages.cs.wisc.edu/~remzi/OSTEP/", access: "Free" },
+            { title: "SQLBolt", provider: "SQLBolt", url: "https://sqlbolt.com/", access: "Free" },
+            { title: "Cisco Networking Academy", provider: "Cisco", url: "https://www.netacad.com/", access: "Free" },
+          ],
+        },
+        {
+          label: "Package 02 — Programming",
+          items: [
+            { title: "C# Fundamentals", provider: "Passionate Coders", url: "https://www.youtube.com/watch?v=DZHohhJDjHk&list=PLsV97AQt78NT0H8J71qe7edwRpAirfqOI", access: "Free", ref: "R1" },
+            { title: "Advanced C#", provider: "Passionate Coders", url: "https://www.youtube.com/playlist?list=PLsV97AQt78NQYhO7NqlBTrJX_Nsk3SmyY", access: "Free", ref: "R12" },
+            { title: "Microsoft Learn .NET", provider: "Microsoft", url: "https://learn.microsoft.com/en-us/training/dotnet/", access: "Free" },
+            { title: "MIT Introduction to Algorithms", provider: "MIT OpenCourseWare", url: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/", access: "Free" },
+          ],
+        },
+        {
+          label: "Package 03 — Full-Stack Development",
+          items: [
+            { title: "Entity Framework Core", provider: "DevCreed", url: "https://www.youtube.com/watch?v=I9eMtI_RnUQ&list=PL62tSREI9C-cHV28v-EqWinveTTAos8Pp", access: "Free", ref: "R2" },
+            { title: "ASP.NET Core API", provider: "Julio Casal", url: "https://www.youtube.com/watch?v=YbRe4iIVYJk", access: "Free", ref: "R3" },
+            { title: "Web Prerequisites", provider: "devdojo", url: "https://www.youtube.com/watch?v=_GTMOmRrqkU", access: "Free", ref: "R4" },
+            { title: "Modern JavaScript ES6", provider: "Programming with Mosh", url: "https://www.youtube.com/watch?v=NCwa_xi0Uuc", access: "Free", ref: "R5" },
+            { title: "JavaScript for React", provider: "PedroTech", url: "https://www.youtube.com/watch?v=m55PTVUrlnA", access: "Free", ref: "R6" },
+            { title: "React JS 19", provider: "JavaScript Mastery", url: "https://www.youtube.com/watch?v=dCLhUialKPQ", access: "Free", ref: "R7" },
+            { title: "xUnit Unit Testing", provider: "Nick Chapsas", url: "https://www.youtube.com/watch?v=2Wp8en1I9oQ", access: "Free", ref: "R10" },
+            { title: "Git & GitHub", provider: "freeCodeCamp", url: "https://www.youtube.com/watch?v=RGOj5yH7evk", access: "Free", ref: "R11" },
+            { title: "React Official Learning Guide", provider: "react.dev", url: "https://react.dev/learn", access: "Free" },
+            { title: "Docker Getting Started", provider: "Docker", url: "https://docs.docker.com/get-started/", access: "Free" },
+          ],
+        },
+        {
+          label: "Package 04 — AI & Agentic Coding",
+          items: [
+            { title: "GitHub Copilot Beginner's Guide", provider: "GitHub", url: "https://www.youtube.com/watch?v=SJqGYwRq0uc", access: "Free", ref: "R8" },
+            { title: "GH-300 GitHub Copilot", provider: "Microsoft Learn", url: "https://www.youtube.com/playlist?list=PLahhVEj9XNTd8lE7clFGR1el35zaBmJbS", access: "Free", ref: "R13" },
+            { title: "Microsoft Generative AI for Beginners", provider: "Microsoft", url: "https://github.com/microsoft/generative-ai-for-beginners", access: "Free" },
+            { title: "GitHub Copilot Documentation", provider: "GitHub", url: "https://docs.github.com/en/copilot", access: "Free tier" },
+            { title: "Claude Code Documentation", provider: "Anthropic", url: "https://code.claude.com/docs/en/overview", access: "Subscription" },
+            { title: "MIT Missing Semester", provider: "MIT", url: "https://missing.csail.mit.edu/", access: "Free" },
+          ],
+        },
+        {
+          label: "Package 05 — Architecture & Engineering Breadth",
+          items: [
+            { title: "Clean Architecture", provider: "Milan Jovanović", url: "https://www.youtube.com/watch?v=fe4iuaoxGbA", access: "Free", ref: "R9" },
+            { title: "System Design Primer", provider: "Donne Martin", url: "https://github.com/donnemartin/system-design-primer", access: "Free" },
+            { title: "Azure Architecture Center", provider: "Microsoft", url: "https://learn.microsoft.com/en-us/azure/architecture/", access: "Free" },
+            { title: "Kubernetes Basics", provider: "Kubernetes", url: "https://kubernetes.io/docs/tutorials/kubernetes-basics/", access: "Free" },
+          ],
+        },
+        {
+          label: "Package 06 — Developing GenAI Applications",
+          items: [
+            { title: "How Real AI Products Are Designed & Deployed", provider: "itichannel", url: "https://www.youtube.com/watch?v=NEIcvXdyEAc", access: "Free", ref: "R14" },
+            { title: "Microsoft GenAI for Beginners .NET", provider: "Microsoft", url: "https://github.com/microsoft/Generative-AI-for-beginners-dotnet", access: "Free" },
+            { title: "Microsoft AI Agents for Beginners", provider: "Microsoft", url: "https://github.com/microsoft/ai-agents-for-beginners", access: "Free" },
+            { title: "Hugging Face AI Agents Course", provider: "Hugging Face", url: "https://huggingface.co/learn/agents-course/unit0/introduction", access: "Free" },
+            { title: "LangGraph Academy", provider: "LangChain", url: "https://academy.langchain.com/courses/intro-to-langgraph", access: "Free" },
+          ],
+        },
+        {
+          label: "Software Companies — Adoption References",
+          items: [
+            { title: "DORA", provider: "DORA", url: "https://dora.dev/", access: "Free" },
+            { title: "GitHub Team Agentic Adoption Guide", provider: "GitHub", url: "https://docs.github.com/en/copilot/tutorials/roll-out-at-scale/enable-developers/drive-team-agentic-adoption", access: "Free" },
+            { title: "WorxForge Whitepaper", provider: "ITWorx", url: "https://github.com/itworx/WorxForge/blob/main/docs/Whitepaper/WorxForge-Juniors-and-AI-Coding-Agents.pdf", access: "Free" },
+          ],
+        },
+      ],
+      resourcesNote: "Some linked courses are free while using their associated AI services may require credits or paid plans.",
+      finalMessage: "Learn the right skills. Develop real expertise. Use AI effectively. Own the outcome.",
+      watchLabel: "Watch Live / Replay",
+    },
   },
 ];
 
