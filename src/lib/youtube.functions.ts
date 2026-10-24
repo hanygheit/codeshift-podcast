@@ -17,7 +17,7 @@ export type UpcomingResult =
   | { status: "error"; message: string };
 
 const TTL_MS = 20 * 60 * 1000;
-let upcomingCache: { at: number; value: UpcomingResult } | null = null;
+let upcomingCacheV2: { at: number; value: UpcomingResult } | null = null;
 
 type Thumbs = Record<string, { url: string } | undefined>;
 interface VideoItem {
@@ -42,7 +42,7 @@ async function yt<T>(path: string, params: Record<string, string>, key: string):
 export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (): Promise<UpcomingResult> => {
   const key = process.env["YOUTUBE_API_KEY"];
   if (!key) return { status: "unconfigured" };
-  if (upcomingCache && Date.now() - upcomingCache.at < TTL_MS) return upcomingCache.value;
+  if (upcomingCacheV2 && Date.now() - upcomingCacheV2.at < TTL_MS) return upcomingCacheV2.value;
   try {
     const uploads = "UU" + CODESHIFT_CHANNEL_ID.slice(2);
     const list = await yt<{ items?: { contentDetails: { videoId: string } }[] }>("playlistItems",
@@ -74,7 +74,7 @@ export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (
       event = candidates[0] ?? null;
     }
     const value: UpcomingResult = { status: "ok", event, checkedAt: new Date().toISOString() };
-    upcomingCache = { at: Date.now(), value };
+    upcomingCacheV2 = { at: Date.now(), value };
     return value;
   } catch (e) {
     console.error("Upcoming live lookup failed", e);
