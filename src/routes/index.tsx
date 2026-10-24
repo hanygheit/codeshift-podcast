@@ -7,7 +7,7 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { ExtLink, HostCard, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
-import logoAsset from "@/assets/codeshift-logo.png.asset.json";
+import { EPISODES } from "@/content/episodes";
 
 export const Route = createFileRoute("/")({
   validateSearch: (s) => archiveSearchSchema.parse(s),
@@ -47,7 +47,25 @@ function Home() {
               <Button asChild size="lg" variant="outline"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
             </div>
           </div>
-          <img src={logoAsset.url} alt="CodeShift logo" className="mx-auto w-56 rounded-full shadow-glow md:w-72" />
+          <div className="rounded-2xl border bg-card/70 p-6 shadow-glow backdrop-blur">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal">On the show</p>
+              <span className="font-mono text-xs text-muted-foreground">{EPISODES.length} episodes</span>
+            </div>
+            <ul className="mt-4 space-y-2">
+              {TOPICS_EXPLORED.map((t, i) => (
+                <li key={t} className="flex items-center gap-3 rounded-lg border bg-background/40 px-3 py-2 text-sm">
+                  <span className="font-mono text-xs text-primary">{String(i + 1).padStart(2, "0")}</span>{t}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 flex items-center gap-3 border-t pt-4">
+              <div className="flex -space-x-3">
+                {HOSTS.map((h) => <img key={h.name} src={h.photo} alt={h.name} className="h-10 w-10 rounded-full border-2 border-card object-cover" />)}
+              </div>
+              <p className="text-sm text-muted-foreground">Hosted by {HOSTS.map((h) => h.name).join(" & ")}</p>
+            </div>
+          </div>
         </div>
       </section>
 
