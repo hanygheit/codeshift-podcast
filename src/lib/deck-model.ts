@@ -50,7 +50,7 @@ function layoutSlide(slide: DeckSlide, ep: Episode, index: number, total: number
     text(slide.title, 72, 250, 1000, 76, 'title');
     text(`${formatDate(ep.scheduledDate)}\nHany Saad & Ahmed Mamdoh`, 72, 690, 1000, 30, 'body', 'muted');
     rect(72, 834, 520, 80, 'primary');
-    text('Watch Episode →', 104, 855, 456, 30, 'title');
+    text('Watch Episode', 104, 855, 456, 30, 'title');
     nodes.push({ kind: 'link', x: 72, y: 834, width: 520, height: 80, url: ep.youtubeUrl, label: 'Watch Episode' });
     if (slide.image) nodes.push({ kind: 'image', x: 1120, y: 306, width: 728, height: 410, src: slide.image });
   } else {
@@ -112,7 +112,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
   }));
   // Card-based source frameworks not already covered by the career-level brief.
   ep.slides.filter(s => s.type === 'insight').forEach(s => s.blocks.forEach(block => {
-    if (block.kind === 'cards') chunks(block.items, 3).forEach((entries, i) => add({ id: i ? `${s.id}-${i + 1}` : s.id, title: s.title, section: s.section, part: 'summary', layout: 'cards', entries }));
+    if (block.kind === 'cards') chunks(block.items, 4).forEach((entries, i) => add({ id: i ? `${s.id}-${i + 1}` : s.id, title: s.title, section: s.section, part: 'summary', layout: 'cards', entries }));
   }));
   if (b?.adoption) {
     const originalPhases = ep.slides.find(s => s.id === 'playbook-90')?.blocks.find(block => block.kind === 'steps');
