@@ -5,7 +5,7 @@ import { UpcomingEpisode } from "@/components/upcoming-episode";
 import { archiveSearchSchema } from "@/lib/archive";
 import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
-import { ExtLink, HostCard, SupportBadge, Tag } from "@/components/site";
+import { ExtLink, HostCard, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
 
 export const Route = createFileRoute("/")({
@@ -66,10 +66,9 @@ function Home() {
               <div className="absolute left-4 top-4 rounded-full border bg-background/70 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-teal backdrop-blur">
                 Your hosts
               </div>
-              <SupportBadge className="absolute bottom-2 left-3 z-20 rounded p-1 lg:bottom-3 lg:left-5" imgClassName="h-6 w-auto sm:h-7" />
               <figcaption className="absolute inset-x-0 bottom-0 grid grid-cols-2">
                 {HOSTS.map((h, i) => (
-                  <div key={h.name} className="min-w-0 px-3 pb-11 lg:px-5 lg:pb-14">
+                  <div key={h.name} className="min-w-0 px-3 pb-6 lg:px-5 lg:pb-8">
                     <Waveform offset={i} />
                     <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${h.name} on LinkedIn (opens in a new tab)`} className="mt-2 block w-fit font-display text-sm font-semibold text-foreground transition-colors hover:text-teal lg:text-lg">{h.name}</a>
                     <a href={h.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`View ${h.name}'s LinkedIn profile (opens in a new tab)`} className="mt-1 inline-flex min-h-9 items-center gap-1.5 text-[11px] font-semibold text-teal hover:underline sm:text-xs">
