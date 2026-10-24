@@ -7,7 +7,6 @@ import { PageShell } from "@/components/page-shell";
 import { Button } from "@/components/ui/button";
 import { ExtLink, HostCard, Tag } from "@/components/site";
 import { HOSTS, SITE, TOPICS_EXPLORED } from "@/content/site";
-import { EPISODES } from "@/content/episodes";
 
 export const Route = createFileRoute("/")({
   validateSearch: (s) => archiveSearchSchema.parse(s),
@@ -36,37 +35,54 @@ function Home() {
     <PageShell>
       <section className="relative overflow-hidden border-b">
         <div className="pointer-events-none absolute inset-0 bg-hero" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 md:grid-cols-[1.3fr_1fr] md:py-20">
+        <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-12 md:grid-cols-2 md:py-16 lg:gap-16">
           <div>
-            <p className="eyebrow">Weekly Arabic Technical Podcast</p>
-            <h1 className="mt-4 text-4xl font-extrabold leading-[1.05] md:text-6xl">Software Engineering <span className="text-gradient">in the AI Era</span></h1>
-            <p className="mt-3 font-display text-xl text-teal">{SITE.tagline}</p>
-            <p className="mt-5 max-w-xl text-muted-foreground">{SITE.description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-gradient-brand"><a href="#explore">Explore Episodes <ArrowRight /></a></Button>
-              <Button asChild size="lg" variant="outline"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
+            <p className="eyebrow">Weekly Arabic Tech Podcast</p>
+            <h1 className="mt-5 max-w-xl text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.5rem]">
+              Engineering <br className="hidden sm:block" />Beyond the <span className="text-teal">Code.</span>
+            </h1>
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">
+              Practical conversations on AI-native development, software architecture, coding agents, developer growth, and engineering leadership.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="h-12 bg-gradient-brand px-6"><Link to="/episodes">Explore Episodes <ArrowRight /></Link></Button>
+              <Button asChild size="lg" variant="outline" className="h-12 px-6"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
+            </div>
+            <div className="mt-10 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="h-px w-10 bg-primary" /> {SITE.tagline}
             </div>
           </div>
-          <div className="rounded-2xl border bg-card/70 p-6 shadow-glow backdrop-blur">
-            <div className="flex items-center justify-between">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal">On the show</p>
-              <span className="font-mono text-xs text-muted-foreground">{EPISODES.length} episodes</span>
-            </div>
-            <ul className="mt-4 space-y-2">
-              {TOPICS_EXPLORED.map((t, i) => (
-                <li key={t} className="flex items-center gap-3 rounded-lg border bg-background/40 px-3 py-2 text-sm">
-                  <span className="font-mono text-xs text-primary">{String(i + 1).padStart(2, "0")}</span>{t}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 flex items-center gap-3 border-t pt-4">
-              <div className="flex -space-x-3">
-                {HOSTS.map((h) => <img key={h.name} src={h.photo} alt={h.name} className="h-10 w-10 rounded-full border-2 border-card object-cover" />)}
+
+          <figure className="relative">
+            <div className="absolute -inset-6 rounded-[2rem] bg-primary/10 blur-3xl" aria-hidden />
+            <div className="relative overflow-hidden rounded-3xl border bg-card shadow-glow">
+              <div className="grid grid-cols-2">
+                {HOSTS.map((h, i) => (
+                  <div key={h.name} className={`relative aspect-[4/5] overflow-hidden ${i === 0 ? "border-r" : ""}`}>
+                    <img src={h.photo} alt={`${h.name}, CodeShift co-host`} className="h-full w-full object-cover object-top" loading="eager" />
+                  </div>
+                ))}
               </div>
-              <p className="text-sm text-muted-foreground">Hosted by {HOSTS.map((h) => h.name).join(" & ")}</p>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+              <div className="absolute left-4 top-4 rounded-full border bg-background/70 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.18em] text-teal backdrop-blur">
+                Your hosts
+              </div>
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                <Waveform />
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  {HOSTS.map((h) => (
+                    <figcaption key={h.name}>
+                      <p className="font-display text-base font-semibold sm:text-lg">{h.name}</p>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{h.role}</p>
+                    </figcaption>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          </figure>
         </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
       </section>
 
       <UpcomingEpisode />
@@ -92,5 +108,16 @@ function Home() {
         <div className="mt-6 grid gap-5 md:grid-cols-2">{HOSTS.map((h) => <HostCard key={h.name} host={h} />)}</div>
       </section>
     </PageShell>
+  );
+}
+
+const WAVE = [6, 12, 20, 9, 26, 16, 30, 12, 22, 8, 18, 28, 14, 24, 10, 20, 6, 16, 26, 12, 22, 9, 18, 30, 14, 8, 20, 12];
+function Waveform() {
+  return (
+    <div className="flex h-8 items-end gap-[3px]" aria-hidden>
+      {WAVE.map((h, i) => (
+        <span key={i} className="wave-bar w-[3px] rounded-full bg-gradient-to-t from-primary to-teal" style={{ height: h, animationDelay: `${(i % 7) * 0.12}s` }} />
+      ))}
+    </div>
   );
 }
