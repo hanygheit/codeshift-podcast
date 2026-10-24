@@ -92,7 +92,7 @@ function Home() {
           <div><p className="eyebrow">Episode library</p><h2 className="mt-2 text-2xl font-bold">Explore Episodes</h2></div>
           <Link to="/episodes" className="text-sm font-semibold text-primary hover:underline">View All Episodes →</Link>
         </div>
-        <EpisodeExplorer search={s} onChange={(patch, reset) => navigate({ search: (prev) => patchSearch(prev, patch, reset), replace: true, resetScroll: false })} />
+        <EpisodeExplorer pageSize={5} search={s} onChange={(patch, reset) => navigate({ search: (prev) => patchSearch(prev, patch, reset), replace: true, resetScroll: false })} />
       </section>
 
       <section className="border-y bg-surface/50">

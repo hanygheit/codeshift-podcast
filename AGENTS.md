@@ -17,3 +17,4 @@
 - Learning resources live on each episode (EpisodeResources) — never a global directory on the home page. Why: user requirement.
 - Home and /episodes share EpisodeExplorer + filterEpisodes (URL search params, 10/page, default episode number desc). Why: one discovery logic.
 - Upcoming Episode is fetched server-side (getUpcomingLive) from the YouTube Data API via the channel uploads playlist + videos.list (low quota), cached 20 min; needs YOUTUBE_API_KEY. Never hardcode upcoming episodes. Why: automatic schedule sync.
+- Episode library (EpisodeExplorer) merges editorial EPISODES with getYoutubeRecordings (completed public videos ≥10 min, YOUTUBE_PLAYLIST_ID if set else uploads filtered to 'CodeShift' titles, cached 45 min), matched by youtubeVideoId; YouTube-only items get Watch only, no page. Why: auto-discovery without fabricating editorial content.

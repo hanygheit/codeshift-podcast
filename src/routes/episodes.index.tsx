@@ -27,7 +27,7 @@ function Archive() {
       <section className="mx-auto max-w-6xl px-5 py-16">
         <p className="eyebrow">Archive</p>
         <h1 className="mt-3 mb-8 text-4xl font-extrabold md:text-5xl">All episodes</h1>
-        <EpisodeExplorer filters search={s} onChange={(patch, reset) => navigate({ search: (prev) => patchSearch(prev, patch, reset), replace: true, resetScroll: false })} />
+        <EpisodeExplorer search={s} onChange={(patch, reset) => navigate({ search: (prev) => patchSearch(prev, patch, reset), replace: true, resetScroll: false })} />
       </section>
     </PageShell>
   );
