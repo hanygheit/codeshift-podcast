@@ -14,4 +14,17 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+  it.each(["ep001", "ep002", "ep003"])(
+    "preserves episode and presentation routes for %s",
+    (slug) => {
+      const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+      expect(router.matchRoutes(`/episodes/${slug}`).at(-1)?.routeId).toBe("/episodes/$slug");
+      expect(router.matchRoutes(`/episodes/${slug}/slides`).at(-1)?.routeId).toBe(
+        "/episodes/$slug_/slides",
+      );
+      expect(router.matchRoutes(`/api/public/pdf/${slug}`).at(-1)?.routeId).toBe(
+        "/api/public/pdf/$slug",
+      );
+    },
+  );
 });
