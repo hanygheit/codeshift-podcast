@@ -4,6 +4,7 @@ import { formatDate, pad } from "@/content/episodes";
 import { EXECUTIVE_BRIEFS } from "@/content/executive-briefs";
 import metrics from "./deck-font-metrics.json";
 import logo from "@/assets/codeshift-logo.png.asset.json";
+import { ep003PresentationNodes } from "@/content/ep003-presentation";
 
 export const SLIDE_WIDTH = 1920;
 export const SLIDE_HEIGHT = 1080;
@@ -506,6 +507,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
   slides.forEach((s, i) => {
     s.aliases = legacyAliases(s);
     s.nodes = layoutSlide(s, ep, i, slides.length);
+    if (ep.id === "ep003") s.nodes = ep003PresentationNodes(s);
   });
   return slides;
 }
