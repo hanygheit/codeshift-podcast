@@ -39,11 +39,13 @@ export function ep003PresentationNodes(slide: DeckSlide): Primitive[] {
           return {
             ...n,
             width: 300,
-            ...(n.y === 604 ? { lines: ["Engineering", "Verification"] } : {}),
-            ...(n.y === 892 ? { lines: ["Watch episode >"] } : {}),
+            lines: wrapText(n.lines.join(" "), 300, n.size, n.font),
+            ...(n.y === 560 ? { lines: ["03 · SECURITY / UX"] } : {}),
+            ...(n.y === 728 ? { lines: ["04 · MERGE DECISION"] } : {}),
+            ...(n.y === 892 ? { y: 936, size: 22, lines: ["Watch episode >"] } : {}),
           };
-        if (n.kind === "link" && n.x === 1240) return { ...n, width: 300 };
-        if (n.kind === "rect" && n.x === 1240 && n.y === 934) return { ...n, width: 300 };
+        if (n.kind === "link" && n.x === 1240) return { ...n, y: 932, width: 300, height: 42 };
+        if (n.kind === "rect" && n.x === 1240 && n.y === 934) return { ...n, y: 974, width: 300 };
         return n;
       });
     return [...nodes, ...qrNodes(1576, 640, 288, "Scan for Slides & Resources", 566)];
