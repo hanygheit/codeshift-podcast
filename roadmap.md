@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Correct YouTube channel discovery and verify the scheduled EP003 appears on the homepage.
+
 - [x] Consolidate EP001/EP002 into 8/16-slide executive briefs with all resources and one dedicated slide per EP002 package.
 - [x] Improve shared slide typography, editorial layouts, screen-fitting canvas, grouped contents and direct resource/watch actions.
 - [x] Verify every slide on desktop, readable phone views, keyboard/arrows/history/slider/swipe/fullscreen, complete links, finalized PDF counts and unchanged routes; 25 tests pass.
