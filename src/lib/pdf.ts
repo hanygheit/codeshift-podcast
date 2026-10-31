@@ -6,7 +6,7 @@ import { EXECUTIVE_BRIEFS } from "@/content/executive-briefs";
 export const PDF_SOURCE_ORIGIN = "https://codeshift-podcast.lovable.app";
 
 /** Bump when slide design changes so cached PDFs are regenerated. */
-export const DECK_DESIGN_VERSION = "executive-brief-7";
+export const DECK_DESIGN_VERSION = "executive-brief-8";
 
 export function pdfFilename(ep: Episode) {
   return `CodeShift_EP${pad(ep.number)}_${ep.brief?.packages ? "Developer_Learning_Playbook" : "Executive_Summary"}.pdf`;
