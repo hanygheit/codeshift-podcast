@@ -12,11 +12,11 @@ describe("shared presentation rules", () => {
     expect(ep.youtubeUrl).toBe("https://youtube.com/live/u114p0sd86I");
     expect(buildDeck(ep)).toHaveLength(13);
     expect(buildDeck(ep).filter((s) => s.part === "resources")).toHaveLength(2);
-    expect(buildDeck(ep)[0]?.subtitle).toContain("But who makes it production-ready?");
+    expect(buildDeck(ep)[0]?.subtitle).toContain("AI Can Write the Code. Who Owns the Outcome?");
     expect(buildDeck(ep)[0]?.entries.map((e) => e.title)).toEqual([
-      "Prompt",
-      "Code",
-      "Validation",
+      "Human Intent",
+      "AI Agent",
+      "Engineering Verification",
       "Pull Request",
     ]);
   });

@@ -46,8 +46,13 @@ export const EP003: Episode = {
   slides: [],
   presentationCover: {
     subtitle: "Working with AI Coding Agents",
-    question: "AI can write the code. But who makes it production-ready?",
-    stages: ["Prompt", "Code", "Validation", "Pull Request"],
+    question: "AI Can Write the Code. Who Owns the Outcome?",
+    stages: [
+      { title: "Human Intent", role: "You define" },
+      { title: "AI Agent", role: "Agent executes", agent: true },
+      { title: "Engineering Verification", role: "You verify" },
+      { title: "Pull Request", role: "You own" },
+    ],
   },
   resourceSlideTitles: ["Official Claude Learning Resources", "Claude Code Documentation"],
   brief: {

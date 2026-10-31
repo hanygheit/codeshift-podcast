@@ -105,37 +105,76 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
   );
   rect(56, 100, 1808, 2, "border");
   text(s.section.toUpperCase(), 56, 128, 1808, 26, "mono", "teal");
-  if (s.layout === "cover") {
-    const h = text(ep.shortTitle, 56, 235, 1000, 88, "title");
-    text(
-      ep.presentationCover?.subtitle ?? "Executive Episode Brief",
-      56,
-      255 + h,
-      970,
-      42,
-      "body",
-      "muted",
+  if (s.layout === "cover" && ep.presentationCover) {
+    // Live-conversation backdrop: title + hook on the left, human-led workflow on the right.
+    const cover = ep.presentationCover;
+    let y = 196;
+    y += text(ep.shortTitle, 56, y, 1000, 104, "title") + 10;
+    y += text(cover.subtitle, 56, y, 1000, 46, "body", "muted");
+    rect(56, y + 44, 120, 6, "teal");
+    const hook = cover.question.split(/(?<=[.?!])\s+/);
+    const hookTop = y + 92,
+      hookHeight = hook.length * 78 + 64;
+    rect(56, hookTop, 1010, hookHeight, "panel");
+    rect(56, hookTop, 8, hookHeight, "teal");
+    hook.forEach((line, i) =>
+      text(line, 104, hookTop + 38 + i * 78, 940, 60, "title", i ? "teal" : "foreground"),
     );
+    rect(1120, 210, 2, 716, "border");
+    const railX = 1190,
+      rowTop = (i: number) => 214 + i * 168,
+      mid = (i: number) => rowTop(i) + 64;
+    rect(railX - 2, mid(0), 4, mid(cover.stages.length - 1) - mid(0), "teal");
+    cover.stages.forEach((stage, i) => {
+      const top = rowTop(i),
+        c = mid(i),
+        last = i === cover.stages.length - 1;
+      const x = stage.agent ? 1300 : 1240;
+      const accent: Ink = stage.agent ? "primary" : "teal";
+      if (stage.agent) {
+        // Delegated work runs inside a bounded box, branching off the engineer's rail.
+        rect(railX, c - 2, x - railX, 4, "primary");
+        rect(x, top - 14, 1864 - x, 156, "panel");
+        rect(x, top - 14, 1864 - x, 6, "primary");
+        [120, 76, 144, 96].forEach((w, n) =>
+          rect(1696 + (n % 2) * 24, top + 30 + n * 26, w, 10, n === 2 ? "primary" : "border"),
+        );
+      }
+      rect(railX - 20, c - 20, 40, 40, accent);
+      if (!stage.agent && !last) rect(railX - 10, c - 10, 20, 20, "background");
+      if (i === cover.stages.length - 2)
+        [0, 1, 2].forEach((n) => rect(1784 + n * 28, top + 16, 16, 16, "teal"));
+      const pad = stage.agent ? 24 : 0;
+      text(
+        `${String(i + 1).padStart(2, "0")} · ${stage.role.toUpperCase()}`,
+        x + pad,
+        top + 10,
+        stage.agent ? 330 : 620,
+        26,
+        "mono",
+        accent,
+      );
+      text(stage.title, x + pad, top + 54, stage.agent ? 330 : 624, 46, "title");
+    });
+    text("Watch the episode >", 1240, 892, 600, 30, "mono", "teal");
+    rect(1240, 934, 340, 2, "teal");
+    link(ep.youtubeUrl, "Watch the episode", 1240, 880, 600, 60);
+  } else if (s.layout === "cover") {
+    const h = text(ep.shortTitle, 56, 235, 1000, 88, "title");
+    text("Executive Episode Brief", 56, 255 + h, 970, 42, "body", "muted");
     text(
-      ep.presentationCover?.question ?? `${formatDate(ep.scheduledDate)}\nHany Saad & Ahmed Mamdoh`,
+      `${formatDate(ep.scheduledDate)}\nHany Saad & Ahmed Mamdoh`,
       56,
       676,
       990,
-      ep.presentationCover ? 44 : 34,
+      34,
       "body",
       "muted",
     );
     rect(56, 844, 760, 88, "primary");
     text("Watch Full Episode >", 90, 863, 692, 40, "title");
     link(ep.youtubeUrl, "Watch Full Episode", 56, 844, 760, 88);
-    if (ep.presentationCover)
-      ep.presentationCover.stages.forEach((stage, i) => {
-        const y = 300 + i * 130;
-        rect(1110, y, 6, 92, i % 2 ? "primary" : "teal");
-        text(String(i + 1).padStart(2, "0"), 1140, y + 8, 90, 32, "mono", "teal");
-        text(stage, 1250, y + 6, 610, 58, "title");
-      });
-    else if (s.image)
+    if (s.image)
       nodes.push({ kind: "image", x: 1110, y: 285, width: 754, height: 480, src: s.image });
   } else {
     const titleHeight = text(s.title, 56, 190, 1808, s.layout === "directory" ? 58 : 68, "title");
@@ -304,7 +343,17 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
       }
     }
   }
-  text("Think Beyond the Code.", 56, 1016, 1200, 24, "mono", "muted");
+  text(
+    s.layout === "cover" && ep.presentationCover
+      ? "CodeShift — Think Beyond the Code."
+      : "Think Beyond the Code.",
+    56,
+    1016,
+    1200,
+    24,
+    "mono",
+    "muted",
+  );
   text(
     `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`,
     1640,
@@ -330,7 +379,8 @@ export function buildDeck(ep: Episode): DeckSlide[] {
     ...(ep.presentationCover
       ? { subtitle: `${ep.presentationCover.subtitle}\n${ep.presentationCover.question}` }
       : {}),
-    entries: ep.presentationCover?.stages.map((title) => ({ title, body: "" })) ?? [],
+    entries:
+      ep.presentationCover?.stages.map((stage) => ({ title: stage.title, body: stage.role })) ?? [],
   });
   const pages = EXECUTIVE_BRIEFS[ep.id];
   if (pages)
