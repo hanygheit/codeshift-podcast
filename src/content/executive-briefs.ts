@@ -35,7 +35,7 @@ export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
         },
         {
           title: "04 / From Task to PR",
-          body: "Plan, implement, test, review and deliver with evidence.",
+          body: "Plan, verify the Definition of Done and deliver safely.",
         },
         {
           title: "05 / Claude Code in Practice",
@@ -161,8 +161,7 @@ export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
       section: "04 / FROM TASK TO PR · ILLUSTRATIVE ORDERS API SCENARIO",
       layout: "flow",
       cards: true,
-      takeaway:
-        "PR-ready = bounded diff + relevant passing checks + human review + clear verification notes.",
+      takeaway: "A reviewable PR starts the merge decision; it does not finish it.",
       entries: [
         { title: "Define", body: "Engineer sets scope and acceptance criteria." },
         { title: "Plan", body: "Agent inspects; engineer agrees on approach." },
@@ -175,27 +174,83 @@ export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
     },
     {
       id: "verification",
-      title: "Generated Code Is Not Verified Code",
-      section: "04 / FROM TASK TO PR · FOUR REVIEW GATES",
+      title: "The Agent Says “Done.” Are We Actually Done?",
+      section: "04 / FROM TASK TO PR · DEFINITION OF DONE",
       layout: "matrix",
       cards: true,
-      takeaway: "Delegate implementation, not accountability. Confidence is not evidence.",
+      subtitle: "Code Complete ≠ Feature Done",
+      takeaway:
+        "Delegate implementation, not accountability. Done means evidence, not a status update.",
       entries: [
         {
-          title: "01 / Behavior",
-          body: "Compare the change to acceptance criteria; probe edge cases and assumptions.",
+          title: "Testing",
+          body: "Acceptance criteria met; relevant checks pass without regressions.",
         },
         {
-          title: "02 / Tests & regressions",
-          body: "Run relevant automated tests; check that existing behavior still works.",
+          title: "Security • UI/UX",
+          body: "Risks verified; the feature is usable, responsive and accessible.",
         },
         {
-          title: "03 / Security & dependencies",
-          body: "Inspect authorization, input validation, secrets and dependency changes.",
+          title: "Documentation • Observability",
+          body: "Usage and operations documented; failures are diagnosable.",
         },
         {
-          title: "04 / Design & scope",
-          body: "Review boundaries, repository conventions and unrelated changes.",
+          title: "Review • Safe Delivery",
+          body: "Engineering standards met; checks, approvals and rollback ready.",
+        },
+      ],
+    },
+    {
+      id: "quality-evidence",
+      title: "Passing Tests. What Did We Actually Prove?",
+      section: "04 / FROM TASK TO PR · TESTING + SECURITY",
+      layout: "comparison",
+      cards: true,
+      takeaway: "Choose checks for the risk. A green build is evidence, not a guarantee.",
+      entries: [
+        {
+          title: "Test the right boundaries",
+          body: "Unit: logic, limits and error paths.\nIntegration: APIs, data and contracts.\nE2E: critical user journeys.\nReproduce the bug; check regressions.",
+        },
+        {
+          title: "Verify OWASP risks",
+          body: "Probe access control and injection.\nCheck input validation and escaping.\nScan secrets and dependencies.\nReview auth and security configuration.",
+        },
+      ],
+    },
+    {
+      id: "experience-operations",
+      title: "It Works Locally. Can People Use and Support It?",
+      section: "04 / FROM TASK TO PR · UI/UX + DOCUMENTATION + OBSERVABILITY",
+      layout: "comparison",
+      cards: true,
+      takeaway: "Feature quality includes the person using it and the engineer on call.",
+      entries: [
+        {
+          title: "Use it like a real person",
+          body: "Check mobile and desktop layouts.\nExercise loading, empty and error states.\nUse keyboard, focus and screen readers.\nCheck contrast and clear feedback.",
+        },
+        {
+          title: "Make it supportable",
+          body: "Update API, setup and usage docs.\nDocument migrations and recovery.\nUse structured logs; redact secrets.\nVerify useful metrics and alerts.",
+        },
+      ],
+    },
+    {
+      id: "safe-delivery",
+      title: "A Ready PR Is Not Permission to Merge",
+      section: "04 / FROM TASK TO PR · SAFE GIT + ENGINEERING OWNERSHIP",
+      layout: "comparison",
+      cards: true,
+      takeaway: "The agent proposes the change. The engineer owns the merge and its impact.",
+      entries: [
+        {
+          title: "Isolate work. Preserve history.",
+          body: "Use a task branch, not the default.\nUse worktrees for parallel checkouts.\nReview diffs; make focused commits.\nNo force pushes to shared history.",
+        },
+        {
+          title: "Require evidence. Deliver safely.",
+          body: "Protect branches; require PR checks.\nSummarize scope, risks and checks run.\nGet approvals; resolve review findings.\nPlan rollout, rollback and monitoring.",
         },
       ],
     },
