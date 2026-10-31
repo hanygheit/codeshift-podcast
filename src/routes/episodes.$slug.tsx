@@ -67,7 +67,7 @@ function EpisodePage() {
           <div className="mt-4 flex flex-wrap gap-2">{ep.topics.slice(0, 3).map(t => <Tag key={t}>{t}</Tag>)}</div>
           <div className="mt-6 flex flex-wrap gap-3" aria-label="Episode actions">
             <Button asChild size="lg"><a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer"><Youtube /> Watch Episode</a></Button>
-            <Button asChild size="lg" variant="outline"><Link to="/episodes/$slug/slides" params={{ slug: ep.slug }} title="Executive summary, lessons, action items, learning resources, references and downloadable PDF"><BookOpen /> Summary &amp; Resources</Link></Button>
+            <Button asChild size="lg" variant="outline"><Link to="/episodes/$slug/slides" params={{ slug: ep.slug }} title="Presentation, lessons, action items, learning resources, references and downloadable PDF"><BookOpen /> {ep.presentationLabel ?? 'Summary & Resources'}</Link></Button>
           </div>
         </div>
         <img src={ep.thumbnail} alt={`CodeShift EP${pad(ep.number)} episode cover`} className="w-full max-w-sm justify-self-center rounded-md border lg:max-w-none" />

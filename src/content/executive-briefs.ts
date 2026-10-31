@@ -9,6 +9,67 @@ export interface BriefPage {
 }
 
 export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
+  ep003: [
+    { id: 'journey', title: 'The CodeShift journey: WHY > WHAT > HOW', section: 'Working with AI Coding Agents', layout: 'flow', subtitle: 'AI can write the code. But who makes it production-ready?', entries: [
+      { title: 'EP001 / WHY', body: "Why is the developer's role changing?" },
+      { title: 'EP002 / WHAT', body: 'What should developers learn?' },
+      { title: 'EP003 / HOW — Now', body: 'How do engineers work with AI coding agents? Prompt > Code > Validation > Pull Request.' },
+    ] },
+    { id: 'effectiveness', title: 'GenAI Effectiveness = f(Model, Product, Skill)', section: 'A conceptual relationship, not a measured equation', layout: 'matrix', subtitle: 'The model provides capability. The product enables it. Your skill turns it into engineering value.', entries: [
+      { title: '01 / Model', body: 'What the underlying AI can do: reasoning, coding and understanding.' },
+      { title: '02 / Product', body: 'How capability is exposed through tools, interfaces and workflows.' },
+      { title: '03 / Skill', body: 'How effectively you direct, evaluate and improve the work.' },
+    ] },
+    { id: 'orchestrator', title: 'You lead. Agents execute. You own the outcome.', section: 'The engineer is the orchestrator', layout: 'flow', subtitle: 'Engineer > Agents + Repository + Tools + Checks. Judgment and accountability stay with you.', entries: [
+      { title: 'Define', body: 'Set the objective and architecture boundaries.' },
+      { title: 'Guide', body: 'Supply context and steer tool use.' },
+      { title: 'Verify', body: 'Inspect evidence, quality and risks.' },
+      { title: 'Own', body: 'Approve delivery and production outcomes.' },
+    ] },
+    { id: 'assistants-agents', title: 'From assistants to agents', section: 'Increasing autonomy', layout: 'flow', subtitle: 'More autonomy requires better engineering control. Capabilities depend on the product and configuration.', entries: [
+      { title: 'Autocomplete', body: 'Local context; suggests text. You apply and test each change.' },
+      { title: 'Chat Assistant', body: 'Supplied context; explains or drafts. You transfer and verify code.' },
+      { title: 'Coding Assistant', body: 'Editor context; proposes edits and tool use under supervision.' },
+      { title: 'Coding Agent', body: 'Repository + tools; edits, runs checks and iterates within permissions.' },
+    ] },
+    { id: 'engineering-layers', title: 'Prompt + Context + Harness Engineering', section: 'Three connected layers', layout: 'flow', subtitle: 'Better prompting helps. Relevant context and a reliable harness make workflows repeatable.', entries: [
+      { title: 'Prompt / Instruct', body: 'Goals, task description, constraints and expected output.' },
+      { title: 'Context / Inform', body: 'Relevant files, repository structure, conventions, requirements, history and examples.' },
+      { title: 'Harness / Operate', body: 'Tools, permissions, skills, tests, automated checks, feedback loops and guardrails.' },
+    ] },
+    { id: 'task-definition', title: 'A prompt is not yet an engineering-ready task', section: 'Orders API example', layout: 'comparison', entries: [
+      { title: 'Weak task', body: '"Build an orders API."\nMissing scope, context and acceptance criteria.' },
+      { title: 'Engineering-ready task', body: 'Add filtering + server-side pagination to the existing Orders API.\nFollow conventions; preserve endpoints.\nValidate parameters; add tests.\nDone: report changed files + verification results.' },
+    ] },
+    { id: 'task-to-pr', title: 'From task to Pull Request', section: 'Orders API workflow illustration — not an implemented demo', layout: 'flow', subtitle: 'Engineer checkpoints: approve scope and plan; review the diff and test evidence; approve delivery.', entries: [
+      { title: 'Define', body: 'Filters, limits and done criteria.' },
+      { title: 'Plan', body: 'Inspect routes and tests.' },
+      { title: 'Delegate', body: 'Bound scope and tools.' },
+      { title: 'Code', body: 'Implement a small, reviewable diff.' },
+      { title: 'Test', body: 'Valid + invalid inputs.' },
+      { title: 'Review', body: 'Diff, risks, evidence.' },
+      { title: 'Deliver', body: 'PR with checks and notes.' },
+    ] },
+    { id: 'verification', title: 'Generated code is not verified code', section: 'Four approval gates', layout: 'matrix', subtitle: 'The agent proposes and executes changes. The engineer is accountable for approval.', entries: [
+      { title: 'Functional correctness', body: 'Check requirements and edge cases. Reject fabricated assumptions.' },
+      { title: 'Tests & regressions', body: 'Run relevant tests and existing flows. Reject shallow fixes.' },
+      { title: 'Security & dependencies', body: 'Check authorization, validation, secrets and dependency risk.' },
+      { title: 'Architecture & maintainability', body: 'Review boundaries, conventions and unintended changes.' },
+    ] },
+    { id: 'claude-workflow', title: 'Claude Code: four workflow mechanisms', section: 'Persistent context / procedures / delegation / automation', layout: 'matrix', entries: [
+      { title: 'CLAUDE.md / Project context', body: 'Always-relevant instructions and conventions. Use for repository guidance: API patterns + test commands. Not enforced policy.' },
+      { title: 'Skills / Reusable procedures', body: 'Task-specific instructions and materials in SKILL.md. Use for repeatable work: an API-review checklist.' },
+      { title: 'Subagents / Specialized workers', body: 'Separate context with scoped tools and responsibilities. Use for bounded delegation: inspect tests and report gaps.' },
+      { title: 'Hooks / Lifecycle automation', body: 'Event-driven handlers around agent operations. Use for deterministic checks: format after edits or block unsafe commands.' },
+    ] },
+    { id: 'rules', title: 'Five rules for effective agentic coding', section: 'Practical checklist', layout: 'statement', subtitle: "Juniors: explain and test. Seniors: set boundaries and review. Leads: standardize checks. The advantage is engineering the collaboration.", entries: [
+      { title: '01 / Define outcomes, not vague prompts.', body: '' },
+      { title: '02 / Provide relevant context.', body: '' },
+      { title: '03 / Delegate bounded tasks.', body: '' },
+      { title: '04 / Verify with tests, review and evidence.', body: '' },
+      { title: '05 / Keep engineering ownership with humans.', body: '' },
+    ] },
+  ],
   ep001: [
     { id: 'summary', title: 'Episode in 60 seconds', section: 'Core lessons', layout: 'statement', entries: [
       { title: 'Code is cheaper. Judgment is not.', body: 'AI accelerates implementation; engineers still frame problems, verify results and own production outcomes.' },

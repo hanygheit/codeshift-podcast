@@ -4,6 +4,15 @@ import { buildDeck, boundedSlide, slideIndex, SLIDE_WIDTH, SLIDE_HEIGHT } from '
 import { getResource } from '@/content/resources';
 
 describe('shared presentation rules', () => {
+  it('adds EP003 with the specified date, recording and thirteen slides', () => {
+    const ep = EPISODES.find(e => e.id === 'ep003');
+    if (!ep) throw new Error('EP003 missing');
+    expect(ep.slug).toBe('ep003');
+    expect(ep.scheduledDate).toBe('2026-10-31');
+    expect(ep.youtubeUrl).toBe('https://youtube.com/live/u114p0sd86I');
+    expect(buildDeck(ep)).toHaveLength(13);
+    expect(buildDeck(ep).filter(s => s.part === 'resources')).toHaveLength(2);
+  });
   it('uses a 16:9 1920 by 1080 canvas', () => {
     expect(SLIDE_WIDTH).toBe(1920); expect(SLIDE_HEIGHT).toBe(1080);
     expect(SLIDE_WIDTH / SLIDE_HEIGHT).toBe(16 / 9);
