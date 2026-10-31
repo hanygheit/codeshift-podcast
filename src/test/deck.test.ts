@@ -4,20 +4,23 @@ import { buildDeck, boundedSlide, slideIndex, SLIDE_WIDTH, SLIDE_HEIGHT } from "
 import { getResource } from "@/content/resources";
 
 describe("shared presentation rules", () => {
-  it("adds EP003 with the specified date, recording and thirteen slides", () => {
+  it("adds EP003 with the specified date, recording and sixteen slides", () => {
     const ep = EPISODES.find((e) => e.id === "ep003");
     if (!ep) throw new Error("EP003 missing");
     expect(ep.slug).toBe("ep003");
     expect(ep.scheduledDate).toBe("2026-10-31");
     expect(ep.youtubeUrl).toBe("https://youtube.com/live/u114p0sd86I");
-    expect(buildDeck(ep)).toHaveLength(13);
+    expect(buildDeck(ep)).toHaveLength(16);
     expect(buildDeck(ep).filter((s) => s.part === "resources")).toHaveLength(2);
-    expect(buildDeck(ep)[0]?.subtitle).toContain("AI Can Write the Code. Who Owns the Outcome?");
+    expect(buildDeck(ep)[0]?.subtitle).toContain("AI Wrote the Code. Would You Merge It?");
+    expect(buildDeck(ep)[0]?.subtitle).toContain(
+      "The agent generates the code. The engineer owns the outcome.",
+    );
     expect(buildDeck(ep)[0]?.entries.map((e) => e.title)).toEqual([
-      "Human Intent",
-      "AI Agent",
-      "Engineering Verification",
-      "Pull Request",
+      "PR ready",
+      "Correct? Tested?",
+      "Secure? Usable?",
+      "Meets our standards?",
     ]);
   });
   it("keeps EP003 teaching content ordered, readable and non-overlapping", () => {
@@ -34,6 +37,9 @@ describe("shared presentation rules", () => {
       "task-definition",
       "task-to-pr",
       "verification",
+      "quality-evidence",
+      "experience-operations",
+      "safe-delivery",
       "claude-workflow",
       "rules",
       "resources-1",
@@ -48,13 +54,25 @@ describe("shared presentation rules", () => {
       "Review",
       "Deliver",
     ]);
-    expect(deck[11]?.entries[0]?.url).toBe(
+    expect(deck[14]?.entries[0]?.url).toBe(
       "https://academy.claude.com/collections/build-with-claude",
     );
-    expect(deck[12]?.entries.map((e) => e.url)).toEqual(
+    expect(deck[15]?.entries.map((e) => e.url)).toEqual(
       ep.brief?.resourceGroups[1]?.items.map((e) => e.url),
     );
     expect(deck[8]?.takeaway).toContain("Delegate implementation, not accountability.");
+    expect(deck[8]?.title).toBe("The Agent Says “Done.” Are We Actually Done?");
+    expect(deck[8]?.subtitle).toBe("Code Complete ≠ Feature Done");
+    expect(deck[8]?.entries.map((e) => e.title)).toEqual([
+      "Testing",
+      "Security • UI/UX",
+      "Documentation • Observability",
+      "Review • Safe Delivery",
+    ]);
+    expect(deck[9]?.entries[1]?.title).toBe("Verify OWASP risks");
+    expect(deck[10]?.entries[0]?.body).toContain("screen readers");
+    expect(deck[11]?.entries[0]?.body).toContain("worktrees");
+    expect(deck[11]?.entries[1]?.body).toContain("approvals");
     expect(EPISODES.filter((e) => e.slug === ep.slug)).toHaveLength(1);
     for (const slide of deck) {
       const texts = slide.nodes.filter((n) => n.kind === "text").filter((n) => n.lines.length > 0);
