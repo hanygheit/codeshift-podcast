@@ -34,8 +34,8 @@ describe("shared presentation interactions", () => {
     stage.scrollTop = 300;
     view.rerender(<DeckPlayer ep={EP003} slideId="references" />);
     expect(stage.scrollTop).toBe(0);
-    expect(screen.getByText("Slide 13 / 13")).toBeInTheDocument();
-    expect(screen.getByRole("slider")).toHaveValue("13");
+    expect(screen.getByText("Slide 16 / 16")).toBeInTheDocument();
+    expect(screen.getByRole("slider")).toHaveValue("16");
     expect(screen.getByRole("button", { name: "Next slide" })).toBeDisabled();
     fireEvent.change(screen.getByRole("slider"), { target: { value: "6" } });
     expectSlide("engineering-layers");

@@ -45,13 +45,14 @@ export const EP003: Episode = {
   resourceIds: [],
   slides: [],
   presentationCover: {
-    subtitle: "Working with AI Coding Agents",
-    question: "AI Can Write the Code. Who Owns the Outcome?",
+    subtitle:
+      "Working with AI Coding Agents\nThe agent generates the code. The engineer owns the outcome.",
+    question: "AI Wrote the Code. Would You Merge It?",
     stages: [
-      { title: "Human Intent", role: "You define" },
-      { title: "AI Agent", role: "Agent executes", agent: true },
-      { title: "Engineering Verification", role: "You verify" },
-      { title: "Pull Request", role: "You own" },
+      { title: "PR ready", role: "AI Agent / Done", agent: true },
+      { title: "Correct? Tested?", role: "Engineer / Behavior + tests" },
+      { title: "Secure? Usable?", role: "Engineer / Security + UI/UX" },
+      { title: "Meets our standards?", role: "Engineer / Merge decision" },
     ],
   },
   resourceSlideTitles: ["Official Claude Learning Resources", "Claude Code Documentation"],
