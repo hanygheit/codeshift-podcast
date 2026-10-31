@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Correct YouTube channel discovery; real EP003 appears in preview with its cover, recording link and 7 PM Cairo schedule; 11 relevant tests pass.
+- [ ] Apply corrected YouTube channel discovery on the published site — waiting for publication.
+
 - [x] Consolidate EP001/EP002 into 8/16-slide executive briefs with all resources and one dedicated slide per EP002 package.
 - [x] Improve shared slide typography, editorial layouts, screen-fitting canvas, grouped contents and direct resource/watch actions.
 - [x] Verify every slide on desktop, readable phone views, keyboard/arrows/history/slider/swipe/fullscreen, complete links, finalized PDF counts and unchanged routes; 25 tests pass.
@@ -23,5 +26,5 @@
 - [x] Replace Browserless with directly generated vector PDFs sharing web slide layouts
 - [x] Validate both episode flows, slide coverage, PDFs and existing routes; 19 tests pass, EP001 18 pages and EP002 39 pages, native/fallback fullscreen and phone swipes verified
 - [x] Home: Upcoming Episode (YouTube) + Explore Episodes
-- [ ] Upcoming Episode live data — configured YouTube playlist returns 404; correct playlist configuration needed (outside episode redesign)
+- [x] Upcoming Episode live data — corrected personal-channel mismatch to the verified CodeShift Podcast channel; live API and homepage verified.
 - [x] ITI support badge: compact beneath hero CTAs within left column; existing footer acknowledgment retained.

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
-/** Official CodeShift channel ID (provided by the channel owner). */
-export const CODESHIFT_CHANNEL_ID = "UCLCIMGSDf2mHF21404-1Efg";
+/** Verified by YouTube channels.list against the website's @CodeShiftPodcast link. */
+export const CODESHIFT_CHANNEL_ID = "UCRjaB0a3R2gqIgo-UpJZHwA";
 
 export interface LiveEvent {
   videoId: string;
@@ -56,13 +56,13 @@ export const getUpcomingLive = createServerFn({ method: "GET" }).handler(async (
         .filter((v) => v.status?.privacyStatus === "public" && v.liveStreamingDetails && !v.liveStreamingDetails.actualEndTime)
         .filter((v) => v.snippet.liveBroadcastContent === "live" || v.snippet.liveBroadcastContent === "upcoming")
         .map((v): LiveEvent => {
-          const d = v.liveStreamingDetails!;
+          const d = v.liveStreamingDetails;
           const t = v.snippet.thumbnails;
           return {
             videoId: v.id, title: v.snippet.title,
             thumbnail: (t["maxres"] ?? t["standard"] ?? t["high"] ?? t["medium"] ?? t["default"])?.url ?? "",
             url: `https://www.youtube.com/watch?v=${v.id}`,
-            scheduledStart: d.scheduledStartTime ?? d.actualStartTime ?? "",
+            scheduledStart: d?.scheduledStartTime ?? d?.actualStartTime ?? "",
             status: v.snippet.liveBroadcastContent === "live" ? "live" : "upcoming",
           };
         })
