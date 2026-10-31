@@ -3,6 +3,7 @@ import { EPISODES } from "@/content/episodes";
 import { buildDeck, wrapText } from "@/lib/deck-model";
 import { ep003PresentationNodes } from "@/content/ep003-presentation";
 import qr from "@/assets/ep003-qr.json";
+import pollQr from "@/assets/live-poll-qr.json";
 
 const url = "https://codeshift-podcast.lovable.app/episodes/ep003/slides?slide=cover";
 
@@ -30,12 +31,35 @@ describe("EP003 live presentation QR", () => {
     });
   });
 
+  it("adds a separate permanent live-poll QR to the EP003 poll slide", () => {
+    expect(pollQr.url).toBe("https://codeshift-podcast.lovable.app/poll");
+    const side = pollQr.rows.length;
+    expect(side).toBeGreaterThanOrEqual(41);
+    pollQr.rows.forEach((row, i) => {
+      expect(row).toMatch(new RegExp(`^[01]{${side}}$`));
+      expect(row.slice(0, 4)).toBe("0000");
+      expect(row.slice(-4)).toBe("0000");
+      if (i < 4 || i >= side - 4) expect(row).toBe("0".repeat(side));
+    });
+    const ep = EPISODES.find((e) => e.id === "ep003")!;
+    const pollSlide = buildDeck(ep).find((slide) => slide.id === "live-poll");
+    expect(pollSlide?.nodes.some((node) => node.kind === "link" && node.url === pollQr.url)).toBe(
+      true,
+    );
+    expect(
+      pollSlide?.nodes.some(
+        (node) => node.kind === "text" && node.lines.includes("Scan to Vote Live"),
+      ),
+    ).toBe(true);
+  });
+
   it("leaves unselected EP003 slides untouched and QR areas clear of text and controls", () => {
     const ep = EPISODES.find((e) => e.id === "ep003")!;
     for (const slide of buildDeck(ep)) {
       const links = slide.nodes.filter((n) => n.kind === "link" && n.url === url);
       if (!links.length) {
-        expect(ep003PresentationNodes(slide)).toBe(slide.nodes);
+        if (slide.id === "live-poll") expect(ep003PresentationNodes(slide)).not.toBe(slide.nodes);
+        else expect(ep003PresentationNodes(slide)).toBe(slide.nodes);
         continue;
       }
       for (const link of links) {

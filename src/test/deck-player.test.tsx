@@ -34,17 +34,17 @@ describe("shared presentation interactions", () => {
     stage.scrollTop = 300;
     view.rerender(<DeckPlayer ep={EP003} slideId="references" />);
     expect(stage.scrollTop).toBe(0);
-    expect(screen.getByText("Slide 16 / 16")).toBeInTheDocument();
-    expect(screen.getByRole("slider")).toHaveValue("16");
+    expect(screen.getByText("Slide 17 / 17")).toBeInTheDocument();
+    expect(screen.getByRole("slider")).toHaveValue("17");
     expect(screen.getByRole("button", { name: "Next slide" })).toBeDisabled();
-    fireEvent.change(screen.getByRole("slider"), { target: { value: "6" } });
+    fireEvent.change(screen.getByRole("slider"), { target: { value: "7" } });
     expectSlide("engineering-layers");
   });
 
   it("supports keyboard navigation without hijacking inputs or clickable content", () => {
     render(<DeckPlayer ep={EP003} slideId="journey" />);
     fireEvent.keyDown(window, { key: "ArrowRight" });
-    expectSlide("effectiveness");
+    expectSlide("live-poll");
     fireEvent.keyDown(window, { key: "ArrowLeft" });
     expectSlide("cover");
     fireEvent.keyDown(window, { key: "End" });
@@ -65,7 +65,7 @@ describe("shared presentation interactions", () => {
     fireEvent.change(search, { target: { value: "Harness Engineering" } });
     fireEvent.keyDown(search, { key: "ArrowRight" });
     expect(navigate).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: /06.*Prompt \+ Context \+ Harness/ }));
+    fireEvent.click(screen.getByRole("button", { name: /07.*Prompt \+ Context \+ Harness/ }));
     expectSlide("engineering-layers");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Contents" }));

@@ -48,6 +48,28 @@ export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
       ],
     },
     {
+      id: "live-poll",
+      title: "Your Turn: How Much Would You Trust an AI Coding Agent?",
+      section: "LIVE AUDIENCE POLL",
+      layout: "matrix",
+      subtitle: "How much autonomy would you give an AI Coding Agent on a real project today?",
+      entries: [
+        { title: "A — Suggest code only", body: "I implement the changes myself." },
+        {
+          title: "B — Implement on a separate branch",
+          body: "The agent writes code; I review the changes.",
+        },
+        {
+          title: "C — Implement, test & open a PR",
+          body: "The agent prepares the work; a human approves.",
+        },
+        {
+          title: "D — Auto-merge within approved limits",
+          body: "After required checks pass, under an explicitly authorized team policy.",
+        },
+      ],
+    },
+    {
       id: "effectiveness",
       title: "What Makes AI Work Effective?",
       section: "01 / MINDSET · MODEL + PRODUCT + SKILL",
