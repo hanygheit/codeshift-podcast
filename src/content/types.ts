@@ -98,7 +98,12 @@ export interface Episode {
   slides: Slide[];
   /** Optional episode-specific label; existing episodes retain their default. */
   presentationLabel?: string;
-  presentationCover?: { subtitle: string; question: string; stages: string[] };
+  presentationCover?: {
+    subtitle: string;
+    question: string;
+    /** Human-led workflow stages; `agent` marks the delegated, bounded execution stage. */
+    stages: { title: string; role: string; agent?: boolean }[];
+  };
   resourceSlideTitles?: [string, string];
   /** When set, the episode presents a single scrollable executive brief instead of a slide deck. */
   brief?: EpisodeBrief;
