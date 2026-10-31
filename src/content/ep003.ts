@@ -80,6 +80,8 @@ export const EP003: Episode = {
     actions: [{ role: "Engineer", items: ["Define", "Guide", "Verify", "Own"] }],
     finalMessage:
       "The advantage isn't simply using AI. It's knowing how to engineer the collaboration.",
+    resourcesNote:
+      "Scan for Slides & Resources: https://codeshift-podcast.lovable.app/episodes/ep003/slides?slide=cover",
     resourceGroups: [
       {
         label: "Official Claude learning courses",
