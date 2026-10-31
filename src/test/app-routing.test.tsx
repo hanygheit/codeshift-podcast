@@ -27,4 +27,14 @@ describe("App routing", () => {
       );
     },
   );
+  it.each([
+    ["/poll", "/poll"],
+    ["/polls/ep003-agent-autonomy", "/polls/$slug"],
+    ["/polls/ep003-agent-autonomy/results", "/polls/$slug/results"],
+    ["/admin/polls", "/admin/polls"],
+    ["/api/polls", "/api/polls"],
+  ])("matches poll route %s", (path, routeId) => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    expect(router.matchRoutes(path).at(-1)?.routeId).toBe(routeId);
+  });
 });

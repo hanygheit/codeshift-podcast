@@ -11,10 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as PollRouteImport } from './routes/poll'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AdminPollsRouteImport } from './routes/admin.polls'
+import { Route as ApiPollsRouteImport } from './routes/api/polls'
 import { Route as EpisodesIndexRouteImport } from './routes/episodes.index'
 import { Route as EpisodesSlugRouteImport } from './routes/episodes.$slug'
+import { Route as PollsSlugRouteImport } from './routes/polls.$slug'
 import { Route as EpisodesSlugSlidesRouteImport } from './routes/episodes.$slug_.slides'
+import { Route as PollsSlugResultsRouteImport } from './routes/polls.$slug.results'
 import { Route as ApiPublicPdfSlugRouteImport } from './routes/api/public/pdf.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -27,9 +32,24 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PollRoute = PollRouteImport.update({
+  id: '/poll',
+  path: '/poll',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPollsRoute = AdminPollsRouteImport.update({
+  id: '/admin/polls',
+  path: '/admin/polls',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPollsRoute = ApiPollsRouteImport.update({
+  id: '/api/polls',
+  path: '/api/polls',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EpisodesIndexRoute = EpisodesIndexRouteImport.update({
@@ -42,10 +62,20 @@ const EpisodesSlugRoute = EpisodesSlugRouteImport.update({
   path: '/episodes/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PollsSlugRoute = PollsSlugRouteImport.update({
+  id: '/polls/$slug',
+  path: '/polls/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EpisodesSlugSlidesRoute = EpisodesSlugSlidesRouteImport.update({
   id: '/episodes/$slug_/slides',
   path: '/episodes/$slug/slides',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PollsSlugResultsRoute = PollsSlugResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => PollsSlugRoute,
 } as any)
 const ApiPublicPdfSlugRoute = ApiPublicPdfSlugRouteImport.update({
   id: '/api/public/pdf/$slug',
@@ -56,29 +86,44 @@ const ApiPublicPdfSlugRoute = ApiPublicPdfSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/poll': typeof PollRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/polls': typeof AdminPollsRoute
+  '/api/polls': typeof ApiPollsRoute
   '/episodes/$slug': typeof EpisodesSlugRoute
+  '/polls/$slug': typeof PollsSlugRouteWithChildren
   '/episodes/': typeof EpisodesIndexRoute
   '/episodes/$slug/slides': typeof EpisodesSlugSlidesRoute
+  '/polls/$slug/results': typeof PollsSlugResultsRoute
   '/api/public/pdf/$slug': typeof ApiPublicPdfSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/poll': typeof PollRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/polls': typeof AdminPollsRoute
+  '/api/polls': typeof ApiPollsRoute
   '/episodes/$slug': typeof EpisodesSlugRoute
+  '/polls/$slug': typeof PollsSlugRouteWithChildren
   '/episodes': typeof EpisodesIndexRoute
   '/episodes/$slug/slides': typeof EpisodesSlugSlidesRoute
+  '/polls/$slug/results': typeof PollsSlugResultsRoute
   '/api/public/pdf/$slug': typeof ApiPublicPdfSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/poll': typeof PollRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/polls': typeof AdminPollsRoute
+  '/api/polls': typeof ApiPollsRoute
   '/episodes/$slug': typeof EpisodesSlugRoute
+  '/polls/$slug': typeof PollsSlugRouteWithChildren
   '/episodes/': typeof EpisodesIndexRoute
   '/episodes/$slug_/slides': typeof EpisodesSlugSlidesRoute
+  '/polls/$slug/results': typeof PollsSlugResultsRoute
   '/api/public/pdf/$slug': typeof ApiPublicPdfSlugRoute
 }
 export interface FileRouteTypes {
@@ -86,36 +131,55 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/poll'
     | '/sitemap.xml'
+    | '/admin/polls'
+    | '/api/polls'
     | '/episodes/$slug'
+    | '/polls/$slug'
     | '/episodes/'
     | '/episodes/$slug/slides'
+    | '/polls/$slug/results'
     | '/api/public/pdf/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/poll'
     | '/sitemap.xml'
+    | '/admin/polls'
+    | '/api/polls'
     | '/episodes/$slug'
+    | '/polls/$slug'
     | '/episodes'
     | '/episodes/$slug/slides'
+    | '/polls/$slug/results'
     | '/api/public/pdf/$slug'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/poll'
     | '/sitemap.xml'
+    | '/admin/polls'
+    | '/api/polls'
     | '/episodes/$slug'
+    | '/polls/$slug'
     | '/episodes/'
     | '/episodes/$slug_/slides'
+    | '/polls/$slug/results'
     | '/api/public/pdf/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  PollRoute: typeof PollRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminPollsRoute: typeof AdminPollsRoute
+  ApiPollsRoute: typeof ApiPollsRoute
   EpisodesSlugRoute: typeof EpisodesSlugRoute
+  PollsSlugRoute: typeof PollsSlugRouteWithChildren
   EpisodesIndexRoute: typeof EpisodesIndexRoute
   EpisodesSlugSlidesRoute: typeof EpisodesSlugSlidesRoute
   ApiPublicPdfSlugRoute: typeof ApiPublicPdfSlugRoute
@@ -137,11 +201,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/poll': {
+      id: '/poll'
+      path: '/poll'
+      fullPath: '/poll'
+      preLoaderRoute: typeof PollRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/polls': {
+      id: '/admin/polls'
+      path: '/admin/polls'
+      fullPath: '/admin/polls'
+      preLoaderRoute: typeof AdminPollsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/polls': {
+      id: '/api/polls'
+      path: '/api/polls'
+      fullPath: '/api/polls'
+      preLoaderRoute: typeof ApiPollsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/episodes/': {
@@ -158,12 +243,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EpisodesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/polls/$slug': {
+      id: '/polls/$slug'
+      path: '/polls/$slug'
+      fullPath: '/polls/$slug'
+      preLoaderRoute: typeof PollsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/episodes/$slug_/slides': {
       id: '/episodes/$slug_/slides'
       path: '/episodes/$slug/slides'
       fullPath: '/episodes/$slug/slides'
       preLoaderRoute: typeof EpisodesSlugSlidesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/polls/$slug/results': {
+      id: '/polls/$slug/results'
+      path: '/results'
+      fullPath: '/polls/$slug/results'
+      preLoaderRoute: typeof PollsSlugResultsRouteImport
+      parentRoute: typeof PollsSlugRoute
     }
     '/api/public/pdf/$slug': {
       id: '/api/public/pdf/$slug'
@@ -175,11 +274,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PollsSlugRouteChildren {
+  PollsSlugResultsRoute: typeof PollsSlugResultsRoute
+}
+
+const PollsSlugRouteChildren: PollsSlugRouteChildren = {
+  PollsSlugResultsRoute: PollsSlugResultsRoute,
+}
+
+const PollsSlugRouteWithChildren = PollsSlugRoute._addFileChildren(
+  PollsSlugRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  PollRoute: PollRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminPollsRoute: AdminPollsRoute,
+  ApiPollsRoute: ApiPollsRoute,
   EpisodesSlugRoute: EpisodesSlugRoute,
+  PollsSlugRoute: PollsSlugRouteWithChildren,
   EpisodesIndexRoute: EpisodesIndexRoute,
   EpisodesSlugSlidesRoute: EpisodesSlugSlidesRoute,
   ApiPublicPdfSlugRoute: ApiPublicPdfSlugRoute,

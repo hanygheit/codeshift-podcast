@@ -18,6 +18,7 @@ Each conversation is paired with an episode page, an editorial summary, practica
 - Download presentation PDFs generated on the server from the same slide model as the on-site presentation. PDFs include selectable text and linked references.
 - Search by keyword, episode number, or topic; filter by topic, audience, or year; sort results and navigate paginated lists.
 - Use the site on desktop and mobile, including an adaptive reading layout for presentation content on portrait phones.
+- Run reusable anonymous audience polls at `/poll`, manage polls at `/admin/polls`, and display protected live results at `/polls/<slug>/results`.
 
 ## Episodes
 
@@ -37,7 +38,7 @@ Each editorial presentation is available at `/episodes/<slug>/slides`; for examp
 - **UI:** Tailwind CSS 4, Radix UI primitives, and project components in `src/components/ui/`.
 - **Presentations and PDFs:** A shared TypeScript deck model rendered as SVG in the browser and as PDF on the server using `pdf-lib` and `fontkit`.
 - **Episode discovery:** Optional server-side YouTube Data API integration for upcoming broadcasts and completed public recordings.
-- **Content and persistence:** Editorial content is stored in TypeScript modules in the repository. The active episode and resource flows do not use a database.
+- **Content and persistence:** Editorial content is stored in TypeScript modules; poll definitions and anonymous votes are stored in Supabase.
 
 ## Project structure
 
@@ -51,7 +52,7 @@ src/
     site.ts                 Site identity, social links, and host profiles
   components/              Shared site, episode discovery, and presentation UI
     deck/                  Presentation player, slide rendering, and PDF download
-  routes/                  Home, archive, About, episode, and PDF API routes
+  routes/                  Home, archive, episode, poll and PDF API routes
   lib/
     archive.ts             Episode filtering, sorting, and pagination
     deck-model.ts          Shared presentation model and slide layout
@@ -59,7 +60,7 @@ src/
     youtube.functions.ts   Server-side YouTube Data API integration
 public/fonts/              Bundled presentation fonts
 drizzle/                   Database schema scaffold (currently empty)
-supabase/                  Supabase project configuration scaffold
+supabase/                  Supabase project config and poll database migrations
 ```
 
 `src/content/episodes.ts` is the canonical editorial episode list. Episode-specific records can live in their own module, as EP003 does in `src/content/ep003.ts`. `src/content/executive-briefs.ts` holds additional presentation copy. The episode routes, presentations, and PDF endpoint consume this repository-managed content.
@@ -94,7 +95,16 @@ bun run preview
 | `YOUTUBE_PLAYLIST_ID` | Optional | Selects the playlist for completed-recording discovery. If unset, the integration checks the configured channel's uploads and filters titles for “CodeShift.” |
 | `YOUTUBE_CHANNEL_ID` | Optional | Overrides the channel used for completed-recording discovery when no playlist is set. Upcoming-broadcast lookup uses the CodeShift channel ID defined in source. |
 
-Set these variables in the local environment or deployment provider; do not commit credentials. No environment variables are required for the editorial episode content or local development. Supabase client/auth and cron helper modules are present as scaffolding but are not connected to the current routes; their configuration is not needed to run the site.
+Set these variables in the local environment or deployment provider; do not commit credentials. Apply the migration in `supabase/migrations/` to the connected Supabase project before enabling polls. Poll persistence requires the Supabase variables below. The service-role key and poll secrets are server-only. Generate `POLL_ADMIN_TOKEN` and `POLL_VOTE_SECRET` as separate high-entropy values, each at least 32 characters. The host token is entered on `/admin/polls`; the server exchanges it for an HttpOnly, eight-hour cookie. No voter account is required.
+
+| Variable | Requirement | Purpose |
+| --- | --- | --- |
+| `SUPABASE_URL` | Required for polls | Existing Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Required for polls | Server-only database access; never expose as a `VITE_` variable |
+| `POLL_ADMIN_TOKEN` | Required for host management | High-entropy host access token, at least 32 characters |
+| `POLL_VOTE_SECRET` | Required for anonymous voting | Separate secret used to sign anonymous browser tokens, at least 32 characters |
+
+The permanent QR in `public/poll-qr.svg` always targets `/poll`. Regenerate the SVG and its presentation matrix with `bun run generate:live-poll-qr` only if that permanent URL changes. The first EP003 poll is seeded as a draft; a host explicitly opens it when ready.
 
 ## Adding episode content
 
