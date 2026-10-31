@@ -1,29 +1,47 @@
-# Codeshift Podcast
+# CodeShift Podcast
 
-Implement exactly the screenshot and nothing else
+CodeShift is an independent weekly Arabic podcast about software engineering in the AI era. Each live conversation is paired with an episode archive, editorial notes, reference slides, downloadable PDFs, and curated learning resources.
 
-This project was built with [Lovable](https://lovable.dev).
+**Live site:** [codeshift-podcast.lovable.app](https://codeshift-podcast.lovable.app) · **Schedule:** Saturdays at 7:00 PM Cairo time
 
-**Live app**: https://codeshift-podcast.lovable.app
+## What is here
 
-## Build with Lovable
+- Browse and search editorial episodes alongside eligible public CodeShift recordings from YouTube.
+- Explore episode summaries, takeaways, and curated resources.
+- Open responsive presentations and download selectable, vector-based PDFs.
+- See the hosts, upcoming live session, and project information.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/437097bb-702e-4a63-a16c-631f1881cb50).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+The podcast is delivered in conversational Egyptian Arabic. The written notes and resources are in English. CodeShift is a community knowledge-sharing initiative, not a commercial training platform.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requirements: Node.js and npm.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
+
+Useful scripts:
+
+```sh
+npm run lint
+npm test
+npm run build
+```
+
+`YOUTUBE_API_KEY` enables the server-fetched upcoming session and YouTube recording discovery. `YOUTUBE_PLAYLIST_ID` is optional; when set, it selects the playlist used for completed recordings. Without a playlist ID, recordings are discovered from the channel uploads.
+
+## Project structure
+
+- `src/content/` — canonical site, episode, executive brief, and resource content. Add editorial episodes in `episodes.ts` or an episode module imported by it; routes, presentations, and PDFs consume those records.
+- `src/routes/` — file-based TanStack Start routes, including the home page, episode archive, episode details, presentations, and About page.
+- `src/lib/deck-model.ts` — shared presentation model used by the SVG slides and PDF export.
+- `src/lib/youtube.functions.ts` — server-side YouTube API integration.
+
+## Lovable
+
+This project is connected to [Lovable](https://lovable.dev). You can also continue developing it in the [Lovable editor](https://lovable.dev/projects/437097bb-702e-4a63-a16c-631f1881cb50); changes made there sync with this repository.
 
 ## EP003: From Prompt to Pull Request
 
@@ -42,9 +60,6 @@ fonts, 13 pages at 1920×1080, and clickable links. SVG and PDF use the same
 `buildDeck()` layout. Bump `DECK_DESIGN_VERSION` when changing the layout or fonts.
 
 Validate with `npm test`, `npx tsc --noEmit`, `npm run lint`, and `npm run build`.
-The repository currently has pre-existing full-lint failures, primarily formatting.
-Lovable artwork URLs require the hosted asset service; the original artwork
-references are preserved. Automatic YouTube discovery retains its existing
-server-side `YOUTUBE_API_KEY` requirement and optional `YOUTUBE_PLAYLIST_ID`.
-Publish through the existing Lovable-connected deployment; no history rewriting
-or infrastructure changes are needed.
+Repository-wide lint currently reports pre-existing formatting failures.
+Automatic YouTube discovery retains its existing server-side `YOUTUBE_API_KEY`
+requirement and optional `YOUTUBE_PLAYLIST_ID`.
