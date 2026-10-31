@@ -98,6 +98,8 @@ export interface Episode {
   slides: Slide[];
   /** Optional episode-specific label; existing episodes retain their default. */
   presentationLabel?: string;
+  presentationCover?: { subtitle: string; question: string; stages: string[] };
+  resourceSlideTitles?: [string, string];
   /** When set, the episode presents a single scrollable executive brief instead of a slide deck. */
   brief?: EpisodeBrief;
 }

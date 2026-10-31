@@ -16,6 +16,8 @@ export const EP003: Episode = {
   takeaways: ['Define engineering-ready tasks.', 'Provide relevant context and reliable guardrails.', 'Delegate bounded work and verify the result.', 'Keep engineering ownership with humans.'],
   actionItems: ['Define outcomes and acceptance criteria.', 'Supply relevant repository context.', 'Delegate bounded tasks.', 'Verify with tests, review and evidence.', 'Own the delivered outcome.'],
   presentationLabel: 'Presentation & Resources', resourceIds: [], slides: [],
+  presentationCover: { subtitle: 'Working with AI Coding Agents', question: 'AI can write the code. But who makes it production-ready?', stages: ['Prompt', 'Code', 'Validation', 'Pull Request'] },
+  resourceSlideTitles: ['Official Claude learning courses', 'Official documentation & references'],
   brief: {
     summaryHeadline: 'You lead. Agents execute. You own the outcome.',
     summary: ['AI generates code. Engineers orchestrate the workflow and own the outcome.'],

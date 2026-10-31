@@ -49,11 +49,17 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
  text(s.section.toUpperCase(),56,128,1808,26,'mono','teal');
  if(s.layout==='cover') {
   const h=text(ep.shortTitle,56,235,1000,88,'title');
-  text('Executive Episode Brief',56,255+h,970,42,'body','muted');
-  text(`${formatDate(ep.scheduledDate)}\nHany Saad & Ahmed Mamdoh`,56,676,990,34,'body','muted');
+   text(ep.presentationCover?.subtitle ?? 'Executive Episode Brief',56,255+h,970,42,'body','muted');
+   text(ep.presentationCover?.question ?? `${formatDate(ep.scheduledDate)}\nHany Saad & Ahmed Mamdoh`,56,676,990,34,'body','muted');
   rect(56,844,760,88,'primary'); text('Watch Full Episode >',90,863,692,40,'title');
   link(ep.youtubeUrl,'Watch Full Episode',56,844,760,88);
-  if(s.image) nodes.push({kind:'image',x:1110,y:285,width:754,height:480,src:s.image});
+   if(ep.presentationCover) ep.presentationCover.stages.forEach((stage,i)=>{
+    const y=300+i*130;
+    rect(1110,y,6,92,i%2?'primary':'teal');
+    text(String(i+1).padStart(2,'0'),1140,y+8,90,32,'mono','teal');
+    text(stage,1250,y+6,610,58,'title');
+   });
+   else if(s.image) nodes.push({kind:'image',x:1110,y:285,width:754,height:480,src:s.image});
  } else {
   const titleHeight=text(s.title,56,190,1808,s.layout==='directory'?58:68,'title');
   let start=190+titleHeight+32;
@@ -140,7 +146,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
   if(extra.length)add({id:'references',title:'Engineering & adoption references',section:'Further reading',part:'resources',layout:'directory',entries:extra});
  } else {
   const split=Math.ceil(extra.length/2);
-  [extra.slice(0,split),extra.slice(split)].forEach((entries,i)=>{if(entries.length)add({id:i?'references':'resources-1',title:i?'AI workflows & engineering references':'Foundations & practical development',section:'Learning resources',part:'resources',layout:'directory',entries});});
+   [extra.slice(0,split),extra.slice(split)].forEach((entries,i)=>{if(entries.length)add({id:i?'references':'resources-1',title:ep.resourceSlideTitles?.[i] ?? (i?'AI workflows & engineering references':'Foundations & practical development'),section:'Learning resources',part:'resources',layout:'directory',entries});});
  }
  slides.forEach((s,i)=>{s.aliases=legacyAliases(s);s.nodes=layoutSlide(s,ep,i,slides.length);});return slides;
 }

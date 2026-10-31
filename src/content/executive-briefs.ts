@@ -45,7 +45,7 @@ export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
       { title: 'Define', body: 'Filters, limits and done criteria.' },
       { title: 'Plan', body: 'Inspect routes and tests.' },
       { title: 'Delegate', body: 'Bound scope and tools.' },
-      { title: 'Implement', body: 'Small, reviewable diff.' },
+      { title: 'Code', body: 'Implement a small, reviewable diff.' },
       { title: 'Test', body: 'Valid + invalid inputs.' },
       { title: 'Review', body: 'Diff, risks, evidence.' },
       { title: 'Deliver', body: 'PR with checks and notes.' },
