@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Add EP003 data, 13 live-session slides and verified official resources using existing templates.
+- [ ] Verify EP003 discovery, navigation, fullscreen and existing PDF download; preserve EP001/EP002.
+
 - [x] Correct YouTube channel discovery; real EP003 appears in preview with its cover, recording link and 7 PM Cairo schedule; 11 relevant tests pass.
 - [ ] Apply corrected YouTube channel discovery on the published site — waiting for publication.
 
