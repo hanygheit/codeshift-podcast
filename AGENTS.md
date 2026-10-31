@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Content is repository-managed in src/content (episodes.ts, resources.ts, site.ts); routes render from it — add episodes by adding records, never by editing route components. Why: single source of truth for pages, slides and PDF.
+- Episode-specific modules may export records consumed by episodes.ts; optional presentationLabel customizes the detail CTA without changing other episodes. Why: keep new content isolated while reusing every existing delivery path.
 - Institutional support artwork uses the shared SupportBadge in the footer only — never in the navbar, hero, or a standalone section — always smaller than the navbar logo and separate from Logo. Why: preserve supplied artwork and keep CodeShift the primary identity.
 
 - Episode presentations use the pure buildDeck() declarative primitive model in src/lib/deck-model.ts; SVG SlideFrame and the local pdf-lib backend consume the same 1920×1080 geometry, font metrics, palette, assets and link nodes. Why: vector fidelity without HTML conversion.
