@@ -90,6 +90,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      cast_open_poll_vote: {
+        Args: { p_slug: string; p_option: string; p_voter: string };
+        Returns: Json;
+      };
+      get_open_poll: {
+        Args: { p_slug: string; p_voter: string };
+        Returns: Json;
+      };
       poll_result_counts: {
         Args: { p_poll_id: string };
         Returns: { option_id: string; vote_count: number }[];
