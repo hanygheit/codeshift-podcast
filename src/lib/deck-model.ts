@@ -1,15 +1,29 @@
 import type { Episode } from "@/content/types";
 import { getResource } from "@/content/resources";
 import { formatDate, pad } from "@/content/episodes";
-import { EXECUTIVE_BRIEFS } from "@/content/executive-briefs";
+import { EXECUTIVE_BRIEFS, type BriefPage } from "@/content/executive-briefs";
 import metrics from "./deck-font-metrics.json";
 import logo from "@/assets/codeshift-logo.png.asset.json";
 import { ep003PresentationNodes } from "@/content/ep003-presentation";
+import { ep004PresentationNodes } from "@/content/ep004-presentation";
 
 export const SLIDE_WIDTH = 1920;
 export const SLIDE_HEIGHT = 1080;
 export type FontRole = "title" | "body" | "mono";
-export type Ink = "background" | "foreground" | "muted" | "primary" | "teal" | "panel" | "border";
+export type Ink =
+  | "background"
+  | "foreground"
+  | "muted"
+  | "primary"
+  | "teal"
+  | "panel"
+  | "border"
+  | "panel2"
+  | "dim"
+  | "amber"
+  | "violet"
+  | "rose"
+  | "green";
 export type Primitive =
   | {
       kind: "text";
@@ -31,6 +45,27 @@ export type Primitive =
       height: number;
       url: string;
       label: string;
+    }
+  | {
+      /**
+       * Vector shape. `d` uses only absolute M/L/C/Z commands; x/y/width/height are its
+       * bounding box on the slide. Optional tx/ty/scale place unit-space paths such as icons.
+       */
+      kind: "path";
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      d: string;
+      fill?: Ink;
+      stroke?: Ink;
+      strokeWidth?: number;
+      dash?: number[];
+      opacity?: number;
+      round?: boolean;
+      tx?: number;
+      ty?: number;
+      scale?: number;
     };
 export interface DeckEntry {
   title: string;
@@ -46,7 +81,16 @@ export interface DeckSlide {
   entries: DeckEntry[];
   subtitle?: string;
   image?: string;
-  layout?: "cover" | "statement" | "comparison" | "matrix" | "flow" | "map" | "directory";
+  /** `canvas` renders the shared frame and title only; an episode module draws the body. */
+  layout?:
+    | "cover"
+    | "statement"
+    | "comparison"
+    | "matrix"
+    | "flow"
+    | "map"
+    | "directory"
+    | "canvas";
   takeaway?: string;
   cards?: boolean;
   emphasis?: number;
@@ -56,9 +100,13 @@ export interface DeckSlide {
   aliases?: string[];
   nodes: Primitive[];
 }
-export function wrapText(value: string, width: number, size: number, font: FontRole): string[] {
+/** Advance width of one line, from the bundled font metrics shared by SVG and PDF. */
+export function measureText(value: string, size: number, font: FontRole): number {
   const map = metrics[font] as Record<string, number>;
-  const measure = (s: string) => Array.from(s).reduce((n, c) => n + (map[c] ?? 0.6) * size, 0);
+  return Array.from(value).reduce((n, c) => n + (map[c] ?? 0.6) * size, 0);
+}
+export function wrapText(value: string, width: number, size: number, font: FontRole): string[] {
+  const measure = (s: string) => measureText(s, size, font);
   const lines: string[] = [];
   for (const paragraph of value.split("\n")) {
     let line = "";
@@ -178,9 +226,12 @@ function layoutSlide(s: DeckSlide, ep: Episode, index: number, total: number): P
     if (s.image)
       nodes.push({ kind: "image", x: 1110, y: 285, width: 754, height: 480, src: s.image });
   } else {
-    const titleHeight = text(s.title, 56, 190, 1808, s.layout === "directory" ? 58 : 68, "title");
+    const titleSize = s.layout === "directory" ? 58 : s.layout === "canvas" ? 56 : 68;
+    const titleHeight = text(s.title, 56, 190, 1808, titleSize, "title");
     let start = 190 + titleHeight + 32;
-    if (s.layout === "directory") {
+    if (s.layout === "canvas") {
+      // The body is drawn by the episode's presentation module.
+    } else if (s.layout === "directory") {
       const left = s.packageId ? 520 : 0,
         gap = s.packageId ? 54 : 0;
       if (s.packageId) {
@@ -384,8 +435,7 @@ export function buildDeck(ep: Episode): DeckSlide[] {
       ep.presentationCover?.stages.map((stage) => ({ title: stage.title, body: stage.role })) ?? [],
   });
   const pages = EXECUTIVE_BRIEFS[ep.id];
-  if (pages)
-    pages.forEach((p) =>
+  const addPage = ({ last: _last, ...p }: BriefPage) =>
       add({
         ...p,
         part: "summary",
@@ -396,8 +446,8 @@ export function buildDeck(ep: Episode): DeckSlide[] {
                 body: e.outcome,
               }))
             : p.entries,
-      }),
-    );
+      });
+  if (pages) pages.filter((p) => !p.last).forEach(addPage);
   else {
     add({
       id: "summary",
@@ -504,10 +554,13 @@ export function buildDeck(ep: Episode): DeckSlide[] {
         });
     });
   }
+  // Pages flagged `last` close the deck after the resource slides.
+  pages?.filter((p) => p.last).forEach(addPage);
   slides.forEach((s, i) => {
     s.aliases = legacyAliases(s);
     s.nodes = layoutSlide(s, ep, i, slides.length);
     if (ep.id === "ep003") s.nodes = ep003PresentationNodes(s);
+    if (ep.id === "ep004") s.nodes = ep004PresentationNodes(s);
   });
   return slides;
 }
@@ -519,6 +572,9 @@ function legacyAliases(s: DeckSlide): string[] {
     adoption: ["playbook-90", "adoption-measures"],
     "career-levels": ["levels", "career-levels-2", "agentic"],
     "case-study": ["case-study-2"],
+    "stage-1": ["stages-1-3"],
+    "stage-4": ["stages-4-6"],
+    "stage-7": ["stages-7-9"],
     references: ["references-2", "references-3", "worxforge-links", "resource-note", "resources-7"],
   };
   if (s.packageId) {

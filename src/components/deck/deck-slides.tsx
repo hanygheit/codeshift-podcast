@@ -8,6 +8,7 @@ export function SlideFrame({ ep, slide, index, total }: { ep: Episode; slide: De
       if (node.kind === 'rect') return <rect key={i} x={node.x} y={node.y} width={node.width} height={node.height} fill={`var(--deck-${node.ink})`} />;
       if (node.kind === 'image') return <image key={i} href={node.src} x={node.x} y={node.y} width={node.width} height={node.height} preserveAspectRatio="xMidYMid meet" />;
       if (node.kind === 'link') return <a key={i} href={node.url} target="_blank" rel="noopener noreferrer" aria-label={node.label}><rect x={node.x} y={node.y} width={node.width} height={node.height} fill="transparent" className="deck-link-target" /></a>;
+      if (node.kind === 'path') return <path key={i} d={node.d} transform={node.scale ? `translate(${node.tx ?? 0} ${node.ty ?? 0}) scale(${node.scale})` : undefined} fill={node.fill ? `var(--deck-${node.fill})` : 'none'} stroke={node.stroke ? `var(--deck-${node.stroke})` : undefined} strokeWidth={node.stroke ? node.strokeWidth ?? 2 : undefined} strokeDasharray={node.dash?.join(' ')} strokeLinecap={node.round ? 'round' : undefined} strokeLinejoin={node.round ? 'round' : undefined} opacity={node.opacity} />;
       return <text key={i} x={node.x} y={node.y} fill={`var(--deck-${node.ink})`} fontSize={node.size} fontFamily={`Deck${node.font}`} dominantBaseline="hanging">{node.lines.map((line, j) => <tspan key={j} x={node.x} dy={j ? node.size * 1.3 : 0}>{line || ' '}</tspan>)}</text>;
     })}
   </svg>;

@@ -48,6 +48,13 @@
   --deck-teal: rgb(70 214 197);
   --deck-panel: rgb(24 37 59);
   --deck-border: rgb(49 68 94);
+  /* Diagram inks: raised panel, quiet connector, and component categories. */
+  --deck-panel2: rgb(31 47 74);
+  --deck-dim: rgb(107 124 153);
+  --deck-amber: rgb(245 181 68);
+  --deck-violet: rgb(167 139 250);
+  --deck-rose: rgb(244 114 182);
+  --deck-green: rgb(74 222 128);
   --radius: 0.875rem;
   --background: oklch(0.16 0.035 262);
   --foreground: oklch(0.96 0.01 250);

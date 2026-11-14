@@ -5,7 +5,12 @@ export interface BriefPage {
   id: string;
   title: string;
   section: string;
-  layout: "statement" | "comparison" | "matrix" | "flow" | "map";
+  /** `canvas`: the episode's presentation module draws the body (diagrams, artwork). */
+  layout: "statement" | "comparison" | "matrix" | "flow" | "map" | "canvas";
+  /** Optional artwork shown by canvas slides and in the mobile reading view. */
+  image?: string;
+  /** Place this page after the resource slides, as the deck's final slide. */
+  last?: boolean;
   subtitle?: string;
   takeaway?: string;
   cards?: boolean;

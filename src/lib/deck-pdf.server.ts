@@ -1,4 +1,4 @@
-import { PDFDocument, PDFName, PDFString, rgb, type PDFPage } from 'pdf-lib';
+import { LineCapStyle, PDFDocument, PDFName, PDFString, rgb, type PDFPage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import fontData from '@/assets/deck-fonts.json';
 import imageData from '@/assets/deck-pdf-images.json';
@@ -53,6 +53,19 @@ export async function generateDeckPdf(ep: Episode): Promise<Uint8Array> {
         const ratio = Math.min(node.width / image.width, node.height / image.height);
         const w = image.width * ratio, h = image.height * ratio;
         page.drawImage(image, { x: node.x + (node.width - w) / 2, y: SLIDE_HEIGHT - node.y - (node.height + h) / 2, width: w, height: h });
+        continue;
+      }
+      if (node.kind === 'path') {
+        // Same path data as the SVG; pdf-lib flips the y-axis around the page's top edge.
+        page.drawSvgPath(node.d, {
+          x: node.tx ?? 0, y: SLIDE_HEIGHT - (node.ty ?? 0),
+          ...(node.scale ? { scale: node.scale } : {}),
+          ...(node.fill ? { color: colorFor(node.fill) } : {}),
+          ...(node.stroke ? { borderColor: colorFor(node.stroke), borderWidth: node.strokeWidth ?? 2 } : {}),
+          ...(node.dash ? { borderDashArray: node.dash } : {}),
+          ...(node.round ? { borderLineCap: LineCapStyle.Round } : {}),
+          ...(node.opacity !== undefined ? { opacity: node.opacity, borderOpacity: node.opacity } : {}),
+        });
         continue;
       }
       const color = colorFor(node.ink);
