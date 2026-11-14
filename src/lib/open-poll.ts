@@ -15,7 +15,8 @@ export type OpenPollState = {
   voted?: boolean;
   alreadyVoted?: boolean;
 };
-export type OpenPollErrorKind = "closed" | "rate-limited" | "invalid" | "offline" | "unavailable";
+export type OpenPollErrorKind =
+  "closed" | "rate-limited" | "invalid" | "offline" | "not-ready" | "unavailable";
 
 export class OpenPollError extends Error {
   constructor(
@@ -58,9 +59,16 @@ export function voterToken(): string {
   return memoryToken;
 }
 
-export function toOpenPollError(error: { message?: string } | null | undefined): OpenPollError {
+export function toOpenPollError(
+  error: { message?: string; code?: string } | null | undefined,
+): OpenPollError {
   if (error instanceof OpenPollError) return error;
   const message = error?.message ?? "";
+  // The poll tables/functions have not been created in the database yet.
+  if (
+    /PGRST20[25]|42P01|42883|Could not find the (function|table)/.test(`${error?.code} ${message}`)
+  )
+    return new OpenPollError("Community voting opens soon.", "not-ready");
   if (message.includes("poll_network_rate_limited"))
     return new OpenPollError(
       "Too many votes have come from your network recently. Please try again later.",

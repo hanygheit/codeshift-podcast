@@ -10,7 +10,10 @@ import {
 } from "@/lib/open-poll";
 import { cn } from "@/lib/utils";
 
-type Phase = "loading" | "ready" | "submitting" | "voted" | "closed" | "unavailable";
+// "preview"/"previewed": the poll database is not set up yet, so an answer reveals the insight
+// only — nothing is recorded and no community results are shown until voting opens.
+type Phase =
+  "loading" | "ready" | "submitting" | "voted" | "closed" | "unavailable" | "preview" | "previewed";
 
 export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watchUrl: string }) {
   const [phase, setPhase] = useState<Phase>("loading");
@@ -35,7 +38,12 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
       // Votes from the episode page are accepted only while the poll is "open".
       setPhase(body.myVote ? "voted" : body.poll.status === "open" ? "ready" : "closed");
     } catch (error) {
-      setMessage(toOpenPollError(error instanceof Error ? error : null).message);
+      const failure = toOpenPollError(error as { message?: string; code?: string } | null);
+      if (failure.kind === "not-ready") {
+        setPhase("preview");
+        return;
+      }
+      setMessage(failure.message);
       setPhase("unavailable");
     }
   }, [poll.slug]);
@@ -62,6 +70,11 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
   }, [poll.anchor]);
 
   async function castVote() {
+    if (selected && phase === "preview") {
+      setPhase("previewed");
+      requestAnimationFrame(() => resultsHeading.current?.focus({ preventScroll: true }));
+      return;
+    }
     if (!selected || phase !== "ready") return;
     setPhase("submitting");
     setMessage("");
@@ -73,13 +86,21 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
       requestAnimationFrame(() => resultsHeading.current?.focus({ preventScroll: true }));
     } catch (error) {
       const failure = toOpenPollError(error instanceof Error ? error : null);
+      if (failure.kind === "not-ready") {
+        setPhase("previewed");
+        return;
+      }
       setMessage(failure.message);
       setPhase(failure.kind === "closed" ? "closed" : "ready");
     }
   }
 
   // A closed poll whose results the hosts revealed shows them read-only.
-  const showResults = phase === "voted" || (phase === "closed" && Array.isArray(data?.results));
+  const showResults =
+    phase === "voted" ||
+    phase === "previewed" ||
+    (phase === "closed" && Array.isArray(data?.results));
+  const accepting = phase === "ready" || phase === "preview";
   const locked = phase === "submitting" || phase === "closed" || phase === "unavailable";
 
   return (
@@ -108,7 +129,13 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
       </div>
 
       {showResults ? (
-        <Results poll={poll} data={data} myVote={data?.myVote ?? ""} headingRef={resultsHeading} />
+        <Results
+          poll={poll}
+          data={phase === "previewed" ? null : data}
+          myVote={phase === "previewed" ? selected : (data?.myVote ?? "")}
+          preview={phase === "previewed"}
+          headingRef={resultsHeading}
+        />
       ) : (
         <form
           className="mt-6"
@@ -164,7 +191,7 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
               type="submit"
               size="lg"
               className="bg-gradient-brand font-semibold text-primary-foreground hover:opacity-90"
-              disabled={!selected || phase !== "ready"}
+              disabled={!selected || !accepting}
             >
               {phase === "submitting" || phase === "loading" ? (
                 <Loader2 className="animate-spin" aria-hidden="true" />
@@ -175,11 +202,15 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
                 ? "Casting your vote…"
                 : phase === "loading"
                   ? "Loading poll…"
-                  : "Cast Your Vote"}
+                  : phase === "preview"
+                    ? "Reveal the Insight"
+                    : "Cast Your Vote"}
             </Button>
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Timer className="h-4 w-4 text-teal" aria-hidden="true" />
-              Takes less than 30 seconds · anonymous · no sign-up
+              {phase === "preview"
+                ? "Community voting opens soon · pick an answer to see the insight"
+                : "Takes less than 30 seconds · anonymous · no sign-up"}
             </p>
           </div>
         </form>
@@ -227,11 +258,13 @@ function Results({
   poll,
   data,
   myVote,
+  preview = false,
   headingRef,
 }: {
   poll: EpisodePollContent;
   data: PollResponse | null;
   myVote: string;
+  preview?: boolean;
   headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
   const [grown, setGrown] = useState(false);
@@ -247,7 +280,7 @@ function Results({
     <div className="mt-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 ref={headingRef} tabIndex={-1} className="text-lg font-semibold outline-none">
-          {hasResults ? "Community results" : "Your vote is in"}
+          {hasResults ? "Community results" : preview ? "Your answer" : "Your vote is in"}
         </h3>
         {hasResults && (
           <p className="font-mono text-sm text-muted-foreground">
@@ -309,6 +342,24 @@ function Results({
             );
           })}
         </ul>
+      ) : preview ? (
+        <>
+          {poll.options
+            .filter((option) => option.id === myVote)
+            .map((option) => (
+              <p
+                key={option.id}
+                className="mt-3 rounded-lg border border-primary bg-primary/10 px-4 py-3 text-sm sm:text-base"
+              >
+                <span aria-hidden="true">{option.marker} </span>
+                <strong className="font-semibold">{option.letter}.</strong> {option.label}
+              </p>
+            ))}
+          <p className="mt-2 text-sm text-muted-foreground">
+            Community voting opens soon — real results from other developers will appear here. Your
+            answer has not been recorded.
+          </p>
+        </>
       ) : (
         <p className="mt-2 text-sm text-muted-foreground">
           Thanks — community results will appear once the hosts reveal them.
