@@ -87,10 +87,36 @@ describe("EpisodePoll", () => {
     expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent("Your choice");
   });
 
-  it("reports an unavailable backend instead of showing made-up results", async () => {
+  it("before the poll database exists, an answer reveals the insight only", async () => {
     rpc.mockImplementationOnce(() =>
-      fail("Could not find the function public.get_open_poll(p_slug, p_voter)"),
+      Promise.resolve({
+        data: null,
+        error: {
+          code: "PGRST202",
+          message: "Could not find the function public.get_open_poll(p_slug, p_voter)",
+        },
+      }),
     );
+    render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);
+    const reveal = await screen.findByRole("button", { name: /Reveal the Insight/ });
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(screen.getByText(/Community voting opens soon/)).toBeInTheDocument();
+    expect(reveal).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("radio", { name: /D\. Ask more questions/ }));
+    fireEvent.click(reveal);
+
+    expect(await screen.findByRole("heading", { name: "Your answer" })).toBeInTheDocument();
+    expect(screen.getByText(/Your answer has not been recorded/)).toBeInTheDocument();
+    expect(screen.getByText(POLL.insight.takeaway)).toBeInTheDocument();
+    expect(screen.getByText(POLL.closing)).toBeInTheDocument();
+    expect(screen.queryByText("Community results")).not.toBeInTheDocument();
+    expect(screen.queryByText(/%/)).not.toBeInTheDocument();
+    expect(rpc).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports an unavailable backend instead of showing made-up results", async () => {
+    rpc.mockImplementationOnce(() => fail("upstream request timeout"));
     render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);
     expect(await screen.findByRole("alert")).toHaveTextContent(/temporarily unavailable/);
     expect(screen.queryByText("Community results")).not.toBeInTheDocument();

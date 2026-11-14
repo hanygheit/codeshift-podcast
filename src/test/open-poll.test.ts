@@ -40,7 +40,12 @@ describe("open poll browser client", () => {
     expect(toOpenPollError({ message: "poll_not_open" }).kind).toBe("closed");
     expect(toOpenPollError({ message: "poll_invalid_option" }).kind).toBe("invalid");
     expect(toOpenPollError({ message: "TypeError: Failed to fetch" }).kind).toBe("offline");
-    expect(toOpenPollError({ message: "PGRST202" }).kind).toBe("unavailable");
+    expect(toOpenPollError({ code: "PGRST202", message: "x" }).kind).toBe("not-ready");
+    expect(
+      toOpenPollError({ message: "Could not find the table 'public.polls' in the schema cache" })
+        .kind,
+    ).toBe("not-ready");
+    expect(toOpenPollError({ message: "upstream request timeout" }).kind).toBe("unavailable");
     const mapped = new OpenPollError("x", "rate-limited");
     expect(toOpenPollError(mapped)).toBe(mapped);
   });
