@@ -1,3 +1,5 @@
+import { EP004_BRIEF } from "./ep004-slides";
+
 /** Editorial condensation of the original episode notes; never a transcript. */
 export interface BriefPage {
   id: string;
@@ -12,6 +14,7 @@ export interface BriefPage {
 }
 
 export const EXECUTIVE_BRIEFS: Record<string, BriefPage[]> = {
+  ep004: EP004_BRIEF,
   ep003: [
     {
       id: "journey",

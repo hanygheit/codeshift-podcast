@@ -14,7 +14,7 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
-  it.each(["ep001", "ep002", "ep003"])(
+  it.each(["ep001", "ep002", "ep003", "ep004"])(
     "preserves episode and presentation routes for %s",
     (slug) => {
       const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });

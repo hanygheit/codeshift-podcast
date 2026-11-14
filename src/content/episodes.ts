@@ -2,6 +2,7 @@ import ep001Thumb from "@/assets/ep001.png.asset.json";
 import ep002Thumb from "@/assets/ep002.png.asset.json";
 import type { Episode } from "./types";
 import { EP003 } from './ep003';
+import { EP004 } from "./ep004";
 
 /**
  * Editorial episode records. To add an episode, append a record here —
@@ -9,6 +10,7 @@ import { EP003 } from './ep003';
  * Notes are editorial summaries, not verbatim transcripts.
  */
 export const EPISODES: Episode[] = [
+  EP004,
   EP003,
   {
     id: "ep001",

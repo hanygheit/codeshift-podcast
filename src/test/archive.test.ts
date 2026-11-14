@@ -25,7 +25,7 @@ describe("archive", () => {
     expect(r.items[0]!.id).toBe("ep002");
   });
   it("sorts newest first by default", () => {
-    expect(filterEpisodes(EPISODES, {}).items[0]?.id).toBe("ep003");
+    expect(filterEpisodes(EPISODES, {}).items[0]?.id).toBe("ep004");
     expect(filterEpisodes(EPISODES, { sort: "oldest" }).items[0]!.id).toBe("ep001");
   });
   it("orders by episode number descending by default, regardless of date", () => {
@@ -41,7 +41,7 @@ describe("archive", () => {
 
 describe("library sorting", () => {
   it("supports publication date newest first", () => {
-    expect(filterEpisodes(EPISODES, { sort: "date-desc" }).items[0]?.id).toBe("ep003");
+    expect(filterEpisodes(EPISODES, { sort: "date-desc" }).items[0]?.id).toBe("ep004");
   });
   it("filters by topic", () => {
     const t = EPISODES[0]!.topics[0]!;
