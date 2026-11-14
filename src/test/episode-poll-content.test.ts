@@ -36,6 +36,13 @@ describe("EP004 architecture poll content", () => {
       "C. Build on Kubernetes from day one.",
       "D. Ask more questions before choosing the architecture.",
     ]);
+    for (const option of EP004_ARCHITECTURE_POLL.options) {
+      expect(option.feedback.headline.length).toBeGreaterThan(10);
+      expect(option.feedback.body.length).toBeGreaterThan(60);
+      expect(`${option.feedback.headline} ${option.feedback.body}`).not.toMatch(
+        /\b(correct|wrong|score|right answer)\b/i,
+      );
+    }
     expect(EP004_ARCHITECTURE_POLL.insight.takeaway).toBe(
       "Great architecture starts with questions, not technologies.",
     );
