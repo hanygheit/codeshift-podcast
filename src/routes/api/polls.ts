@@ -1,6 +1,7 @@
 import { createHmac, createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { createFileRoute } from "@tanstack/react-router";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
+import { clientNetworkHash } from "@/lib/poll-network";
 import { calculatePollResults } from "@/lib/poll-results";
 
 type Poll = Tables<"polls">;
@@ -31,8 +32,8 @@ function json(data: unknown, status = 200, headers?: HeadersInit): Response {
   return Response.json(data, { status, headers: responseHeaders });
 }
 
-function failure(message: string, status = 400) {
-  return json({ error: message }, status);
+function failure(message: string, status = 400, headers?: HeadersInit) {
+  return json({ error: message }, status, headers);
 }
 
 function slugIsValid(value: unknown): value is string {
@@ -179,9 +180,55 @@ async function pollView(poll: Poll, host: boolean, participantHash?: string) {
       resultsRevealed: poll.results_revealed,
       updatedAt: poll.updated_at,
     },
-    ...(host || poll.results_revealed ? { total, results } : {}),
+    // Always-open episode polls show results to a participant only after they have voted.
+    ...(host || poll.results_revealed || (poll.status === "open" && myVote)
+      ? { total, results }
+      : {}),
     ...(myVote ? { myVote } : {}),
   };
+}
+
+/**
+ * Votes on an always-open episode poll: one final vote per browser (signed cookie issued by the
+ * poll GET), capped per network by the `poll_vote_network_limit` trigger, and answered with the
+ * real aggregate results so the voter sees them immediately.
+ */
+async function castOpenVote(
+  request: Request,
+  poll: Poll,
+  voter: ReturnType<typeof issueVoterCookie>,
+  optionId: string,
+): Promise<Response> {
+  if (voter.cookie)
+    return failure("Your browser session was not ready. Please cast your vote again.", 403, {
+      "Set-Cookie": voter.cookie,
+    });
+  const secret = getVoterSecret();
+  const participantHash = createHmac("sha256", secret).update(voter.value).digest("hex");
+  const db = await getPollsClient();
+  const { data: existing, error: existingError } = await db
+    .from("poll_votes")
+    .select("option_id")
+    .eq("poll_id", poll.id)
+    .eq("participant_hash", participantHash)
+    .maybeSingle();
+  if (existingError) throw existingError;
+  if (!existing) {
+    const { error } = await db.from("poll_votes").insert({
+      poll_id: poll.id,
+      participant_hash: participantHash,
+      option_id: optionId,
+      network_hash: clientNetworkHash(request, secret),
+    });
+    if (error && error.code === "P0001" && error.message.includes("poll_network_rate_limited"))
+      return failure(
+        "Too many votes have come from your network recently. Please try again later.",
+        429,
+      );
+    if (error && error.code !== "23505") throw error;
+    if (!error) return json({ ...(await pollView(poll, false, participantHash)), voted: true });
+  }
+  return json({ ...(await pollView(poll, false, participantHash)), alreadyVoted: true });
 }
 
 async function runGet(request: Request): Promise<Response> {
@@ -296,13 +343,14 @@ async function runPost(request: Request): Promise<Response> {
       .from("polls")
       .select("*")
       .eq("slug", slug)
-      .eq("status", "live")
+      .in("status", ["live", "open"])
       .maybeSingle();
     if (pollError) throw pollError;
     if (!poll) return failure("This poll is closed.", 409);
     const options = parseOptions(poll.options);
     if (!options?.some((option) => option.id === optionId))
       return failure("Select a valid answer.");
+    if (poll.status === "open") return castOpenVote(request, poll, voter, optionId);
 
     const { error } = await db.from("poll_votes").upsert(
       {

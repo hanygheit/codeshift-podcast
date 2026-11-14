@@ -10,7 +10,7 @@ type Poll = {
   title: string;
   question: string;
   options: Option[];
-  status: "draft" | "live" | "closed";
+  status: "draft" | "live" | "open" | "closed";
   resultsRevealed: boolean;
 };
 type PollSummary = { poll: Poll; total: number; results?: Result[] };
@@ -288,7 +288,7 @@ export function PollAdmin() {
                         Open poll
                       </button>
                     )}
-                    {poll.status === "live" && (
+                    {(poll.status === "live" || poll.status === "open") && (
                       <button type="button" onClick={() => void action("close", poll)}>
                         Close poll
                       </button>
