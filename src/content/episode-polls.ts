@@ -10,6 +10,8 @@ export interface EpisodePollOption {
   letter: string;
   marker: string;
   label: string;
+  /** Shown to a visitor who picked this option: a short verdict and why (no scores). */
+  feedback: { headline: string; body: string };
 }
 
 export interface EpisodePoll {
@@ -52,19 +54,40 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
       letter: "A",
       marker: "🚀",
       label: "Start with Microservices for maximum scalability.",
+      feedback: {
+        headline: "Ambitious — but probably too early.",
+        body: "Microservices let parts of a system scale and deploy independently, but they bring network calls, distributed data, and heavier deployment and monitoring from day one. With 1,000 users and unclear requirements, you pay that cost long before you need the benefit.",
+      },
     },
     {
       id: "b",
       letter: "B",
       marker: "🏗️",
       label: "Start with a Modular Monolith and evolve when needed.",
+      feedback: {
+        headline: "A strong, pragmatic starting point.",
+        body: "One application with clear module boundaries is simple to build and change, and you can split out services later if real load or team growth demands it. Just confirm the requirements actually point here before you commit.",
+      },
     },
-    { id: "c", letter: "C", marker: "☁️", label: "Build on Kubernetes from day one." },
+    {
+      id: "c",
+      letter: "C",
+      marker: "☁️",
+      label: "Build on Kubernetes from day one.",
+      feedback: {
+        headline: "Powerful — but it solves a problem you don’t have yet.",
+        body: "Kubernetes is great for running many services at scale, but it adds real operational work. For 1,000 users, a managed platform or a simple deployment is usually enough; adopt Kubernetes when your deployment needs justify it.",
+      },
+    },
     {
       id: "d",
       letter: "D",
       marker: "🤔",
       label: "Ask more questions before choosing the architecture.",
+      feedback: {
+        headline: "That’s the architect’s mindset.",
+        body: "Traffic, growth, availability targets, budget and team skills decide the architecture. “We might reach 1 million” is a possibility, not a requirement — clarify it before you choose any technology.",
+      },
     },
   ],
   insight: {

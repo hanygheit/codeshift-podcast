@@ -1,5 +1,14 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { Check, Lightbulb, Loader2, RotateCcw, Share2, Timer, Youtube } from "lucide-react";
+import {
+  BarChart3,
+  Check,
+  Lightbulb,
+  Loader2,
+  RotateCcw,
+  Share2,
+  Timer,
+  Youtube,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { EpisodePoll as EpisodePollContent } from "@/content/episode-polls";
 import {
@@ -275,23 +284,37 @@ function Results({
   const counts = new Map((data?.results ?? []).map((result) => [result.optionId, result]));
   const hasResults = Array.isArray(data?.results);
   const total = data?.total ?? 0;
+  const chosen = poll.options.find((option) => option.id === myVote);
 
   return (
     <div className="mt-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 ref={headingRef} tabIndex={-1} className="text-lg font-semibold outline-none">
-          {hasResults ? "Community results" : preview ? "Your answer" : "Your vote is in"}
-        </h3>
-        {hasResults && (
+      {chosen && (
+        <div className="rounded-lg border border-primary/60 bg-primary/10 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+            {data?.alreadyVoted ? "You already chose" : "You chose"}
+          </p>
+          <p className="mt-1 font-semibold sm:text-lg">
+            <span aria-hidden="true">{chosen.marker} </span>
+            {chosen.letter}. {chosen.label}
+          </p>
+          <h3
+            ref={headingRef}
+            tabIndex={-1}
+            className="mt-4 text-xl font-bold leading-snug outline-none md:text-2xl"
+          >
+            {chosen.feedback.headline}
+          </h3>
+          <p className="mt-2 leading-relaxed text-muted-foreground">{chosen.feedback.body}</p>
+        </div>
+      )}
+
+      {hasResults && (
+        <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className="text-lg font-semibold">How the community answered</h3>
           <p className="font-mono text-sm text-muted-foreground">
             {total.toLocaleString("en-US")} {total === 1 ? "vote" : "votes"}
           </p>
-        )}
-      </div>
-      {data?.alreadyVoted && (
-        <p className="mt-2 text-sm text-muted-foreground">
-          You already voted from this browser — here’s how the community answered.
-        </p>
+        </div>
       )}
       {hasResults ? (
         <ul className="mt-4 space-y-3" aria-label="Community results">
@@ -342,27 +365,9 @@ function Results({
             );
           })}
         </ul>
-      ) : preview ? (
-        <>
-          {poll.options
-            .filter((option) => option.id === myVote)
-            .map((option) => (
-              <p
-                key={option.id}
-                className="mt-3 rounded-lg border border-primary bg-primary/10 px-4 py-3 text-sm sm:text-base"
-              >
-                <span aria-hidden="true">{option.marker} </span>
-                <strong className="font-semibold">{option.letter}.</strong> {option.label}
-              </p>
-            ))}
-          <p className="mt-2 text-sm text-muted-foreground">
-            Community voting opens soon — real results from other developers will appear here. Your
-            answer has not been recorded.
-          </p>
-        </>
-      ) : (
-        <p className="mt-2 text-sm text-muted-foreground">
-          Thanks — community results will appear once the hosts reveal them.
+      ) : preview ? null : (
+        <p className="mt-4 text-sm text-muted-foreground">
+          Thanks — your vote is in. Community results will appear once the hosts reveal them.
         </p>
       )}
 
@@ -384,6 +389,15 @@ function Results({
         <p className="mt-4 font-semibold text-foreground">{poll.insight.takeaway}</p>
       </aside>
       <p className="mt-5 text-center text-base font-semibold text-gradient">{poll.closing}</p>
+      {preview && (
+        <p className="mt-5 flex items-start gap-2 rounded-md bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+          <BarChart3 className="mt-0.5 h-4 w-4 shrink-0 text-teal" aria-hidden="true" />
+          <span>
+            Community results aren’t open yet, so this answer wasn’t counted. Come back soon to vote
+            and see how other developers answered.
+          </span>
+        </p>
+      )}
     </div>
   );
 }

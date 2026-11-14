@@ -75,6 +75,11 @@ describe("EpisodePoll", () => {
     expect(items[3]).toHaveTextContent("Your choice");
     expect(items[2]).toHaveTextContent("0%");
     expect(items[0]).not.toHaveTextContent("Your choice");
+    expect(screen.getByText("You chose")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "That’s the architect’s mindset." }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("How the community answered")).toBeInTheDocument();
     expect(screen.getByText(POLL.insight.takeaway)).toBeInTheDocument();
     expect(screen.getByText(POLL.closing)).toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
@@ -85,6 +90,10 @@ describe("EpisodePoll", () => {
     render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);
     const list = await screen.findByRole("list", { name: "Community results" });
     expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent("Your choice");
+    expect(screen.getByText("You chose")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "A strong, pragmatic starting point." }),
+    ).toBeInTheDocument();
   });
 
   it("before the poll database exists, an answer reveals the insight only", async () => {
@@ -103,11 +112,17 @@ describe("EpisodePoll", () => {
     expect(screen.getByText(/Community voting opens soon/)).toBeInTheDocument();
     expect(reveal).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("radio", { name: /D\. Ask more questions/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /C\. Build on Kubernetes/ }));
     fireEvent.click(reveal);
 
-    expect(await screen.findByRole("heading", { name: "Your answer" })).toBeInTheDocument();
-    expect(screen.getByText(/Your answer has not been recorded/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: "Powerful — but it solves a problem you don’t have yet.",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("You chose")).toBeInTheDocument();
+    expect(screen.getByText(/C\. Build on Kubernetes from day one\./)).toBeInTheDocument();
+    expect(screen.getByText(/this answer wasn’t counted/)).toBeInTheDocument();
     expect(screen.getByText(POLL.insight.takeaway)).toBeInTheDocument();
     expect(screen.getByText(POLL.closing)).toBeInTheDocument();
     expect(screen.queryByText("Community results")).not.toBeInTheDocument();
