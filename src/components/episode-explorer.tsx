@@ -42,14 +42,19 @@ export function mergeLibrary(recordings: YtRecording[]): LibraryItem[] {
 export function EpisodeRow({ ep }: { ep: LibraryItem }) {
   const label = ep.number != null ? `EP${pad(ep.number)}` : "New";
   return (
-    <article className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
-      <img src={ep.thumbnail} alt="" loading="lazy" className="hidden aspect-video w-40 shrink-0 rounded-lg border object-cover sm:block" />
+    <article className="group flex flex-col gap-4 py-5 sm:flex-row sm:items-center">
+      <img
+        src={ep.thumbnail}
+        alt=""
+        loading="lazy"
+        className="hidden aspect-video w-40 shrink-0 rounded-lg border object-cover shadow-card transition-transform duration-200 group-hover:-translate-y-0.5 sm:block"
+      />
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-center gap-x-3 font-mono text-xs">
           <span className="font-bold text-teal">{label}</span>
           <time dateTime={ep.scheduledDate} className="text-muted-foreground">{formatDate(ep.scheduledDate)}</time>
         </p>
-        <h3 className="mt-1 text-base font-bold leading-snug md:text-lg">{ep.title}</h3>
+        <h3 className="mt-1 text-base font-bold leading-snug transition-colors group-hover:text-primary md:text-lg">{ep.title}</h3>
         {ep.summary && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{ep.summary}</p>}
       </div>
       <div className="flex shrink-0 flex-wrap gap-2 sm:w-auto sm:flex-col lg:flex-row">
@@ -85,7 +90,7 @@ export function EpisodeExplorer({ search: s, onChange, pageSize = PAGE_SIZE }: {
 
   return (
     <div>
-      <div className="flex flex-col gap-2 rounded-xl border bg-surface p-2.5 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="flex flex-col gap-2 rounded-xl border bg-surface p-2.5 shadow-card sm:flex-row sm:flex-wrap sm:items-center">
         <label className="relative min-w-0 flex-1 sm:min-w-64">
           <span className="sr-only">Search episodes</span>
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

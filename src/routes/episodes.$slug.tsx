@@ -69,16 +69,16 @@ function EpisodePage() {
           <p className="mt-4 leading-relaxed text-muted-foreground">{ep.description} {ep.summary}</p>
           <div className="mt-4 flex flex-wrap gap-2">{ep.topics.slice(0, 3).map(t => <Tag key={t}>{t}</Tag>)}</div>
           <div className="mt-6 flex flex-wrap gap-3" aria-label="Episode actions">
-            <Button asChild size="lg"><a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer"><Youtube /> Watch Episode</a></Button>
+            <Button asChild size="lg" className="bg-gradient-brand shadow-glow"><a href={ep.youtubeUrl} target="_blank" rel="noopener noreferrer"><Youtube /> Watch Episode</a></Button>
             <Button asChild size="lg" variant="outline"><Link to="/episodes/$slug/slides" params={{ slug: ep.slug }} title="Presentation, lessons, action items, learning resources, references and downloadable PDF"><BookOpen /> {ep.presentationLabel ?? 'Summary & Resources'}</Link></Button>
           </div>
         </div>
-        <img src={ep.thumbnail} alt={`CodeShift EP${pad(ep.number)} episode cover`} className="w-full max-w-sm justify-self-center rounded-md border lg:max-w-none" />
+        <img src={ep.thumbnail} alt={`CodeShift EP${pad(ep.number)} episode cover`} className="w-full max-w-sm justify-self-center rounded-xl border shadow-glow lg:max-w-none" />
       </header>
       {poll && <EpisodePoll poll={poll} watchUrl={ep.youtubeUrl} />}
       <section className="mt-10 border-t pt-7">
         <p className="eyebrow">Inside this episode</p><h2 className="mt-2 text-2xl font-semibold">What you’ll learn</h2>
-        <div className="mt-5 grid gap-x-10 gap-y-6 md:grid-cols-2">{ideas.map((idea, i) => <div key={idea.title} className="flex gap-4"><span className="font-mono text-sm text-teal">0{i + 1}</span><div><h3 className="font-semibold">{idea.title}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{idea.body}</p></div></div>)}</div>
+        <div className="mt-5 grid gap-x-10 gap-y-6 md:grid-cols-2">{ideas.map((idea, i) => <div key={idea.title} className="flex gap-4"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-secondary font-mono text-sm font-medium text-primary">0{i + 1}</span><div><h3 className="font-semibold">{idea.title}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{idea.body}</p></div></div>)}</div>
       </section>
       <details className="mt-8 border-y py-4"><summary className="cursor-pointer text-sm font-semibold">Watch here</summary><div className="mt-4 max-w-2xl"><YouTubeEmbed id={ep.youtubeVideoId} title={ep.title} thumbnail={ep.thumbnail} /></div></details>
       <nav aria-label="Episode navigation" className="mt-7 grid gap-5 sm:grid-cols-2">
