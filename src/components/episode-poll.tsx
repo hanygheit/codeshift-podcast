@@ -2,29 +2,15 @@ import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
 import { Check, Lightbulb, Loader2, RotateCcw, Share2, Timer, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { EpisodePoll as EpisodePollContent } from "@/content/episode-polls";
+import {
+  castOpenPollVote,
+  getOpenPoll,
+  type OpenPollState as PollResponse,
+  toOpenPollError,
+} from "@/lib/open-poll";
 import { cn } from "@/lib/utils";
 
-type PollResult = { optionId: string; count: number; percent: number };
-type PollResponse = {
-  poll?: { slug: string; status: "draft" | "live" | "open" | "closed" } | null;
-  total?: number;
-  results?: PollResult[];
-  myVote?: string;
-  alreadyVoted?: boolean;
-  error?: string;
-};
 type Phase = "loading" | "ready" | "submitting" | "voted" | "closed" | "unavailable";
-
-const UNAVAILABLE = "Voting is temporarily unavailable. Please try again in a moment.";
-const OFFLINE = "We couldn’t reach the server. Check your connection and try again.";
-
-async function readJson(response: Response): Promise<PollResponse> {
-  try {
-    return (await response.json()) as PollResponse;
-  } catch {
-    return {};
-  }
-}
 
 export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watchUrl: string }) {
   const [phase, setPhase] = useState<Phase>("loading");
@@ -38,21 +24,18 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
     setPhase("loading");
     setMessage("");
     try {
-      const response = await fetch(`/api/polls?slug=${encodeURIComponent(poll.slug)}`, {
-        cache: "no-store",
-      });
-      const body = await readJson(response);
-      if (!response.ok || !body.poll) {
-        setMessage(response.ok ? "This poll isn’t open yet. Please check back soon." : UNAVAILABLE);
+      const body = await getOpenPoll(poll.slug);
+      if (!body.poll) {
+        setMessage("This poll isn’t open yet. Please check back soon.");
         setPhase("unavailable");
         return;
       }
       setData(body);
       if (body.myVote) setSelected(body.myVote);
-      const accepting = body.poll.status === "open" || body.poll.status === "live";
-      setPhase(body.myVote ? "voted" : accepting ? "ready" : "closed");
-    } catch {
-      setMessage(OFFLINE);
+      // Votes from the episode page are accepted only while the poll is "open".
+      setPhase(body.myVote ? "voted" : body.poll.status === "open" ? "ready" : "closed");
+    } catch (error) {
+      setMessage(toOpenPollError(error instanceof Error ? error : null).message);
       setPhase("unavailable");
     }
   }, [poll.slug]);
@@ -83,24 +66,15 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
     setPhase("submitting");
     setMessage("");
     try {
-      const response = await fetch("/api/polls", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ operation: "vote", slug: poll.slug, optionId: selected }),
-      });
-      const body = await readJson(response);
-      if (!response.ok) {
-        setMessage(body.error ?? UNAVAILABLE);
-        setPhase(response.status === 409 ? "closed" : "ready");
-        return;
-      }
+      const body = await castOpenPollVote(poll.slug, selected);
       setData(body);
       if (body.myVote) setSelected(body.myVote);
       setPhase("voted");
       requestAnimationFrame(() => resultsHeading.current?.focus({ preventScroll: true }));
-    } catch {
-      setMessage(OFFLINE);
-      setPhase("ready");
+    } catch (error) {
+      const failure = toOpenPollError(error instanceof Error ? error : null);
+      setMessage(failure.message);
+      setPhase(failure.kind === "closed" ? "closed" : "ready");
     }
   }
 
