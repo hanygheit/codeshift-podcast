@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ArrowLeft, ArrowRight, BookOpen, Youtube } from 'lucide-react';
+import { EpisodePoll } from "@/components/episode-poll";
 import { PageShell } from '@/components/page-shell';
 import { Tag } from '@/components/site';
 import { Button } from '@/components/ui/button';
 import { YouTubeEmbed } from '@/components/youtube-embed';
+import { EPISODE_POLLS } from "@/content/episode-polls";
 import { EPISODES, formatDate, getEpisode, pad } from '@/content/episodes';
 
 export const Route = createFileRoute("/episodes/$slug")({
@@ -50,6 +52,7 @@ function EpisodePage() {
   const ordered = [...EPISODES].sort((a, b) => a.number - b.number);
   const idx = ordered.findIndex(e => e.id === ep.id);
   const prev = ordered[idx - 1], next = ordered[idx + 1];
+  const poll = EPISODE_POLLS[ep.id];
   const ideas = ep.brief?.packages ? [
     { title: 'Six learning packages for the AI era', body: ep.takeaways[0] ?? '' },
     { title: 'Priorities by career level', body: ep.takeaways[1] ?? '' },
@@ -72,6 +75,7 @@ function EpisodePage() {
         </div>
         <img src={ep.thumbnail} alt={`CodeShift EP${pad(ep.number)} episode cover`} className="w-full max-w-sm justify-self-center rounded-md border lg:max-w-none" />
       </header>
+      {poll && <EpisodePoll poll={poll} watchUrl={ep.youtubeUrl} />}
       <section className="mt-10 border-t pt-7">
         <p className="eyebrow">Inside this episode</p><h2 className="mt-2 text-2xl font-semibold">What you’ll learn</h2>
         <div className="mt-5 grid gap-x-10 gap-y-6 md:grid-cols-2">{ideas.map((idea, i) => <div key={idea.title} className="flex gap-4"><span className="font-mono text-sm text-teal">0{i + 1}</span><div><h3 className="font-semibold">{idea.title}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{idea.body}</p></div></div>)}</div>

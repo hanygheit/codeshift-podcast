@@ -10,7 +10,7 @@ type PollData = {
   title: string;
   question: string;
   options: PollOption[];
-  status: "draft" | "live" | "closed";
+  status: "draft" | "live" | "open" | "closed";
   resultsRevealed: boolean;
 };
 type PollResponse = {
@@ -72,7 +72,13 @@ export function PollView({ slug, hostMode = false }: { slug?: string; hostMode?:
   }
 
   const poll = data?.poll;
-  const resultsVisible = !!poll && (hostMode || poll.resultsRevealed);
+  // "open" polls (embedded on an episode page) accept votes outside the live session and show
+  // results to a participant once the API returns them, i.e. after they have voted; votes are final.
+  const accepting = poll?.status === "live" || poll?.status === "open";
+  const finalVote = poll?.status === "open" && !!data?.myVote;
+  const resultsVisible =
+    !!poll &&
+    (hostMode || poll.resultsRevealed || (poll.status === "open" && Array.isArray(data?.results)));
   const resultMap = new Map((data?.results ?? []).map((result) => [result.optionId, result]));
   const leader = resultsVisible
     ? (data?.results ?? []).reduce<PollResult | null>(
@@ -109,21 +115,25 @@ export function PollView({ slug, hostMode = false }: { slug?: string; hostMode?:
             <div>
               <span className="poll-eyebrow">
                 {poll.episodeNumber ? `EP${String(poll.episodeNumber).padStart(3, "0")} · ` : ""}
-                {poll.status === "live" ? "LIVE POLL" : "ARCHIVED POLL"}
+                {poll.status === "live"
+                  ? "LIVE POLL"
+                  : poll.status === "open"
+                    ? "OPEN POLL"
+                    : "ARCHIVED POLL"}
               </span>
               <h1>{poll.title}</h1>
             </div>
             <span className={`poll-status ${poll.status}`}>{poll.status}</span>
           </div>
           <h2 className="poll-question">{poll.question}</h2>
-          {poll.status === "live" && !hostMode ? (
+          {accepting && !hostMode ? (
             <form
               onSubmit={(event) => {
                 event.preventDefault();
                 void submitVote();
               }}
             >
-              <fieldset className="poll-options" disabled={submitting}>
+              <fieldset className="poll-options" disabled={submitting || finalVote}>
                 <legend className="sr-only">Choose one answer</legend>
                 {poll.options.map((option) => (
                   <label
@@ -162,11 +172,13 @@ export function PollView({ slug, hostMode = false }: { slug?: string; hostMode?:
                   total={data?.total ?? 0}
                 />
               )}
-              <button type="submit" className="poll-submit" disabled={!selected || submitting}>
-                {submitting ? "Submitting…" : data?.myVote ? "Update my vote" : "Vote"}
-              </button>
+              {!finalVote && (
+                <button type="submit" className="poll-submit" disabled={!selected || submitting}>
+                  {submitting ? "Submitting…" : data?.myVote ? "Update my vote" : "Vote"}
+                </button>
+              )}
             </form>
-          ) : poll.status === "live" && hostMode ? (
+          ) : accepting && hostMode ? (
             <PollResults
               poll={poll}
               resultMap={resultMap}
@@ -193,7 +205,7 @@ export function PollView({ slug, hostMode = false }: { slug?: string; hostMode?:
               {error}
             </p>
           )}
-          {!hostMode && poll.status === "live" && !resultsVisible && !data?.myVote && (
+          {!hostMode && accepting && !resultsVisible && !data?.myVote && (
             <p className="poll-privacy">
               One anonymous answer per browser. No name or account required.
             </p>
