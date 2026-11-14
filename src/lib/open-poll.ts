@@ -1,10 +1,10 @@
-import { calculatePollResults, type PollOptionResult } from "@/lib/poll-results";
+import type { PollOptionResult } from "@/lib/poll-results";
 
 /**
- * Browser client for always-open episode polls. Votes go straight to the database functions
- * `get_open_poll` / `cast_open_poll_vote` with the site's publishable key; the database enforces
- * one vote per browser token, valid options, open status and per-network caps, and returns
- * results only after voting. No server secret is involved.
+ * Browser client for always-open episode polls. Votes go through `/api/polls`, which stores them
+ * server-side (see episode-poll-store.server.ts): one vote per browser, per-network caps, real
+ * aggregate results returned only after voting. When the server has no vote store configured it
+ * answers `notReady`, and the page falls back to its insight-only mode.
  */
 export type OpenPollStatus = "draft" | "live" | "open" | "closed";
 export type OpenPollState = {
@@ -27,56 +27,26 @@ export class OpenPollError extends Error {
   }
 }
 
-type RawState = Omit<OpenPollState, "total" | "results"> & {
-  counts?: { optionId: string; count: number }[];
-};
-
-const VOTER_KEY = "codeshift-poll-voter";
-const TOKEN = /^[A-Za-z0-9-]{16,100}$/;
-let memoryToken: string | undefined;
-
-function newToken(): string {
-  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
-  return Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
-}
-
-/** Random per-browser voter token; kept in memory when storage is unavailable. */
-export function voterToken(): string {
-  try {
-    const saved = window.localStorage.getItem(VOTER_KEY);
-    if (saved && TOKEN.test(saved)) return saved;
-  } catch {
-    // Storage blocked (private mode, embedded browsers): fall back to this page's memory.
-  }
-  memoryToken ??= newToken();
-  try {
-    window.localStorage.setItem(VOTER_KEY, memoryToken);
-  } catch {
-    // Ignore; the in-memory token still allows one vote from this page.
-  }
-  return memoryToken;
-}
+type Reply = OpenPollState & { notReady?: boolean; error?: string; code?: string };
 
 export function toOpenPollError(
-  error: { message?: string; code?: string } | null | undefined,
+  error:
+    | { message?: string | undefined; code?: string | undefined; status?: number | undefined }
+    | null
+    | undefined,
 ): OpenPollError {
   if (error instanceof OpenPollError) return error;
   const message = error?.message ?? "";
-  // The poll tables/functions have not been created in the database yet.
-  if (
-    /PGRST20[25]|42P01|42883|Could not find the (function|table)/.test(`${error?.code} ${message}`)
-  )
-    return new OpenPollError("Community voting opens soon.", "not-ready");
-  if (message.includes("poll_network_rate_limited"))
+  const code = error?.code ?? "";
+  if (code === "not_ready") return new OpenPollError("Community voting opens soon.", "not-ready");
+  if (code === "rate_limited" || error?.status === 429)
     return new OpenPollError(
-      "Too many votes have come from your network recently. Please try again later.",
+      message || "Too many votes have come from your network recently. Please try again later.",
       "rate-limited",
     );
-  if (message.includes("poll_not_open")) return new OpenPollError("This poll is closed.", "closed");
-  if (message.includes("poll_invalid_option"))
-    return new OpenPollError("Select a valid answer.", "invalid");
+  if (code === "closed" || error?.status === 409)
+    return new OpenPollError("This poll is closed.", "closed");
+  if (code === "invalid_option") return new OpenPollError("Select a valid answer.", "invalid");
   if (/fetch|network|load failed/i.test(message))
     return new OpenPollError(
       "We couldn’t reach the server. Check your connection and try again.",
@@ -88,36 +58,34 @@ export function toOpenPollError(
   );
 }
 
-export function toOpenPollState(raw: unknown): OpenPollState {
-  const { counts, ...state } = (raw ?? { poll: null }) as RawState;
-  return Array.isArray(counts) ? { ...state, ...calculatePollResults(counts) } : state;
-}
-
-async function client() {
-  const { supabase } = await import("@/integrations/supabase/client");
-  return supabase;
-}
-
-export async function getOpenPoll(slug: string): Promise<OpenPollState> {
-  let result;
+async function request(init?: RequestInit, query = ""): Promise<OpenPollState> {
+  let response: Response;
   try {
-    result = await (await client()).rpc("get_open_poll", { p_slug: slug, p_voter: voterToken() });
+    response = await fetch(`/api/polls${query}`, { cache: "no-store", ...init });
   } catch (error) {
-    throw toOpenPollError(error instanceof Error ? error : null);
+    throw toOpenPollError(error instanceof Error ? error : { message: "network" });
   }
-  if (result.error) throw toOpenPollError(result.error);
-  return toOpenPollState(result.data);
+  let reply: Reply;
+  try {
+    reply = (await response.json()) as Reply;
+  } catch {
+    reply = { poll: null };
+  }
+  if (!response.ok)
+    throw toOpenPollError({ message: reply.error, code: reply.code, status: response.status });
+  if (reply.notReady) throw toOpenPollError({ code: "not_ready" });
+  const { notReady: _notReady, error: _error, code: _code, ...state } = reply;
+  return state;
 }
 
-export async function castOpenPollVote(slug: string, optionId: string): Promise<OpenPollState> {
-  let result;
-  try {
-    result = await (
-      await client()
-    ).rpc("cast_open_poll_vote", { p_slug: slug, p_option: optionId, p_voter: voterToken() });
-  } catch (error) {
-    throw toOpenPollError(error instanceof Error ? error : null);
-  }
-  if (result.error) throw toOpenPollError(result.error);
-  return toOpenPollState(result.data);
+export function getOpenPoll(slug: string): Promise<OpenPollState> {
+  return request(undefined, `?episodePoll=${encodeURIComponent(slug)}`);
+}
+
+export function castOpenPollVote(slug: string, optionId: string): Promise<OpenPollState> {
+  return request({
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ operation: "episode-vote", slug, optionId }),
+  });
 }

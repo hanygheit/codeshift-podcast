@@ -1,6 +1,7 @@
 import { createHmac, createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { createFileRoute } from "@tanstack/react-router";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
+import type { EpisodePollReply, EpisodePollStore } from "@/lib/episode-poll-store.server";
 import { clientNetworkHash } from "@/lib/poll-network";
 import { calculatePollResults } from "@/lib/poll-results";
 
@@ -231,8 +232,46 @@ async function castOpenVote(
   return json({ ...(await pollView(poll, false, participantHash)), alreadyVoted: true });
 }
 
+/**
+ * Always-open episode polls (e.g. EP004 #architecture-poll) are stored in a private Storage
+ * bucket via the deployment's own Supabase connection — no tables, migrations or extra secrets.
+ * When that connection is not configured, the page shows its insight-only mode.
+ */
+async function runEpisodePoll(
+  run: (store: EpisodePollStore) => Promise<EpisodePollReply>,
+  slug: unknown,
+  { readOnly }: { readOnly: boolean },
+): Promise<Response> {
+  const notReady = () =>
+    json({ poll: { slug: typeof slug === "string" ? slug : "", status: "open" }, notReady: true });
+  const { supabaseEpisodePollStore } = await import("@/lib/episode-poll-store.server");
+  const store = await supabaseEpisodePollStore().catch((error: unknown) => {
+    console.error("Episode poll store unavailable", error);
+    return null;
+  });
+  if (!store) return notReady();
+  try {
+    const reply = await run(store);
+    return json(
+      reply.body,
+      reply.status,
+      reply.setCookie ? { "Set-Cookie": reply.setCookie } : undefined,
+    );
+  } catch (error) {
+    console.error("Episode poll request failed", error);
+    // Loading the page never shows an error: it falls back to the insight-only mode.
+    if (readOnly) return notReady();
+    return failure("Voting is temporarily unavailable. Please try again in a moment.", 503);
+  }
+}
+
 async function runGet(request: Request): Promise<Response> {
   const url = new URL(request.url);
+  const episodePoll = url.searchParams.get("episodePoll");
+  if (episodePoll !== null)
+    return runEpisodePoll((store) => store.state(request, episodePoll), episodePoll, {
+      readOnly: true,
+    });
   const host = url.searchParams.get("admin") === "1" || url.searchParams.get("host") === "1";
   if (host && !isAuthorized(request)) return failure("Host authorization is required.", 401);
 
@@ -311,7 +350,13 @@ async function runPost(request: Request): Promise<Response> {
     return failure("Invalid request body.");
   }
 
-  const operation = body["operation"] as Operation;
+  const operation = body["operation"] as Operation | "episode-vote";
+  if (operation === "episode-vote")
+    return runEpisodePoll(
+      (store) => store.vote(request, body["slug"], body["optionId"]),
+      body["slug"],
+      { readOnly: false },
+    );
   if (operation === "admin-login") {
     if (typeof body["token"] !== "string") return failure("Enter the host access token.", 401);
     const cookie = adminCookie(body["token"]);

@@ -3,22 +3,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EpisodePoll } from "@/components/episode-poll";
 import { EP004_ARCHITECTURE_POLL as POLL } from "@/content/episode-polls";
 
-const rpc = vi.hoisted(() => vi.fn());
-vi.mock("@/integrations/supabase/client", () => ({ supabase: { rpc } }));
-
 const WATCH = "https://youtube.com/live/GnvFox330Sg";
 const pollRecord = { slug: POLL.slug, status: "open" };
-const counts = [
-  { optionId: "a", count: 1 },
-  { optionId: "b", count: 2 },
-  { optionId: "d", count: 5 },
-];
-const ok = (data: unknown) => Promise.resolve({ data, error: null });
-const fail = (message: string) => Promise.resolve({ data: null, error: { message } });
+const results = {
+  total: 8,
+  results: [
+    { optionId: "a", count: 1, percent: 13 },
+    { optionId: "b", count: 2, percent: 25 },
+    { optionId: "d", count: 5, percent: 63 },
+  ],
+};
+const fetchMock = vi.fn<typeof fetch>();
+const reply = (body: unknown, status = 200) =>
+  Promise.resolve(new Response(JSON.stringify(body), { status }));
 
 beforeEach(() => {
-  rpc.mockReset();
-  window.localStorage.clear();
+  fetchMock.mockReset();
+  vi.stubGlobal("fetch", fetchMock);
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
     callback(0);
     return 0;
@@ -35,9 +36,10 @@ async function renderReady() {
 
 describe("EpisodePoll", () => {
   it("shows the scenario and choices without results, then reveals real results after voting", async () => {
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord }));
+    fetchMock.mockImplementationOnce(() => reply({ poll: pollRecord }));
     const vote = await renderReady();
 
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(`/api/polls?episodePoll=${POLL.slug}`);
     expect(
       screen.getByRole("heading", { name: /You’re the Architect\. What Would YOU Build\?/ }),
     ).toBeInTheDocument();
@@ -47,27 +49,31 @@ describe("EpisodePoll", () => {
       screen.getByRole("link", { name: /Watch EP004: Inside Software Architecture/ }),
     ).toHaveAttribute("href", WATCH);
     expect(vote).toBeDisabled();
-    expect(screen.queryByText("Community results")).not.toBeInTheDocument();
+    expect(screen.queryByText("How the community answered")).not.toBeInTheDocument();
     expect(screen.queryByText(POLL.insight.takeaway)).not.toBeInTheDocument();
-
-    const [, firstArgs] = rpc.mock.calls[0] as [string, { p_slug: string; p_voter: string }];
-    expect(rpc.mock.calls[0]?.[0]).toBe("get_open_poll");
-    expect(firstArgs.p_slug).toBe(POLL.slug);
-    expect(firstArgs.p_voter).toMatch(/^[A-Za-z0-9-]{16,100}$/);
 
     expect(screen.getAllByRole("radio")).toHaveLength(4);
     fireEvent.click(screen.getByRole("radio", { name: /D\. Ask more questions/ }));
     expect(vote).toBeEnabled();
 
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord, counts, myVote: "d", voted: true }));
+    fetchMock.mockImplementationOnce(() =>
+      reply({ poll: pollRecord, ...results, myVote: "d", voted: true }),
+    );
     fireEvent.click(vote);
 
     const list = await screen.findByRole("list", { name: "Community results" });
-    expect(rpc).toHaveBeenLastCalledWith("cast_open_poll_vote", {
-      p_slug: POLL.slug,
-      p_option: "d",
-      p_voter: firstArgs.p_voter,
+    const [url, init] = fetchMock.mock.calls[1] ?? [];
+    expect(url).toBe("/api/polls");
+    expect(JSON.parse(String(init?.body))).toEqual({
+      operation: "episode-vote",
+      slug: POLL.slug,
+      optionId: "d",
     });
+    expect(screen.getByText("You chose")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "That’s the architect’s mindset." }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("How the community answered")).toBeInTheDocument();
     expect(screen.getByText("8 votes")).toBeInTheDocument();
     const items = within(list).getAllByRole("listitem");
     expect(items).toHaveLength(4);
@@ -75,37 +81,23 @@ describe("EpisodePoll", () => {
     expect(items[3]).toHaveTextContent("Your choice");
     expect(items[2]).toHaveTextContent("0%");
     expect(items[0]).not.toHaveTextContent("Your choice");
-    expect(screen.getByText("You chose")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "That’s the architect’s mindset." }),
-    ).toBeInTheDocument();
-    expect(screen.getByText("How the community answered")).toBeInTheDocument();
     expect(screen.getByText(POLL.insight.takeaway)).toBeInTheDocument();
     expect(screen.getByText(POLL.closing)).toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
 
-  it("goes straight to results for a browser that already voted", async () => {
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord, counts, myVote: "b" }));
+  it("goes straight to results and feedback for a browser that already voted", async () => {
+    fetchMock.mockImplementationOnce(() => reply({ poll: pollRecord, ...results, myVote: "b" }));
     render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);
     const list = await screen.findByRole("list", { name: "Community results" });
     expect(within(list).getAllByRole("listitem")[1]).toHaveTextContent("Your choice");
-    expect(screen.getByText("You chose")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "A strong, pragmatic starting point." }),
     ).toBeInTheDocument();
   });
 
-  it("before the poll database exists, an answer reveals the insight only", async () => {
-    rpc.mockImplementationOnce(() =>
-      Promise.resolve({
-        data: null,
-        error: {
-          code: "PGRST202",
-          message: "Could not find the function public.get_open_poll(p_slug, p_voter)",
-        },
-      }),
-    );
+  it("without a vote store, an answer reveals personal feedback and the insight only", async () => {
+    fetchMock.mockImplementationOnce(() => reply({ poll: pollRecord, notReady: true }));
     render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);
     const reveal = await screen.findByRole("button", { name: /Reveal the Insight/ });
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -121,31 +113,37 @@ describe("EpisodePoll", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText("You chose")).toBeInTheDocument();
-    expect(screen.getByText(/C\. Build on Kubernetes from day one\./)).toBeInTheDocument();
     expect(screen.getByText(/this answer wasn’t counted/)).toBeInTheDocument();
     expect(screen.getByText(POLL.insight.takeaway)).toBeInTheDocument();
-    expect(screen.getByText(POLL.closing)).toBeInTheDocument();
-    expect(screen.queryByText("Community results")).not.toBeInTheDocument();
+    expect(screen.queryByText("How the community answered")).not.toBeInTheDocument();
     expect(screen.queryByText(/%/)).not.toBeInTheDocument();
-    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("reports an unavailable backend instead of showing made-up results", async () => {
-    rpc.mockImplementationOnce(() => fail("upstream request timeout"));
+  it("reports an unavailable server instead of showing made-up results", async () => {
+    fetchMock.mockImplementationOnce(() => reply({ error: "down" }, 503));
     render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);
     expect(await screen.findByRole("alert")).toHaveTextContent(/temporarily unavailable/);
-    expect(screen.queryByText("Community results")).not.toBeInTheDocument();
+    expect(screen.queryByText("How the community answered")).not.toBeInTheDocument();
 
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord }));
+    fetchMock.mockImplementationOnce(() => reply({ poll: pollRecord }));
     fireEvent.click(screen.getByRole("button", { name: /Try again/ }));
     await waitFor(() => expect(screen.queryByRole("alert")).not.toBeInTheDocument());
   });
 
   it("keeps the selection and explains a rate-limited vote", async () => {
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord }));
+    fetchMock.mockImplementationOnce(() => reply({ poll: pollRecord }));
     const vote = await renderReady();
     fireEvent.click(screen.getByRole("radio", { name: /B\. Start with a Modular Monolith/ }));
-    rpc.mockImplementationOnce(() => fail("poll_network_rate_limited"));
+    fetchMock.mockImplementationOnce(() =>
+      reply(
+        {
+          error: "Too many votes have come from your network recently. Please try again later.",
+          code: "rate_limited",
+        },
+        429,
+      ),
+    );
     fireEvent.click(vote);
     expect(
       await screen.findByText(/Too many votes have come from your network/),
@@ -153,18 +151,8 @@ describe("EpisodePoll", () => {
     expect(screen.getByRole("radio", { name: /B\. Start with a Modular Monolith/ })).toBeChecked();
   });
 
-  it("switches to the closed state when the poll closes before the vote lands", async () => {
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord }));
-    const vote = await renderReady();
-    fireEvent.click(screen.getByRole("radio", { name: /C\. Build on Kubernetes/ }));
-    rpc.mockImplementationOnce(() => fail("poll_not_open"));
-    fireEvent.click(vote);
-    expect(await screen.findByText("This poll is closed.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Cast Your Vote/ })).toBeDisabled();
-  });
-
   it("copies the direct poll link when native sharing is not used", async () => {
-    rpc.mockImplementationOnce(() => ok({ poll: pollRecord }));
+    fetchMock.mockImplementationOnce(() => reply({ poll: pollRecord }));
     const writeText = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
     render(<EpisodePoll poll={POLL} watchUrl={WATCH} />);

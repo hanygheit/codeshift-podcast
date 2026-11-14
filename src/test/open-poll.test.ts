@@ -1,70 +1,62 @@
-import { readdirSync, readFileSync } from "node:fs";
-import path from "node:path";
-import { beforeEach, describe, expect, it } from "vitest";
-import { OpenPollError, toOpenPollError, toOpenPollState, voterToken } from "@/lib/open-poll";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { castOpenPollVote, getOpenPoll, OpenPollError, toOpenPollError } from "@/lib/open-poll";
+
+const fetchMock = vi.fn<typeof fetch>();
+const reply = (body: unknown, status = 200) =>
+  Promise.resolve(new Response(JSON.stringify(body), { status }));
+
+beforeEach(() => {
+  fetchMock.mockReset();
+  vi.stubGlobal("fetch", fetchMock);
+});
+afterEach(() => vi.unstubAllGlobals());
 
 describe("open poll browser client", () => {
-  beforeEach(() => window.localStorage.clear());
-
-  it("keeps one random voter token per browser", () => {
-    const token = voterToken();
-    expect(token).toMatch(/^[A-Za-z0-9-]{16,100}$/);
-    expect(voterToken()).toBe(token);
-    expect(window.localStorage.getItem("codeshift-poll-voter")).toBe(token);
-  });
-
-  it("turns database counts into real percentages and totals", () => {
-    expect(
-      toOpenPollState({
-        poll: { slug: "s", status: "open" },
-        myVote: "d",
-        counts: [
-          { optionId: "d", count: 3 },
-          { optionId: "b", count: 1 },
-        ],
-      }),
-    ).toEqual({
+  it("reads the poll through /api/polls and passes results through", async () => {
+    fetchMock.mockImplementationOnce(() =>
+      reply({ poll: { slug: "s", status: "open" }, myVote: "d", total: 1, results: [] }),
+    );
+    expect(await getOpenPoll("s")).toEqual({
       poll: { slug: "s", status: "open" },
       myVote: "d",
-      total: 4,
-      results: [
-        { optionId: "d", count: 3, percent: 75 },
-        { optionId: "b", count: 1, percent: 25 },
-      ],
+      total: 1,
+      results: [],
     });
-    expect(toOpenPollState({ poll: { slug: "s", status: "open" } })).not.toHaveProperty("results");
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/polls?episodePoll=s");
   });
 
-  it("maps database errors to visitor-facing messages", () => {
-    expect(toOpenPollError({ message: "poll_network_rate_limited" }).kind).toBe("rate-limited");
-    expect(toOpenPollError({ message: "poll_not_open" }).kind).toBe("closed");
-    expect(toOpenPollError({ message: "poll_invalid_option" }).kind).toBe("invalid");
-    expect(toOpenPollError({ message: "TypeError: Failed to fetch" }).kind).toBe("offline");
-    expect(toOpenPollError({ code: "PGRST202", message: "x" }).kind).toBe("not-ready");
-    expect(
-      toOpenPollError({ message: "Could not find the table 'public.polls' in the schema cache" })
-        .kind,
-    ).toBe("not-ready");
-    expect(toOpenPollError({ message: "upstream request timeout" }).kind).toBe("unavailable");
+  it("posts the vote as an episode-vote operation", async () => {
+    fetchMock.mockImplementationOnce(() => reply({ poll: { slug: "s", status: "open" } }));
+    await castOpenPollVote("s", "b");
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe("/api/polls");
+    expect(init?.method).toBe("POST");
+    expect(JSON.parse(String(init?.body))).toEqual({
+      operation: "episode-vote",
+      slug: "s",
+      optionId: "b",
+    });
+  });
+
+  it("turns a server without a vote store into the insight-only mode", async () => {
+    fetchMock.mockImplementationOnce(() =>
+      reply({ poll: { slug: "s", status: "open" }, notReady: true }),
+    );
+    await expect(getOpenPoll("s")).rejects.toMatchObject({ kind: "not-ready" });
+  });
+
+  it("maps server errors to visitor-facing messages", async () => {
+    fetchMock.mockImplementationOnce(() =>
+      reply({ error: "Too many.", code: "rate_limited" }, 429),
+    );
+    await expect(castOpenPollVote("s", "a")).rejects.toMatchObject({ kind: "rate-limited" });
+    fetchMock.mockImplementationOnce(() => reply({ error: "x", code: "invalid_option" }, 400));
+    await expect(castOpenPollVote("s", "z")).rejects.toMatchObject({ kind: "invalid" });
+    fetchMock.mockImplementationOnce(() => reply({ error: "down" }, 503));
+    await expect(getOpenPoll("s")).rejects.toMatchObject({ kind: "unavailable" });
+    fetchMock.mockImplementationOnce(() => Promise.reject(new TypeError("Failed to fetch")));
+    await expect(getOpenPoll("s")).rejects.toMatchObject({ kind: "offline" });
     const mapped = new OpenPollError("x", "rate-limited");
     expect(toOpenPollError(mapped)).toBe(mapped);
-  });
-});
-
-describe("secret-free poll migration", () => {
-  const dir = path.resolve(__dirname, "../../supabase/migrations");
-  const file = readdirSync(dir).find((name) => name.endsWith("_secret_free_open_polls.sql"));
-  const sql = readFileSync(path.join(dir, file ?? ""), "utf8");
-
-  it("exposes only the two poll functions to the publishable key", () => {
-    const grants = [...sql.matchAll(/grant execute on function public\.(\w+)/g)].map((m) => m[1]);
-    expect(grants).toEqual(["get_open_poll", "cast_open_poll_vote"]);
-    expect(sql).toMatch(
-      /revoke all on public\.poll_private_settings from public, anon, authenticated/,
-    );
-    expect(sql).toMatch(
-      /revoke all on function public\.poll_private_hash\(text\) from public, anon/,
-    );
-    expect(sql).not.toMatch(/grant (select|insert|update|delete)/i);
   });
 });
