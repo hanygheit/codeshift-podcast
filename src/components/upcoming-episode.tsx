@@ -21,7 +21,10 @@ function Countdown({ iso }: { iso: string }) {
   return (
     <div className="flex gap-2" aria-label="Time until broadcast">
       {parts.map(([v, l]) => (
-        <div key={l} className="min-w-16 rounded-xl border bg-surface px-3 py-2 text-center">
+        <div
+          key={l}
+          className="min-w-16 rounded-xl border bg-surface px-3 py-2 text-center shadow-card"
+        >
           <p className="font-mono text-2xl font-bold tabular-nums">{String(v).padStart(2, "0")}</p>
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{l}</p>
         </div>
@@ -34,7 +37,7 @@ function EventCard({ e }: { e: LiveEvent }) {
   const live = e.status === "live";
   const num = e.title.match(/EP\s?0*(\d{1,3})/i)?.[1];
   return (
-    <div className="grid items-center gap-6 overflow-hidden rounded-3xl border bg-card p-4 md:grid-cols-[1.1fr_1fr] md:p-6">
+    <div className="grid items-center gap-6 overflow-hidden rounded-3xl border bg-card p-4 shadow-card md:grid-cols-[1.1fr_1fr] md:p-6">
       <ExtLink href={e.url} className="relative block overflow-hidden rounded-2xl border">
         {e.thumbnail && <img src={e.thumbnail} alt={e.title} className="aspect-video w-full object-cover" />}
         <span className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${live ? "bg-destructive text-destructive-foreground" : "bg-background/85 text-teal backdrop-blur"}`}>
@@ -46,7 +49,7 @@ function EventCard({ e }: { e: LiveEvent }) {
         <h3 className="mt-1 text-2xl font-bold leading-tight">{e.title}</h3>
         {e.scheduledStart && <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><CalendarClock className="h-4 w-4 text-teal" /> {cairo(e.scheduledStart)} · Cairo time</p>}
         {!live && e.scheduledStart && <div className="mt-5"><Countdown iso={e.scheduledStart} /></div>}
-        <Button asChild className="mt-6 bg-gradient-brand"><ExtLink href={e.url}><Youtube /> {live ? "Join Live" : "Watch / Set Reminder"}</ExtLink></Button>
+        <Button asChild className="mt-6 bg-gradient-brand shadow-glow"><ExtLink href={e.url}><Youtube /> {live ? "Join Live" : "Watch / Set Reminder"}</ExtLink></Button>
         {!live && <p className="mt-2 text-xs text-muted-foreground">Opens YouTube, where you can tap “Notify me”.</p>}
       </div>
     </div>

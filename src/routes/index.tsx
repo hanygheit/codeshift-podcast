@@ -36,24 +36,25 @@ function Home() {
       <section className="relative overflow-hidden border-b" data-home-hero>
         <div className="pointer-events-none absolute inset-0 bg-hero" />
         <div className="pointer-events-none absolute inset-0 hero-grid opacity-40" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-7 px-5 py-7 md:grid-cols-2 md:gap-8 lg:gap-12">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-7 px-5 py-8 md:grid-cols-2 md:gap-8 md:py-10 lg:gap-12">
           <div>
             <p className="eyebrow">WEEKLY ARABIC TECH PODCAST</p>
             <h1 className="mt-3 max-w-xl text-3xl font-bold leading-[1.12] sm:text-4xl lg:text-[40px]">
-              Software Engineering in the <span className="text-teal">AI Era.</span>
+              Software Engineering in the <span className="marker text-primary">AI Era.</span>
             </h1>
             <p className="mt-3 font-mono text-sm text-teal">Think Beyond the Code.</p>
             <p className="mt-3 max-w-lg text-base leading-6 text-muted-foreground">
               Practical conversations on software engineering, architecture, AI-native development, coding agents, and developer growth.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-11 bg-gradient-brand px-5"><Link to="/episodes">Explore Episodes <ArrowRight /></Link></Button>
-              <Button asChild size="lg" variant="outline" className="h-11 px-5"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
+              <Button asChild size="lg" className="h-11 bg-gradient-brand px-5 shadow-glow"><Link to="/episodes">Explore Episodes <ArrowRight /></Link></Button>
+              <Button asChild size="lg" variant="outline" className="h-11 bg-card px-5"><ExtLink href={SITE.youtube}><Youtube /> Watch on YouTube</ExtLink></Button>
             </div>
           </div>
 
-          <figure className="relative">
-            <div className="relative overflow-hidden rounded-2xl border bg-card shadow-glow">
+          <figure className="relative rounded-2xl shadow-pop">
+            {/* Portrait card stays a dark island in both themes so the photo fade and captions keep their contrast. */}
+            <div className="dark relative overflow-hidden rounded-2xl border bg-card">
               <div className="grid grid-cols-2">
                 {HOSTS.map((h, i) => (
                   <div key={h.name} className={`relative aspect-[4/5] overflow-hidden md:aspect-auto md:h-[340px] ${i === 0 ? "border-r" : ""}`}>

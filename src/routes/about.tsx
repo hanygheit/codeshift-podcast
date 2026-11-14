@@ -25,7 +25,7 @@ function About() {
       <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-[1.4fr_1fr]">
         <div>
           <p className="eyebrow">About CodeShift</p>
-          <h1 className="mt-4 text-5xl font-extrabold leading-tight">A podcast for the craft of building software in the <span className="text-gradient">AI era</span>.</h1>
+          <h1 className="mt-4 text-5xl font-extrabold leading-tight">A podcast for the craft of building software in the <span className="marker text-primary">AI era</span>.</h1>
           <div className="mt-6 space-y-4 text-lg text-muted-foreground">
             <p>{SITE.description}</p>
             <p>Join us live: {SITE.schedule}. Conversations are in Egyptian Arabic; episode notes, slides, and resources are in English so they are easy to search, revisit, and share.</p>

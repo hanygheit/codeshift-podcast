@@ -1,10 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Facebook, Linkedin, Menu, X, Youtube } from "lucide-react";
+import { Facebook, Linkedin, Menu, Moon, Sun, X, Youtube } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { SITE, HOSTS } from "@/content/site";
 import logoAsset from "@/assets/codeshift-logo.png.asset.json";
 import itiSupport from "@/assets/iti-support.png.asset.json";
 import { Button } from "@/components/ui/button";
+import { toggleTheme } from "@/lib/theme";
 
 export function SupportBadge({ className = "w-28 p-2", imgClassName = "h-auto w-full" }: { className?: string; imgClassName?: string }) {
   return (
@@ -68,21 +69,42 @@ function NavItem({ n, className, activeClass, onNavigate }: { n: (typeof nav)[nu
   );
 }
 
+/** Light/dark switch. Stateless: the icon follows the `dark` class on <html>, so SSR and hydration agree. */
+export function ThemeToggle({ className = "" }: { className?: string }) {
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className={className}
+      aria-label="Switch between light and dark theme"
+      title="Switch theme"
+      onClick={toggleTheme}
+    >
+      <Moon className="h-5 w-5 dark:hidden" />
+      <Sun className="hidden h-5 w-5 dark:block" />
+    </Button>
+  );
+}
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="screen-only sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md">
+    <header className="screen-only sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 lg:h-[74px]">
         <Wordmark prominent />
         <nav aria-label="Main" className="hidden items-center gap-1 text-sm lg:flex">
           {nav.map((n) => <NavItem key={n.label} n={n} className={linkCls} activeClass={activeCls} />)}
-          <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-md bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground">
+          <ExtLink href={SITE.youtube} className="ml-2 inline-flex items-center gap-2 rounded-full bg-gradient-brand px-4 py-2 font-semibold text-primary-foreground shadow-card transition-transform hover:-translate-y-0.5">
             <Youtube className="h-4 w-4" /> YouTube
           </ExtLink>
+          <ThemeToggle className="ml-1" />
         </nav>
-        <Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-1 lg:hidden">
+          <ThemeToggle />
+          <Button variant="ghost" size="icon" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
       {open && (
         <nav aria-label="Mobile" className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t bg-background px-5 py-3 lg:hidden">
@@ -96,7 +118,7 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="screen-only mt-20 border-t">
+    <footer className="screen-only mt-20 border-t bg-surface/60">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-3">
         <div className="space-y-3">
           <Wordmark />
@@ -129,13 +151,13 @@ export function ExtLink({ href, children, className }: { href: string; children:
 }
 
 export function Tag({ children }: { children: ReactNode }) {
-  return <span className="rounded-full border bg-secondary/60 px-2.5 py-1 font-mono text-[11px] text-secondary-foreground">{children}</span>;
+  return <span className="rounded-full border bg-secondary/70 px-2.5 py-1 font-mono text-[11px] text-secondary-foreground transition-colors hover:border-primary/40 hover:bg-secondary">{children}</span>;
 }
 
 export function HostCard({ host }: { host: (typeof HOSTS)[number] }) {
   return (
-    <div className="flex gap-5 rounded-2xl border bg-card p-6">
-      <img src={host.photo} alt={`${host.name}`} loading="lazy" className="h-24 w-24 shrink-0 rounded-2xl object-cover ring-2 ring-primary/40" />
+    <div className="card-lift flex gap-5 rounded-2xl border bg-card p-6">
+      <img src={host.photo} alt={`${host.name}`} loading="lazy" className="h-24 w-24 shrink-0 rounded-2xl object-cover ring-2 ring-primary/30" />
       <div className="min-w-0">
         <h3 className="text-lg font-semibold">{host.name}</h3>
         <p className="text-sm text-teal">{host.role}</p>
