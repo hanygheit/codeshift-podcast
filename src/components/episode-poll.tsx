@@ -10,7 +10,7 @@ import {
   Youtube,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { EpisodePoll as EpisodePollContent } from "@/content/episode-polls";
+import type { EpisodePoll as EpisodePollContent, EpisodePollTone } from "@/content/episode-polls";
 import {
   castOpenPollVote,
   getHostResults,
@@ -31,6 +31,8 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
   const [selected, setSelected] = useState("");
   const [data, setData] = useState<PollResponse | null>(null);
   const [message, setMessage] = useState("");
+  // True once the visitor answers in this visit: the feedback then scrolls into view.
+  const [justAnswered, setJustAnswered] = useState(false);
   const resultsHeading = useRef<HTMLHeadingElement>(null);
   const titleId = `${poll.anchor}-title`;
 
@@ -83,7 +85,7 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
   async function castVote() {
     if (selected && phase === "preview") {
       setPhase("previewed");
-      requestAnimationFrame(() => resultsHeading.current?.focus({ preventScroll: true }));
+      setJustAnswered(true);
       return;
     }
     if (!selected || phase !== "ready") return;
@@ -94,7 +96,7 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
       setData(body);
       if (body.myVote) setSelected(body.myVote);
       setPhase("voted");
-      requestAnimationFrame(() => resultsHeading.current?.focus({ preventScroll: true }));
+      setJustAnswered(true);
     } catch (error) {
       const failure = toOpenPollError(error instanceof Error ? error : null);
       if (failure.kind === "not-ready") {
@@ -142,6 +144,8 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
           data={phase === "previewed" ? null : data}
           myVote={phase === "previewed" ? selected : (data?.myVote ?? "")}
           preview={phase === "previewed"}
+          watchUrl={watchUrl}
+          reveal={justAnswered}
           headingRef={resultsHeading}
         />
       ) : (
@@ -246,18 +250,40 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
       )}
 
       <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t pt-5">
-        <a
-          href={watchUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-teal hover:underline"
-        >
-          <Youtube className="h-4 w-4" aria-hidden="true" /> {poll.watchLabel}
-        </a>
+        {!showResults && (
+          <a
+            href={watchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-teal hover:underline"
+          >
+            <Youtube className="h-4 w-4" aria-hidden="true" /> {poll.watchLabel}
+          </a>
+        )}
         <p className="text-xs text-muted-foreground">One anonymous vote per browser</p>
         <HostResultsPanel poll={poll} />
       </div>
     </section>
+  );
+}
+
+const TONE: Record<EpisodePollTone, string> = {
+  best: "bg-teal/20 text-teal",
+  strong: "bg-primary/15 text-primary",
+  early: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+};
+
+function VerdictTag({ option }: { option: EpisodePollContent["options"][number] }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        TONE[option.verdict.tone],
+      )}
+    >
+      {option.verdict.tone === "best" && <Check className="h-3 w-3" aria-hidden="true" />}
+      {option.verdict.label}
+    </span>
   );
 }
 
@@ -266,97 +292,170 @@ function Results({
   data,
   myVote,
   preview = false,
+  watchUrl,
+  reveal,
   headingRef,
 }: {
   poll: EpisodePollContent;
   data: PollResponse | null;
   myVote: string;
   preview?: boolean;
+  watchUrl: string;
+  reveal: boolean;
   headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
+  const [shown, setShown] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShown(true), 20);
+    if (reveal) {
+      root.current?.scrollIntoView?.({ block: "start" });
+      headingRef.current?.focus({ preventScroll: true });
+    }
+    return () => window.clearTimeout(timer);
+  }, [reveal, headingRef]);
   const chosen = poll.options.find((option) => option.id === myVote);
   const best = poll.options.find((option) => option.id === poll.bestOptionId);
   const choseBest = !!chosen && chosen.id === best?.id;
 
   return (
-    <div className="mt-6">
-      {chosen && (
-        <div className="rounded-lg border border-primary/60 bg-primary/10 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-            {data?.alreadyVoted ? "You already chose" : "You chose"}
-          </p>
-          <p className="mt-1 font-semibold sm:text-lg">
-            <span aria-hidden="true">{chosen.marker} </span>
-            {chosen.letter}. {chosen.label}
-          </p>
-          <h3
-            ref={headingRef}
-            tabIndex={-1}
-            className="mt-4 text-xl font-bold leading-snug outline-none md:text-2xl"
+    <div
+      ref={root}
+      id={`${poll.anchor}-feedback`}
+      className={cn(
+        "mt-6 scroll-mt-24 transition-all duration-500 ease-out motion-reduce:transition-none",
+        shown ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
+      )}
+    >
+      <div className={cn("grid gap-4", !choseBest && "md:grid-cols-2")}>
+        {chosen && (
+          <div
+            className={cn(
+              "rounded-xl border p-5 sm:p-6",
+              choseBest ? "border-teal/60 bg-teal/10" : "border-primary/50 bg-primary/5",
+            )}
           >
-            {chosen.feedback.headline}
-          </h3>
-          <p className="mt-2 leading-relaxed text-muted-foreground">{chosen.feedback.body}</p>
-        </div>
-      )}
-
-      {best && (
-        <div className="mt-4 rounded-lg border border-teal/60 bg-teal/10 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-teal">
-            {choseBest ? "You picked the best answer" : "The best answer"}
-          </p>
-          <p className="mt-1 font-semibold sm:text-lg">
-            <span aria-hidden="true">{best.marker} </span>
-            {best.letter}. {best.label}
-          </p>
-          {!choseBest && (
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {choseBest
+                  ? "You picked the best answer"
+                  : data?.alreadyVoted
+                    ? "You already chose"
+                    : "You chose"}
+              </p>
+              <VerdictTag option={chosen} />
+            </div>
+            <p className="mt-3 flex items-start gap-3 font-semibold sm:text-lg">
+              <span aria-hidden="true" className="text-2xl leading-none">
+                {chosen.marker}
+              </span>
+              <span>
+                {chosen.letter}. {chosen.label}
+              </span>
+            </p>
+            <h3
+              ref={headingRef}
+              tabIndex={-1}
+              className="mt-4 text-xl font-bold leading-snug outline-none md:text-2xl"
+            >
+              {chosen.feedback.headline}
+            </h3>
+            <p className="mt-2 leading-relaxed text-muted-foreground">{chosen.feedback.body}</p>
+          </div>
+        )}
+        {best && !choseBest && (
+          <div className="rounded-xl border border-teal/60 bg-teal/10 p-5 sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                The best answer
+              </p>
+              <VerdictTag option={best} />
+            </div>
+            <p className="mt-3 flex items-start gap-3 font-semibold sm:text-lg">
+              <span aria-hidden="true" className="text-2xl leading-none">
+                {best.marker}
+              </span>
+              <span>
+                {best.letter}. {best.label}
+              </span>
+            </p>
+            <p className="mt-4 text-xl font-bold leading-snug md:text-2xl">
+              {best.feedback.headline}
+            </p>
             <p className="mt-2 leading-relaxed text-muted-foreground">{best.feedback.body}</p>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
-      <aside
-        aria-labelledby={`${poll.anchor}-insight`}
-        className="mt-6 rounded-lg border border-teal/40 bg-teal/5 p-5"
-      >
-        <h3 id={`${poll.anchor}-insight`} className="flex items-center gap-2 font-semibold">
+      <section aria-labelledby={`${poll.anchor}-questions`} className="mt-8">
+        <h3 id={`${poll.anchor}-questions`} className="flex items-center gap-2 font-semibold">
           <Lightbulb className="h-5 w-5 text-teal" aria-hidden="true" />
+          {poll.questions.title}
+        </h3>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3" aria-label="Questions to ask">
+          {poll.questions.items.map((item) => (
+            <li
+              key={item.topic}
+              className="rounded-lg border bg-background/50 px-4 py-3 text-sm leading-snug"
+            >
+              <strong className="block text-foreground">{item.topic}</strong>
+              <span className="text-muted-foreground">{item.question}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby={`${poll.anchor}-insight`} className="mt-8">
+        <h3 id={`${poll.anchor}-insight`} className="font-semibold">
           {poll.insight.title}
         </h3>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          {poll.insight.intro}
-        </p>
-        <ul className="mt-4 space-y-3" aria-label="Insight for each option">
+        <p className="mt-1 text-sm text-muted-foreground">{poll.insight.intro}</p>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2" aria-label="Insight for each option">
           {poll.options.map((option) => (
             <li
               key={option.id}
               className={cn(
-                "rounded-md border px-4 py-3 text-sm leading-relaxed sm:text-base",
-                option.id === myVote ? "border-primary/60 bg-primary/5" : "bg-background/40",
+                "rounded-lg border p-4 text-sm leading-relaxed",
+                option.id === myVote ? "border-primary/60 bg-primary/5" : "bg-background/50",
               )}
             >
-              <p className="font-semibold text-foreground">
+              <div className="flex flex-wrap items-center gap-2">
+                <VerdictTag option={option} />
+                {option.id === myVote && (
+                  <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-foreground/10 px-2.5 py-0.5 text-xs font-semibold">
+                    Your choice
+                  </span>
+                )}
+              </div>
+              <p className="mt-2 font-semibold text-foreground">
                 <span aria-hidden="true">{option.marker} </span>
                 {option.letter}. {option.label}
-                {option.id === best?.id && (
-                  <span className="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-teal/20 px-2 py-0.5 align-middle text-xs font-semibold text-teal">
-                    <Check className="h-3 w-3" aria-hidden="true" /> Best answer
-                  </span>
-                )}
-                {option.id === myVote && (
-                  <span className="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/20 px-2 py-0.5 align-middle text-xs font-semibold text-primary">
-                    <Check className="h-3 w-3" aria-hidden="true" /> Your choice
-                  </span>
-                )}
               </p>
               <p className="mt-1 text-muted-foreground">{option.insight}</p>
             </li>
           ))}
         </ul>
-        <p className="mt-4 font-semibold text-foreground">{poll.insight.takeaway}</p>
-      </aside>
-      <p className="mt-5 text-center text-base font-semibold text-gradient">{poll.closing}</p>
-      <p className="mt-5 text-center text-sm text-muted-foreground">
+      </section>
+
+      <div className="mt-8 rounded-xl border border-primary/30 bg-primary/5">
+        <div className="px-5 py-6 text-center">
+          <p className="text-lg font-bold leading-snug md:text-xl">{poll.insight.takeaway}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{poll.closing}</p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <Button
+              asChild
+              size="lg"
+              className="h-auto min-h-10 max-w-full whitespace-normal bg-gradient-brand px-5 py-2 text-center font-semibold text-primary-foreground hover:opacity-90"
+            >
+              <a href={watchUrl} target="_blank" rel="noopener noreferrer">
+                <Youtube aria-hidden="true" /> {poll.watchLabel}
+              </a>
+            </Button>
+            <ShareButton poll={poll} label="Challenge a Friend" />
+          </div>
+        </div>
+      </div>
+      <p className="mt-4 text-center text-xs text-muted-foreground">
         {preview
           ? "Voting isn’t open yet, so this answer wasn’t counted."
           : "Thanks — your vote is counted. The hosts will share the community results."}
@@ -475,7 +574,13 @@ function HostResultsPanel({ poll }: { poll: EpisodePollContent }) {
   );
 }
 
-function ShareButton({ poll }: { poll: EpisodePollContent }) {
+function ShareButton({
+  poll,
+  label = "Share This Challenge",
+}: {
+  poll: EpisodePollContent;
+  label?: string;
+}) {
   const [status, setStatus] = useState("");
 
   async function share() {
@@ -505,7 +610,7 @@ function ShareButton({ poll }: { poll: EpisodePollContent }) {
   return (
     <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
       <Button type="button" variant="outline" size="sm" onClick={() => void share()}>
-        <Share2 aria-hidden="true" /> Share This Challenge
+        <Share2 aria-hidden="true" /> {label}
       </Button>
       <span role="status" className="max-w-64 break-all text-xs text-teal sm:text-right">
         {status}
