@@ -13,6 +13,7 @@ import { calculatePollResults } from "@/lib/poll-results";
  *                                            so a second vote from the same browser is refused
  *   <slug>/options/<optionId>/<participant>  one object per vote; results = object counts
  *   <slug>/networks/<day>/<network>/<participant>  per-network caps (burst + daily)
+ * Community results are never sent to visitors; only hosts read them (PIN-checked in the route).
  * <participant> and <network> are keyed hashes; raw cookies and IP addresses are never stored.
  * The bucket is private: visitors cannot read or write it directly, only through /api/polls.
  */
@@ -99,19 +100,35 @@ export class EpisodePollStore {
     return visible(found).some((o) => o.name === participant);
   }
 
-  /** Real counts plus the participant's own option, read from the per-option folders. */
-  private async results(poll: EpisodePoll, participant: string) {
-    const folders = await Promise.all(
+  /** The option this browser voted for, if any. */
+  private async myVote(poll: EpisodePoll, participant: string): Promise<string | undefined> {
+    const found = await Promise.all(
+      poll.options.map(async (option) =>
+        visible(
+          await this.storage.list(`${poll.slug}/options/${option.id}`, {
+            limit: 1,
+            offset: 0,
+            search: participant,
+          }),
+        ).some((o) => o.name === participant)
+          ? option.id
+          : undefined,
+      ),
+    );
+    return found.find((id) => id !== undefined);
+  }
+
+  /** Real counts for the hosts only; the route checks the host PIN before calling this. */
+  async hostResults(slug: unknown): Promise<EpisodePollReply> {
+    const poll = typeof slug === "string" ? findPoll(slug) : undefined;
+    if (!poll) return { status: 404, body: { error: "Unknown poll.", code: "unknown_poll" } };
+    const counts = await Promise.all(
       poll.options.map(async (option) => ({
         optionId: option.id,
-        objects: await listAll(this.storage, `${poll.slug}/options/${option.id}`),
+        count: (await listAll(this.storage, `${poll.slug}/options/${option.id}`)).length,
       })),
     );
-    const myVote = folders.find((f) => f.objects.some((o) => o.name === participant))?.optionId;
-    const counts = folders
-      .filter((f) => f.objects.length > 0)
-      .map((f) => ({ optionId: f.optionId, count: f.objects.length }));
-    return { ...(myVote ? { myVote } : {}), ...calculatePollResults(counts) };
+    return { status: 200, body: { ...calculatePollResults(counts) } };
   }
 
   async state(request: Request, slug: string): Promise<EpisodePollReply> {
@@ -120,8 +137,10 @@ export class EpisodePollStore {
     const { token, setCookie } = voter(request);
     const participant = this.hash(`voter:${token}`);
     const body: Record<string, unknown> = { poll: { slug: poll.slug, status: "open" } };
-    if (!setCookie && (await this.hasVoted(poll.slug, participant)))
-      Object.assign(body, await this.results(poll, participant));
+    if (!setCookie && (await this.hasVoted(poll.slug, participant))) {
+      const myVote = await this.myVote(poll, participant);
+      if (myVote) body["myVote"] = myVote;
+    }
     return { status: 200, body, setCookie };
   }
 
@@ -133,17 +152,21 @@ export class EpisodePollStore {
 
     const { token, setCookie } = voter(request);
     const participant = this.hash(`voter:${token}`);
-    const reply = async (flag: "voted" | "alreadyVoted"): Promise<EpisodePollReply> => ({
+    // Visitors never receive community results; only their own choice comes back.
+    const reply = (flag: "voted" | "alreadyVoted", myVote: string): EpisodePollReply => ({
       status: 200,
-      body: {
-        poll: { slug: poll.slug, status: "open" },
-        ...(await this.results(poll, participant)),
-        [flag]: true,
-      },
+      body: { poll: { slug: poll.slug, status: "open" }, myVote, [flag]: true },
       setCookie,
     });
+    const settle = async (): Promise<EpisodePollReply> => {
+      const earlier = await this.myVote(poll, participant);
+      if (earlier) return reply("alreadyVoted", earlier);
+      // The earlier attempt reserved the voter but did not finish: complete it now.
+      await this.storage.create(`${poll.slug}/options/${optionId}/${participant}`);
+      return reply("voted", optionId);
+    };
 
-    if (!setCookie && (await this.hasVoted(poll.slug, participant))) return reply("alreadyVoted");
+    if (!setCookie && (await this.hasVoted(poll.slug, participant))) return settle();
 
     const address = clientAddress(request);
     let networkFolder: string | undefined;
@@ -170,10 +193,10 @@ export class EpisodePollStore {
 
     // The voter object is the lock: only the first request for this browser can create it.
     if ((await this.storage.create(`${poll.slug}/voters/${participant}`)) === "exists")
-      return reply("alreadyVoted");
+      return settle();
     await this.storage.create(`${poll.slug}/options/${optionId}/${participant}`);
     if (networkFolder) await this.storage.create(`${networkFolder}/${participant}`);
-    return reply("voted");
+    return reply("voted", optionId);
   }
 }
 

@@ -350,7 +350,16 @@ async function runPost(request: Request): Promise<Response> {
     return failure("Invalid request body.");
   }
 
-  const operation = body["operation"] as Operation | "episode-vote";
+  const operation = body["operation"] as Operation | "episode-vote" | "episode-results";
+  if (operation === "episode-results") {
+    // Hosts only: a static PIN (override with POLL_RESULTS_PIN) releases the real counts.
+    const pin = process.env["POLL_RESULTS_PIN"] || "1405";
+    if (typeof body["pin"] !== "string" || !tokensMatch(body["pin"], pin))
+      return failure("That PIN is not correct.", 401);
+    return runEpisodePoll((store) => store.hostResults(body["slug"]), body["slug"], {
+      readOnly: false,
+    });
+  }
   if (operation === "episode-vote")
     return runEpisodePoll(
       (store) => store.vote(request, body["slug"], body["optionId"]),

@@ -13,7 +13,9 @@ import { Button } from "@/components/ui/button";
 import type { EpisodePoll as EpisodePollContent } from "@/content/episode-polls";
 import {
   castOpenPollVote,
+  getHostResults,
   getOpenPoll,
+  type HostResults,
   type OpenPollState as PollResponse,
   toOpenPollError,
 } from "@/lib/open-poll";
@@ -105,10 +107,7 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
   }
 
   // A closed poll whose results the hosts revealed shows them read-only.
-  const showResults =
-    phase === "voted" ||
-    phase === "previewed" ||
-    (phase === "closed" && Array.isArray(data?.results));
+  const showResults = phase === "voted" || phase === "previewed";
   const accepting = phase === "ready" || phase === "preview";
   const locked = phase === "submitting" || phase === "closed" || phase === "unavailable";
 
@@ -255,9 +254,8 @@ export function EpisodePoll({ poll, watchUrl }: { poll: EpisodePollContent; watc
         >
           <Youtube className="h-4 w-4" aria-hidden="true" /> {poll.watchLabel}
         </a>
-        <p className="text-xs text-muted-foreground">
-          One anonymous vote per browser · real community results
-        </p>
+        <p className="text-xs text-muted-foreground">One anonymous vote per browser</p>
+        <HostResultsPanel poll={poll} />
       </div>
     </section>
   );
@@ -276,15 +274,9 @@ function Results({
   preview?: boolean;
   headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
-  const [grown, setGrown] = useState(false);
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setGrown(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-  const counts = new Map((data?.results ?? []).map((result) => [result.optionId, result]));
-  const hasResults = Array.isArray(data?.results);
-  const total = data?.total ?? 0;
   const chosen = poll.options.find((option) => option.id === myVote);
+  const best = poll.options.find((option) => option.id === poll.bestOptionId);
+  const choseBest = !!chosen && chosen.id === best?.id;
 
   return (
     <div className="mt-6">
@@ -308,67 +300,19 @@ function Results({
         </div>
       )}
 
-      {hasResults && (
-        <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-lg font-semibold">How the community answered</h3>
-          <p className="font-mono text-sm text-muted-foreground">
-            {total.toLocaleString("en-US")} {total === 1 ? "vote" : "votes"}
+      {best && (
+        <div className="mt-4 rounded-lg border border-teal/60 bg-teal/10 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-teal">
+            {choseBest ? "You picked the best answer" : "The best answer"}
           </p>
+          <p className="mt-1 font-semibold sm:text-lg">
+            <span aria-hidden="true">{best.marker} </span>
+            {best.letter}. {best.label}
+          </p>
+          {!choseBest && (
+            <p className="mt-2 leading-relaxed text-muted-foreground">{best.feedback.body}</p>
+          )}
         </div>
-      )}
-      {hasResults ? (
-        <ul className="mt-4 space-y-3" aria-label="Community results">
-          {poll.options.map((option) => {
-            const result = counts.get(option.id);
-            const percent = result?.percent ?? 0;
-            const count = result?.count ?? 0;
-            const mine = option.id === myVote;
-            return (
-              <li
-                key={option.id}
-                className={cn(
-                  "rounded-lg border px-4 py-3",
-                  mine ? "border-primary bg-primary/10" : "bg-background/40",
-                )}
-              >
-                <div className="flex items-start justify-between gap-3 text-sm sm:text-base">
-                  <span className="min-w-0">
-                    <span aria-hidden="true">{option.marker} </span>
-                    <strong className="font-semibold">{option.letter}.</strong> {option.label}
-                    {mine && (
-                      <span className="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/20 px-2 py-0.5 align-middle text-xs font-semibold text-primary">
-                        <Check className="h-3 w-3" aria-hidden="true" /> Your choice
-                      </span>
-                    )}
-                  </span>
-                  <span className="shrink-0 text-right">
-                    <strong className="font-mono">{percent}%</strong>
-                    <span className="block text-xs text-muted-foreground">
-                      {count.toLocaleString("en-US")} {count === 1 ? "vote" : "votes"}
-                    </span>
-                  </span>
-                </div>
-                <div
-                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-muted"
-                  role="img"
-                  aria-label={`${option.letter}: ${percent}% (${count} ${count === 1 ? "vote" : "votes"})`}
-                >
-                  <div
-                    className={cn(
-                      "h-full rounded-full transition-[width] duration-700 ease-out motion-reduce:transition-none",
-                      mine ? "bg-gradient-brand" : "bg-muted-foreground/50",
-                    )}
-                    style={{ width: grown ? `${percent}%` : "0%" }}
-                  />
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      ) : preview ? null : (
-        <p className="mt-4 text-sm text-muted-foreground">
-          Thanks — your vote is in. Community results will appear once the hosts reveal them.
-        </p>
       )}
 
       <aside
@@ -379,24 +323,153 @@ function Results({
           <Lightbulb className="h-5 w-5 text-teal" aria-hidden="true" />
           {poll.insight.title}
         </h3>
-        <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          {poll.insight.points.map((point) => (
-            <li key={point.text}>
-              {point.lead && <strong className="text-foreground">{point.lead}</strong>} {point.text}
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+          {poll.insight.intro}
+        </p>
+        <ul className="mt-4 space-y-3" aria-label="Insight for each option">
+          {poll.options.map((option) => (
+            <li
+              key={option.id}
+              className={cn(
+                "rounded-md border px-4 py-3 text-sm leading-relaxed sm:text-base",
+                option.id === myVote ? "border-primary/60 bg-primary/5" : "bg-background/40",
+              )}
+            >
+              <p className="font-semibold text-foreground">
+                <span aria-hidden="true">{option.marker} </span>
+                {option.letter}. {option.label}
+                {option.id === best?.id && (
+                  <span className="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-teal/20 px-2 py-0.5 align-middle text-xs font-semibold text-teal">
+                    <Check className="h-3 w-3" aria-hidden="true" /> Best answer
+                  </span>
+                )}
+                {option.id === myVote && (
+                  <span className="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-primary/20 px-2 py-0.5 align-middle text-xs font-semibold text-primary">
+                    <Check className="h-3 w-3" aria-hidden="true" /> Your choice
+                  </span>
+                )}
+              </p>
+              <p className="mt-1 text-muted-foreground">{option.insight}</p>
             </li>
           ))}
         </ul>
         <p className="mt-4 font-semibold text-foreground">{poll.insight.takeaway}</p>
       </aside>
       <p className="mt-5 text-center text-base font-semibold text-gradient">{poll.closing}</p>
-      {preview && (
-        <p className="mt-5 flex items-start gap-2 rounded-md bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
-          <BarChart3 className="mt-0.5 h-4 w-4 shrink-0 text-teal" aria-hidden="true" />
-          <span>
-            Community results aren’t open yet, so this answer wasn’t counted. Come back soon to vote
-            and see how other developers answered.
-          </span>
+      <p className="mt-5 text-center text-sm text-muted-foreground">
+        {preview
+          ? "Voting isn’t open yet, so this answer wasn’t counted."
+          : "Thanks — your vote is counted. The hosts will share the community results."}
+      </p>
+    </div>
+  );
+}
+
+/** Hosts only: the server releases the real community results for the correct PIN. */
+function HostResultsPanel({ poll }: { poll: EpisodePollContent }) {
+  const [open, setOpen] = useState(false);
+  const [pin, setPin] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [results, setResults] = useState<HostResults | null>(null);
+
+  async function load() {
+    if (!pin || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      setResults(await getHostResults(poll.slug, pin));
+    } catch (reason) {
+      setResults(null);
+      setError(reason instanceof Error ? reason.message : "Results are not available right now.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!open)
+    return (
+      <button
+        type="button"
+        className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+        onClick={() => setOpen(true)}
+      >
+        Host results
+      </button>
+    );
+
+  const counts = new Map((results?.results ?? []).map((result) => [result.optionId, result]));
+  return (
+    <div className="w-full rounded-lg border bg-background/50 p-4">
+      <form
+        className="flex flex-wrap items-end gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void load();
+        }}
+      >
+        <label className="text-sm font-semibold">
+          Host PIN
+          <input
+            type="password"
+            inputMode="numeric"
+            autoComplete="off"
+            value={pin}
+            onChange={(event) => setPin(event.target.value)}
+            className="mt-1 block h-9 w-28 rounded-md border bg-background px-3 text-base"
+          />
+        </label>
+        <Button type="submit" size="sm" disabled={!pin || busy}>
+          <BarChart3 aria-hidden="true" />
+          {busy ? "Loading…" : results ? "Refresh results" : "Show results"}
+        </Button>
+        <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(false)}>
+          Hide
+        </Button>
+      </form>
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {error}
         </p>
+      )}
+      {results && (
+        <>
+          <p className="mt-4 font-mono text-sm text-muted-foreground">
+            {results.total.toLocaleString("en-US")} {results.total === 1 ? "vote" : "votes"}
+          </p>
+          <ul className="mt-3 space-y-3" aria-label="Community results">
+            {poll.options.map((option) => {
+              const percent = counts.get(option.id)?.percent ?? 0;
+              const count = counts.get(option.id)?.count ?? 0;
+              return (
+                <li key={option.id} className="rounded-lg border bg-background/40 px-4 py-3">
+                  <div className="flex items-start justify-between gap-3 text-sm sm:text-base">
+                    <span className="min-w-0">
+                      <span aria-hidden="true">{option.marker} </span>
+                      <strong className="font-semibold">{option.letter}.</strong> {option.label}
+                    </span>
+                    <span className="shrink-0 text-right">
+                      <strong className="font-mono">{percent}%</strong>
+                      <span className="block text-xs text-muted-foreground">
+                        {count.toLocaleString("en-US")} {count === 1 ? "vote" : "votes"}
+                      </span>
+                    </span>
+                  </div>
+                  <div
+                    className="mt-2 h-2.5 overflow-hidden rounded-full bg-muted"
+                    role="img"
+                    aria-label={`${option.letter}: ${percent}% (${count} ${count === 1 ? "vote" : "votes"})`}
+                  >
+                    <div
+                      className="h-full rounded-full bg-gradient-brand"
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
     </div>
   );
