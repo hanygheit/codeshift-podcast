@@ -3,15 +3,17 @@
  *
  * Each poll is a row in the `polls` table with status `open` (seeded by a migration). The episode
  * page renders the copy below and reads/writes votes through `/api/polls`; option ids must match
- * the database record. Results are real aggregates and are shown only after a visitor votes.
+ * the database record. Votes are real and stored server-side; community results are visible to hosts only (results PIN).
  */
 export interface EpisodePollOption {
   id: string;
   letter: string;
   marker: string;
   label: string;
-  /** Shown to a visitor who picked this option: a short verdict and why (no scores). */
+  /** Shown to a visitor who picked this option: a short verdict and why. */
   feedback: { headline: string; body: string };
+  /** One-line takeaway for this option, listed for every option after answering. */
+  insight: string;
 }
 
 export interface EpisodePoll {
@@ -25,11 +27,9 @@ export interface EpisodePoll {
   subtitle: string;
   scenario: { context: string; quote: string; question: string };
   options: EpisodePollOption[];
-  insight: {
-    title: string;
-    points: { lead?: string; text: string }[];
-    takeaway: string;
-  };
+  /** The option the hosts consider the best answer; named explicitly after answering. */
+  bestOptionId: string;
+  insight: { title: string; intro: string; takeaway: string };
   closing: string;
   watchLabel: string;
   shareText: string;
@@ -58,6 +58,8 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
         headline: "Ambitious — but probably too early.",
         body: "Microservices let parts of a system scale and deploy independently, but they bring network calls, distributed data, and heavier deployment and monitoring from day one. With 1,000 users and unclear requirements, you pay that cost long before you need the benefit.",
       },
+      insight:
+        "Valuable when many teams must deploy and scale parts of a large system independently. For 1,000 users it adds cost and complexity before there is a need.",
     },
     {
       id: "b",
@@ -68,6 +70,8 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
         headline: "A strong, pragmatic starting point.",
         body: "One application with clear module boundaries is simple to build and change, and you can split out services later if real load or team growth demands it. Just confirm the requirements actually point here before you commit.",
       },
+      insight:
+        "Usually the best architecture to start building with: simple to run, and easy to split later. It is the right second step, after the requirements are clear.",
     },
     {
       id: "c",
@@ -78,6 +82,8 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
         headline: "Powerful — but it solves a problem you don’t have yet.",
         body: "Kubernetes is great for running many services at scale, but it adds real operational work. For 1,000 users, a managed platform or a simple deployment is usually enough; adopt Kubernetes when your deployment needs justify it.",
       },
+      insight:
+        "A deployment platform, not an architecture. Worth adopting once you run many services at real scale, not on day one.",
     },
     {
       id: "d",
@@ -88,26 +94,15 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
         headline: "That’s the architect’s mindset.",
         body: "Traffic, growth, availability targets, budget and team skills decide the architecture. “We might reach 1 million” is a possibility, not a requirement — clarify it before you choose any technology.",
       },
+      insight:
+        "The best first decision. Real requirements, traffic, availability targets, budget and team skills decide everything that follows.",
     },
   ],
+  bestOptionId: "d",
   insight: {
     title: "Architecture Insight",
-    points: [
-      {
-        text: "Before selecting an architecture, clarify the real requirements, expected traffic, growth patterns, availability targets, budget, and team capabilities.",
-      },
-      {
-        lead: "D — Ask more questions",
-        text: "demonstrates the strongest architectural thinking at this stage.",
-      },
-      {
-        lead: "B — Modular Monolith",
-        text: "could be an excellent starting architecture once the requirements justify it.",
-      },
-      {
-        text: "Microservices and Kubernetes may become useful, but they aren’t automatically necessary because a system might eventually serve 1 million users.",
-      },
-    ],
+    intro:
+      "Before selecting an architecture, clarify the real requirements, expected traffic, growth patterns, availability targets, budget, and team capabilities. Here is how each choice holds up:",
     takeaway: "Great architecture starts with questions, not technologies.",
   },
   closing: "There is no one-size-fits-all architecture. Context and trade-offs matter!",

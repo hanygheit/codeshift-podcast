@@ -2,8 +2,8 @@ import type { PollOptionResult } from "@/lib/poll-results";
 
 /**
  * Browser client for always-open episode polls. Votes go through `/api/polls`, which stores them
- * server-side (see episode-poll-store.server.ts): one vote per browser, per-network caps, real
- * aggregate results returned only after voting. When the server has no vote store configured it
+ * server-side (see episode-poll-store.server.ts): one vote per browser, per-network caps, community
+ * results are never sent to visitors, only to hosts who enter the results PIN. When the server has no vote store configured it
  * answers `notReady`, and the page falls back to its insight-only mode.
  */
 export type OpenPollStatus = "draft" | "live" | "open" | "closed";
@@ -88,4 +88,28 @@ export function castOpenPollVote(slug: string, optionId: string): Promise<OpenPo
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ operation: "episode-vote", slug, optionId }),
   });
+}
+
+export type HostResults = { total: number; results: PollOptionResult[] };
+
+/** Host-only: real community results, released by the server for the correct PIN. */
+export async function getHostResults(slug: string, pin: string): Promise<HostResults> {
+  let response: Response;
+  try {
+    response = await fetch("/api/polls", {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operation: "episode-results", slug, pin }),
+    });
+  } catch {
+    throw new OpenPollError("We couldn’t reach the server. Try again.", "offline");
+  }
+  const reply = (await response.json().catch(() => ({}))) as Partial<HostResults> & {
+    notReady?: boolean;
+  };
+  if (response.status === 401) throw new OpenPollError("That PIN is not correct.", "invalid");
+  if (!response.ok || reply.notReady || !Array.isArray(reply.results))
+    throw new OpenPollError("Results are not available right now.", "unavailable");
+  return { total: reply.total ?? 0, results: reply.results };
 }

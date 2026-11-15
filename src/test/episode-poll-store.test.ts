@@ -62,35 +62,46 @@ describe("episode poll vote store", () => {
     expect(reply.body).toEqual({ poll: { slug: POLL.slug, status: "open" } });
   });
 
-  it("stores a vote and answers with real counts", async () => {
+  it("stores votes, never sends results to voters, and gives hosts the real counts", async () => {
     const first = await newVisitor();
     const second = await newVisitor("198.51.100.4");
     await store.vote(req(first), POLL.slug, "d");
     const reply = await store.vote(req(second, "198.51.100.4"), POLL.slug, "b");
     expect(reply.status).toBe(200);
-    expect(reply.body).toMatchObject({ voted: true, myVote: "b", total: 2 });
-    expect(reply.body["results"]).toEqual(
-      expect.arrayContaining([
+    expect(reply.body).toEqual({
+      poll: { slug: POLL.slug, status: "open" },
+      myVote: "b",
+      voted: true,
+    });
+
+    const host = await store.hostResults(POLL.slug);
+    expect(host.body).toEqual({
+      total: 2,
+      results: [
+        { optionId: "a", count: 0, percent: 0 },
         { optionId: "b", count: 1, percent: 50 },
+        { optionId: "c", count: 0, percent: 0 },
         { optionId: "d", count: 1, percent: 50 },
-      ]),
-    );
+      ],
+    });
+    expect((await store.hostResults("nope")).status).toBe(404);
   });
 
   it("keeps the first vote and reports it when the same browser votes again", async () => {
     const cookie = await newVisitor();
     await store.vote(req(cookie), POLL.slug, "a");
     const again = await store.vote(req(cookie), POLL.slug, "c");
-    expect(again.body).toMatchObject({ alreadyVoted: true, myVote: "a", total: 1 });
+    expect(again.body).toMatchObject({ alreadyVoted: true, myVote: "a" });
+    expect(again.body).not.toHaveProperty("results");
     expect([...storage.objects.keys()].filter((p) => p.includes("/options/c/"))).toHaveLength(0);
   });
 
-  it("restores the vote and results after a refresh", async () => {
+  it("restores the visitor's own vote after a refresh, without results", async () => {
     const cookie = await newVisitor();
     await store.vote(req(cookie), POLL.slug, "d");
     const reply = await store.state(req(cookie), POLL.slug);
     expect(reply.setCookie).toBeUndefined();
-    expect(reply.body).toMatchObject({ myVote: "d", total: 1 });
+    expect(reply.body).toEqual({ poll: { slug: POLL.slug, status: "open" }, myVote: "d" });
   });
 
   it("only one of two simultaneous votes from the same browser counts", async () => {
@@ -167,6 +178,18 @@ describe("/api/polls episode poll endpoints", () => {
       }),
     });
     expect(await post.json()).toMatchObject({ notReady: true });
+
+    const results = (pin: unknown) =>
+      handlers.POST({
+        request: new Request(`${SITE}/api/polls`, {
+          method: "POST",
+          headers: { origin: SITE, "content-type": "application/json" },
+          body: JSON.stringify({ operation: "episode-results", slug: POLL.slug, pin }),
+        }),
+      });
+    expect((await results("0000")).status).toBe(401);
+    expect((await results(undefined)).status).toBe(401);
+    expect((await results("1405")).status).toBe(200);
     vi.unstubAllEnvs();
   });
 });
