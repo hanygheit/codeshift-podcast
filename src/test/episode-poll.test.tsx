@@ -77,6 +77,15 @@ describe("EpisodePoll", () => {
     expect(screen.getByText(POLL.insight.takeaway)).toBeInTheDocument();
     expect(screen.getByText(POLL.closing)).toBeInTheDocument();
     expect(screen.getByText(/your vote is counted/)).toBeInTheDocument();
+    expect(items[1]).toHaveTextContent("Strong next step");
+    expect(items[0]).toHaveTextContent("Too early");
+    expect(
+      within(screen.getByRole("list", { name: "Questions to ask" })).getAllByRole("listitem"),
+    ).toHaveLength(POLL.questions.items.length);
+    expect(screen.getByRole("button", { name: /Challenge a Friend/ })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: /Watch EP004: Inside Software Architecture/ }),
+    ).toHaveLength(1);
     expect(screen.queryByRole("list", { name: "Community results" })).not.toBeInTheDocument();
     expect(screen.queryByText(/\d+%/)).not.toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();

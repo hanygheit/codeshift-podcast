@@ -5,6 +5,8 @@
  * page renders the copy below and reads/writes votes through `/api/polls`; option ids must match
  * the database record. Votes are real and stored server-side; community results are visible to hosts only (results PIN).
  */
+export type EpisodePollTone = "best" | "strong" | "early";
+
 export interface EpisodePollOption {
   id: string;
   letter: string;
@@ -12,6 +14,8 @@ export interface EpisodePollOption {
   label: string;
   /** Shown to a visitor who picked this option: a short verdict and why. */
   feedback: { headline: string; body: string };
+  /** Short verdict tag shown next to the option after answering. */
+  verdict: { label: string; tone: EpisodePollTone };
   /** One-line takeaway for this option, listed for every option after answering. */
   insight: string;
 }
@@ -29,6 +33,8 @@ export interface EpisodePoll {
   options: EpisodePollOption[];
   /** The option the hosts consider the best answer; named explicitly after answering. */
   bestOptionId: string;
+  /** What an architect clarifies before choosing; shown after answering. */
+  questions: { title: string; items: { topic: string; question: string }[] };
   insight: { title: string; intro: string; takeaway: string };
   closing: string;
   watchLabel: string;
@@ -51,6 +57,7 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
   options: [
     {
       id: "a",
+      verdict: { label: "Too early", tone: "early" },
       letter: "A",
       marker: "🚀",
       label: "Start with Microservices for maximum scalability.",
@@ -63,6 +70,7 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
     },
     {
       id: "b",
+      verdict: { label: "Strong next step", tone: "strong" },
       letter: "B",
       marker: "🏗️",
       label: "Start with a Modular Monolith and evolve when needed.",
@@ -75,6 +83,7 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
     },
     {
       id: "c",
+      verdict: { label: "Too early", tone: "early" },
       letter: "C",
       marker: "☁️",
       label: "Build on Kubernetes from day one.",
@@ -87,6 +96,7 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
     },
     {
       id: "d",
+      verdict: { label: "Best answer", tone: "best" },
       letter: "D",
       marker: "🤔",
       label: "Ask more questions before choosing the architecture.",
@@ -99,10 +109,20 @@ export const EP004_ARCHITECTURE_POLL: EpisodePoll = {
     },
   ],
   bestOptionId: "d",
+  questions: {
+    title: "Ask these before you choose",
+    items: [
+      { topic: "Requirements", question: "What must the system actually do first?" },
+      { topic: "Traffic", question: "How many users and requests, today and at peak?" },
+      { topic: "Growth", question: "How fast is it expected to grow — and how sure is that?" },
+      { topic: "Availability", question: "How much downtime can the business accept?" },
+      { topic: "Budget", question: "What can we afford to build and to run?" },
+      { topic: "Team", question: "What can this team build and operate well?" },
+    ],
+  },
   insight: {
-    title: "Architecture Insight",
-    intro:
-      "Before selecting an architecture, clarify the real requirements, expected traffic, growth patterns, availability targets, budget, and team capabilities. Here is how each choice holds up:",
+    title: "How each option holds up",
+    intro: "Every choice has a place — the question is when.",
     takeaway: "Great architecture starts with questions, not technologies.",
   },
   closing: "There is no one-size-fits-all architecture. Context and trade-offs matter!",
